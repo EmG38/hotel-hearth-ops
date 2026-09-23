@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import type { RoomType } from "@/lib/hotel-types";
 import { isBlocked, isSellable, statusMeta } from "@/lib/room-status";
-import { Card, Chip, EmptyState, PageHeader, Select, StatTile } from "@/components/ui-kit";
+import { Card, Chip, EmptyState, Select, StatTile } from "@/components/ui-kit";
+import { PageHero } from "@/components/PageHero";
 import { StatusLegend } from "@/components/StatusLegend";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
@@ -51,7 +52,9 @@ function AvailabilityBoard() {
 
   return (
     <>
-      <PageHeader
+      <PageHero
+        ghostIcon="vpn_key"
+        eyebrow="Reception"
         title="Availability Board"
         subtitle="Out of Order and Out of Service rooms are excluded from the sellable count"
         actions={
@@ -60,33 +63,33 @@ function AvailabilityBoard() {
             {showAll ? "Showing all statuses" : "Ready rooms only"}
           </Chip>
         }
-      />
-
-      <Card className="mb-5 flex flex-wrap items-center gap-6 p-5">
-        <div>
-          <p className="text-display text-primary">
-            {sellable.length}
-            <span className="text-headline text-on-surface-subtle"> of {rooms.length}</span>
-          </p>
-          <p className="text-label uppercase text-on-surface-variant">Rooms sellable now</p>
+      >
+        <div className="flex flex-wrap items-center gap-6">
+          <div>
+            <p className="text-display text-primary">
+              {sellable.length}
+              <span className="text-headline text-on-surface-subtle"> of {rooms.length}</span>
+            </p>
+            <p className="text-label uppercase text-on-surface-variant">Rooms sellable now</p>
+          </div>
+          <div className="grid flex-1 gap-3 sm:grid-cols-3">
+            {ROOM_TYPES.map((t) => {
+              const all = rooms.filter((r) => r.type === t);
+              return (
+                <StatTile
+                  key={t}
+                  label={t}
+                  value={all.filter(isSellable).length}
+                  unit={`/ ${all.length}`}
+                  icon={t === "Suite" ? "king_bed" : t === "Deluxe" ? "bed" : "single_bed"}
+                  tone="success"
+                  hint={`${all.filter(isBlocked).length} blocked`}
+                />
+              );
+            })}
+          </div>
         </div>
-        <div className="grid flex-1 gap-3 sm:grid-cols-3">
-          {ROOM_TYPES.map((t) => {
-            const all = rooms.filter((r) => r.type === t);
-            return (
-              <StatTile
-                key={t}
-                label={t}
-                value={all.filter(isSellable).length}
-                unit={`/ ${all.length}`}
-                icon={t === "Suite" ? "king_bed" : t === "Deluxe" ? "bed" : "single_bed"}
-                tone="success"
-                hint={`${all.filter(isBlocked).length} blocked`}
-              />
-            );
-          })}
-        </div>
-      </Card>
+      </PageHero>
 
       <Card className="mb-5 p-4">
         <div className="flex flex-wrap items-end gap-3">
@@ -180,7 +183,11 @@ function AvailabilityBoard() {
                                     : "border-oos/40 bg-oos/15 text-on-surface-variant",
                                 )}
                               >
-                                {f === "ooo" ? "Out of Order" : f === "oos" ? "Out of Service" : "DND"}
+                                {f === "ooo"
+                                  ? "Out of Order"
+                                  : f === "oos"
+                                    ? "Out of Service"
+                                    : "DND"}
                               </span>
                             ))
                           )}

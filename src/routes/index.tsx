@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room, RoomStatus } from "@/lib/hotel-types";
 import { STATUS_ORDER, statusMeta } from "@/lib/room-status";
-import { Card, Chip, PageHeader, Select, StatTile } from "@/components/ui-kit";
+import { Card, Chip, Select, StatTile } from "@/components/ui-kit";
+import { PageHero } from "@/components/PageHero";
 import { RoomTile } from "@/components/RoomTile";
 import { StatusLegend } from "@/components/StatusLegend";
 import { AssignPanel } from "@/components/supervisor/AssignPanel";
@@ -78,31 +79,33 @@ function PropertyBoard() {
 
   return (
     <>
-      <PageHeader
+      <PageHero
+        ghostIcon="apartment"
+        eyebrow="Supervisor"
         title="Property Board"
         subtitle={`${rooms.length} rooms · ${filtered.length} shown · ${rooms.filter((r) => r.rush).length} rush flagged`}
-      />
-
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {STATUS_ORDER.map((s) => (
-          <StatTile
-            key={s}
-            label={statusMeta[s].label}
-            value={counts[s] ?? 0}
-            icon={statusMeta[s].icon}
-            tone={
-              s === "dirty"
-                ? "error"
-                : s === "in_progress"
-                  ? "warning"
-                  : s === "clean"
-                    ? "info"
-                    : "success"
-            }
-            hint={`${Math.round(((counts[s] ?? 0) / rooms.length) * 100)}% of property`}
-          />
-        ))}
-      </div>
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {STATUS_ORDER.map((s) => (
+            <StatTile
+              key={s}
+              label={statusMeta[s].label}
+              value={counts[s] ?? 0}
+              icon={statusMeta[s].icon}
+              tone={
+                s === "dirty"
+                  ? "error"
+                  : s === "in_progress"
+                    ? "warning"
+                    : s === "clean"
+                      ? "info"
+                      : "success"
+              }
+              hint={`${Math.round(((counts[s] ?? 0) / rooms.length) * 100)}% of property`}
+            />
+          ))}
+        </div>
+      </PageHero>
 
       <Card className="mb-5 p-4">
         <div className="flex flex-wrap items-end gap-3">
