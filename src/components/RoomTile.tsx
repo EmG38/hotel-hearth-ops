@@ -22,7 +22,9 @@ export function RoomTile({
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-start gap-1 rounded-xl border p-2.5 text-left transition-colors",
+        "relative flex flex-col items-start gap-1 rounded-xl border p-2.5 text-left transition-all duration-150",
+        "hover:-translate-y-0.5 hover:shadow-soft active:scale-[0.97] active:translate-y-0",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
         blocked
           ? room.flags.includes("ooo")
             ? "border-ooo/40 bg-ooo/10 hover:bg-ooo/15"
@@ -50,11 +52,7 @@ export function RoomTile({
 
       {blocked && (
         <span className="text-label-sm flex items-center gap-1 text-on-surface-variant">
-          <Icon
-            name={flagMeta[room.flags.includes("ooo") ? "ooo" : "oos"].icon}
-            size={13}
-            filled
-          />
+          <Icon name={flagMeta[room.flags.includes("ooo") ? "ooo" : "oos"].icon} size={13} filled />
           {room.flags.includes("ooo") ? "OOO" : "OOS"}
         </span>
       )}

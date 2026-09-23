@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import { Avatar, Button, Card, Chip, EmptyState, PageHeader, StatTile } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
@@ -148,14 +149,28 @@ function IssueTriage() {
                       <Button
                         variant="outline"
                         icon="do_not_disturb_on"
-                        onClick={() => room && toggleFlag(room.id, "oos")}
+                        onClick={() => {
+                          if (!room) return;
+                          const willAdd = !room.flags.includes("oos");
+                          toggleFlag(room.id, "oos");
+                          toast(
+                            `Room ${room.number} ${willAdd ? "marked Out of Service" : "cleared from Out of Service"}`,
+                          );
+                        }}
                       >
                         {room?.flags.includes("oos") ? "Clear Out of Service" : "Out of Service"}
                       </Button>
                       <Button
                         variant="outline"
                         icon="build"
-                        onClick={() => room && toggleFlag(room.id, "ooo")}
+                        onClick={() => {
+                          if (!room) return;
+                          const willAdd = !room.flags.includes("ooo");
+                          toggleFlag(room.id, "ooo");
+                          toast(
+                            `Room ${room.number} ${willAdd ? "marked Out of Order" : "cleared from Out of Order"}`,
+                          );
+                        }}
                       >
                         {room?.flags.includes("ooo") ? "Clear Out of Order" : "Out of Order"}
                       </Button>
@@ -165,7 +180,12 @@ function IssueTriage() {
                     <Button
                       variant="primary"
                       icon="handyman"
-                      onClick={() => setIssueStatus(issue.id, "maintenance")}
+                      onClick={() => {
+                        setIssueStatus(issue.id, "maintenance");
+                        toast(`"${issue.title}" assigned to maintenance`, {
+                          icon: <Icon name="handyman" size={18} filled />,
+                        });
+                      }}
                     >
                       Assign to maintenance
                     </Button>
@@ -173,7 +193,12 @@ function IssueTriage() {
                     <Button
                       variant="success"
                       icon="task_alt"
-                      onClick={() => setIssueStatus(issue.id, "resolved")}
+                      onClick={() => {
+                        setIssueStatus(issue.id, "resolved");
+                        toast.success(`"${issue.title}" marked resolved`, {
+                          icon: <Icon name="task_alt" size={18} filled />,
+                        });
+                      }}
                     >
                       Mark resolved
                     </Button>

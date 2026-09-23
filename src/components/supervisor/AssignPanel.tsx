@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { SidePanel } from "../SidePanel";
 import { Avatar, Button, Chip, FlagChip, StatusChip } from "../ui-kit";
 import { Icon } from "../Icon";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room, RoomStatus } from "@/lib/hotel-types";
-import { STATUS_ORDER, statusMeta } from "@/lib/room-status";
+import { STATUS_ORDER, flagMeta, statusMeta } from "@/lib/room-status";
 import { cn } from "@/lib/utils";
 
 export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () => void }) {
@@ -31,7 +32,13 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
             icon="assignment_ind"
             disabled={!selected || selected === room.attendantId}
             onClick={() => {
-              if (selected) assignRoom(room.id, selected);
+              if (selected) {
+                assignRoom(room.id, selected);
+                const name = staff.find((s) => s.id === selected)?.name ?? "attendant";
+                toast.success(`Room ${room.number} assigned to ${name}`, {
+                  icon: <Icon name="assignment_ind" size={18} filled />,
+                });
+              }
               onClose();
             }}
           >
@@ -79,7 +86,9 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
                         {s.shift} shift · {load} open {load === 1 ? "room" : "rooms"}
                       </span>
                     </span>
-                    {active && <Icon name="check_circle" size={20} filled className="text-primary" />}
+                    {active && (
+                      <Icon name="check_circle" size={20} filled className="text-primary" />
+                    )}
                   </button>
                 </li>
               );
@@ -94,7 +103,13 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
               <Chip
                 key={s}
                 active={room.status === s}
-                onClick={() => setRoomStatus(room.id, s)}
+                onClick={() => {
+                  if (room.status === s) return;
+                  setRoomStatus(room.id, s);
+                  toast(`Room ${room.number} marked ${statusMeta[s].label}`, {
+                    icon: <Icon name={statusMeta[s].icon} size={18} filled />,
+                  });
+                }}
               >
                 <Icon name={statusMeta[s].icon} size={14} filled />
                 {statusMeta[s].short}
@@ -106,18 +121,39 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
         <section>
           <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Flags</p>
           <div className="flex flex-wrap gap-1.5">
-            <Chip active={room.rush} onClick={() => toggleRush(room.id)}>
+            <Chip
+              active={room.rush}
+              onClick={() => {
+                const next = !room.rush;
+                toggleRush(room.id);
+                toast(
+                  next
+                    ? `Room ${room.number} flagged Rush`
+                    : `Rush flag removed from Room ${room.number}`,
+                  {
+                    icon: <Icon name="star" size={18} filled />,
+                  },
+                );
+              }}
+            >
               <Icon name="star" size={14} filled /> Rush
             </Chip>
-            <Chip active={room.flags.includes("ooo")} onClick={() => toggleFlag(room.id, "ooo")}>
-              <Icon name="build" size={14} filled /> Out of Order
-            </Chip>
-            <Chip active={room.flags.includes("oos")} onClick={() => toggleFlag(room.id, "oos")}>
-              <Icon name="do_not_disturb_on" size={14} filled /> Out of Service
-            </Chip>
-            <Chip active={room.flags.includes("dnd")} onClick={() => toggleFlag(room.id, "dnd")}>
-              <Icon name="bedtime" size={14} filled /> DND
-            </Chip>
+            {(["ooo", "oos", "dnd"] as const).map((flag) => (
+              <Chip
+                key={flag}
+                active={room.flags.includes(flag)}
+                onClick={() => {
+                  const willAdd = !room.flags.includes(flag);
+                  toggleFlag(room.id, flag);
+                  toast(
+                    `${flagMeta[flag].label} ${willAdd ? "added to" : "cleared from"} Room ${room.number}`,
+                    { icon: <Icon name={flagMeta[flag].icon} size={18} filled /> },
+                  );
+                }}
+              >
+                <Icon name={flagMeta[flag].icon} size={14} filled /> {flagMeta[flag].label}
+              </Chip>
+            ))}
           </div>
         </section>
 

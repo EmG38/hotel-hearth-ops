@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
-import { Avatar, Button, Card, EmptyState, PageHeader, StatTile, inputClass } from "@/components/ui-kit";
+import {
+  Avatar,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  StatTile,
+  inputClass,
+} from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +132,13 @@ function InspectionCard({ roomId }: { roomId: string }) {
               variant="danger"
               icon="undo"
               disabled={note.trim().length === 0}
-              onClick={() => setRoomStatus(room.id, "in_progress", `Rejected: ${note.trim()}`)}
+              onClick={() => {
+                setRoomStatus(room.id, "in_progress", `Rejected: ${note.trim()}`);
+                toast(`Room ${room.number} sent back to In Progress`, {
+                  description: attendant ? `Note sent to ${attendant.name}` : undefined,
+                  icon: <Icon name="undo" size={18} filled />,
+                });
+              }}
             >
               Reject to In Progress
             </Button>
@@ -131,7 +146,13 @@ function InspectionCard({ roomId }: { roomId: string }) {
               variant="outline"
               icon="cleaning_services"
               disabled={note.trim().length === 0}
-              onClick={() => setRoomStatus(room.id, "dirty", `Rejected: ${note.trim()}`)}
+              onClick={() => {
+                setRoomStatus(room.id, "dirty", `Rejected: ${note.trim()}`);
+                toast(`Room ${room.number} sent back to Dirty`, {
+                  description: attendant ? `Note sent to ${attendant.name}` : undefined,
+                  icon: <Icon name="cleaning_services" size={18} filled />,
+                });
+              }}
             >
               Reject to Dirty
             </Button>
@@ -145,7 +166,12 @@ function InspectionCard({ roomId }: { roomId: string }) {
               variant="success"
               icon="verified"
               disabled={!allChecked}
-              onClick={() => setRoomStatus(room.id, "inspected", "Inspection passed")}
+              onClick={() => {
+                setRoomStatus(room.id, "inspected", "Inspection passed");
+                toast.success(`Room ${room.number} passed — ready to sell`, {
+                  icon: <Icon name="verified" size={18} filled />,
+                });
+              }}
             >
               Pass inspection
             </Button>
@@ -171,7 +197,12 @@ function InspectionQueue() {
       />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <StatTile label="Awaiting inspection" value={queue.length} icon="search_check" tone="info" />
+        <StatTile
+          label="Awaiting inspection"
+          value={queue.length}
+          icon="search_check"
+          tone="info"
+        />
         <StatTile
           label="Rush in queue"
           value={queue.filter((r) => r.rush).length}

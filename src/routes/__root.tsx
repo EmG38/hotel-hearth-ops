@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { HotelProvider } from "../lib/hotel-store";
 import { AppShell } from "../components/AppShell";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -135,6 +136,7 @@ function RootComponent() {
           {/* Required: nested routes render here. */}
           <Outlet />
         </AppShell>
+        <Toaster position="bottom-right" richColors closeButton expand={false} />
       </HotelProvider>
     </QueryClientProvider>
   );

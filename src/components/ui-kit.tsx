@@ -29,7 +29,8 @@ export function Button({
     <button
       {...rest}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-label transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-label transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
         buttonVariants[variant],
         className,
       )}
@@ -52,7 +53,8 @@ export function Chip({
     <button
       {...rest}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-label transition-colors",
+        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-label transition-all duration-150 active:scale-[0.96]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
         active
           ? "border-primary bg-primary text-on-primary"
           : "border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container",
@@ -195,7 +197,9 @@ export function Field({
     <label className="block">
       <span className="text-label-sm uppercase text-on-surface-subtle">{label}</span>
       <div className="mt-1.5">{children}</div>
-      {hint ? <span className="text-label-sm mt-1 block text-on-surface-subtle">{hint}</span> : null}
+      {hint ? (
+        <span className="text-label-sm mt-1 block text-on-surface-subtle">{hint}</span>
+      ) : null}
     </label>
   );
 }
@@ -203,9 +207,6 @@ export function Field({
 export const inputClass =
   "w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:border-primary focus:ring-2 focus:ring-primary/20";
 
-export function Select({
-  className,
-  ...rest
-}: React.SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({ className, ...rest }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...rest} className={cn(inputClass, "appearance-none pr-8", className)} />;
 }

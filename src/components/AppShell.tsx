@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
+import { GlobalSearch } from "./GlobalSearch";
 import { useHotel } from "@/lib/hotel-store";
 import type { Role } from "@/lib/hotel-types";
 import logoAsset from "@/assets/hotel-logo.png.asset.json";
@@ -43,7 +44,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
             onClick={() => setRole(s.role)}
             title={s.label}
             className={cn(
-              "grid h-9 place-items-center rounded-full",
+              "grid h-9 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               role === s.role
                 ? "bg-primary text-on-primary"
                 : "text-on-surface-variant hover:bg-surface-container",
@@ -62,7 +63,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
           key={s.role}
           onClick={() => setRole(s.role)}
           className={cn(
-            "text-label flex-1 rounded-full px-2 py-1.5 transition-colors",
+            "text-label flex-1 rounded-full px-2 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             role === s.role
               ? "bg-surface-container-lowest text-on-surface shadow-soft"
               : "text-on-surface-variant",
@@ -102,8 +103,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
 
       <nav className="flex-1 overflow-y-auto">
         {navSections.map((section) => {
-          const active =
-            section.role === role || section.items.some((i) => i.to === pathname);
+          const active = section.role === role || section.items.some((i) => i.to === pathname);
           return (
             <div key={section.role} className={cn("mb-2", !active && "opacity-45")}>
               {!collapsed && (
@@ -120,7 +120,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
                         to={item.to}
                         title={item.label}
                         className={cn(
-                          "text-body flex items-center gap-3 rounded-full px-3 py-2 transition-colors",
+                          "text-body flex items-center gap-3 rounded-full px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                           collapsed && "justify-center px-0",
                           isActive
                             ? "bg-primary-container font-semibold text-secondary"
@@ -158,17 +158,7 @@ function TopBar() {
   const rush = rooms.filter((r) => r.rush).length;
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-outline-variant bg-surface-container-lowest px-4 md:px-6">
-      <div className="relative w-full max-w-sm">
-        <Icon
-          name="search"
-          size={18}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-subtle"
-        />
-        <input
-          placeholder="Search room, guest or reservation"
-          className="text-body w-full rounded-full border border-outline-variant bg-surface-container py-2 pl-10 pr-3 text-on-surface outline-none placeholder:text-on-surface-subtle focus:border-primary focus:bg-surface-container-lowest"
-        />
-      </div>
+      <GlobalSearch />
 
       <div className="ml-auto flex items-center gap-3">
         <span className="text-label hidden items-center gap-1.5 rounded-full border border-warning/20 bg-warning/10 px-3 py-1.5 text-warning sm:inline-flex">

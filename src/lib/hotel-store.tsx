@@ -23,6 +23,12 @@ interface HotelState {
   staff: Staff[];
   issues: Issue[];
   reservations: Reservation[];
+  /** Set by global search to ask the Property Board to open a room's panel on next render. */
+  focusRoomId: string | null;
+  setFocusRoomId: (id: string | null) => void;
+  /** Set by global search to ask Check-In to pre-select a reservation on next render. */
+  focusReservationId: string | null;
+  setFocusReservationId: (id: string | null) => void;
   roomById: (id: string | null) => Room | undefined;
   staffById: (id: string | null) => Staff | undefined;
   workload: (staffId: string) => number;
@@ -46,6 +52,8 @@ export function HotelProvider({ children }: { children: ReactNode }) {
   const [staff] = useState<Staff[]>(seedStaff);
   const [issues, setIssues] = useState<Issue[]>(seedIssues);
   const [reservations, setReservations] = useState<Reservation[]>(seedReservations);
+  const [focusRoomId, setFocusRoomId] = useState<string | null>(null);
+  const [focusReservationId, setFocusReservationId] = useState<string | null>(null);
 
   const patchRoom = useCallback((roomId: string, patch: (r: Room) => Room) => {
     setRooms((prev) => prev.map((r) => (r.id === roomId ? patch(r) : r)));
@@ -59,6 +67,10 @@ export function HotelProvider({ children }: { children: ReactNode }) {
       staff,
       issues,
       reservations,
+      focusRoomId,
+      setFocusRoomId,
+      focusReservationId,
+      setFocusReservationId,
       roomById: (id) => (id ? rooms.find((r) => r.id === id) : undefined),
       staffById: (id) => (id ? staff.find((s) => s.id === id) : undefined),
       workload: (staffId) =>
@@ -93,7 +105,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
           prev.map((b) => (b.id === reservationId ? { ...b, ...times } : b)),
         ),
     };
-  }, [role, rooms, staff, issues, reservations, patchRoom]);
+  }, [role, rooms, staff, issues, reservations, patchRoom, focusRoomId, focusReservationId]);
 
   return <HotelContext.Provider value={value}>{children}</HotelContext.Provider>;
 }

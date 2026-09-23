@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room, RoomStatus } from "@/lib/hotel-types";
 import { STATUS_ORDER, statusMeta } from "@/lib/room-status";
@@ -15,12 +15,14 @@ export const Route = createFileRoute("/")({
       { title: "Property Board — Hotel App" },
       {
         name: "description",
-        content: "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
+        content:
+          "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
       },
       { property: "og:title", content: "Property Board — Hotel App" },
       {
         property: "og:description",
-        content: "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
+        content:
+          "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
       },
     ],
   }),
@@ -30,7 +32,7 @@ export const Route = createFileRoute("/")({
 const ROOM_TYPES = ["Standard", "Deluxe", "Suite"] as const;
 
 function PropertyBoard() {
-  const { rooms, staff } = useHotel();
+  const { rooms, staff, focusRoomId, setFocusRoomId } = useHotel();
   const [floor, setFloor] = useState<string>("all");
   const [status, setStatus] = useState<RoomStatus | "all">("all");
   const [attendant, setAttendant] = useState<string>("all");
@@ -60,6 +62,20 @@ function PropertyBoard() {
   const [selected, setSelected] = useState<Room | null>(null);
   const floors = [5, 4, 3, 2, 1];
 
+  useEffect(() => {
+    if (!focusRoomId) return;
+    const room = rooms.find((r) => r.id === focusRoomId);
+    if (room) {
+      setSelected(room);
+      setFloor("all");
+      setStatus("all");
+      setAttendant("all");
+      setRushOnly(false);
+    }
+    setFocusRoomId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRoomId]);
+
   return (
     <>
       <PageHeader
@@ -75,7 +91,13 @@ function PropertyBoard() {
             value={counts[s] ?? 0}
             icon={statusMeta[s].icon}
             tone={
-              s === "dirty" ? "error" : s === "in_progress" ? "warning" : s === "clean" ? "info" : "success"
+              s === "dirty"
+                ? "error"
+                : s === "in_progress"
+                  ? "warning"
+                  : s === "clean"
+                    ? "info"
+                    : "success"
             }
             hint={`${Math.round(((counts[s] ?? 0) / rooms.length) * 100)}% of property`}
           />

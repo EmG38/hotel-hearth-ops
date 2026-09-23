@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Icon } from "./Icon";
 
 export function SidePanel({
@@ -16,15 +16,24 @@ export function SidePanel({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
-        className="absolute inset-0 bg-on-surface/30 backdrop-blur-[1px]"
+        className="animate-in fade-in absolute inset-0 bg-on-surface/30 backdrop-blur-[1px] duration-200"
         onClick={onClose}
         role="presentation"
       />
-      <div className="relative flex h-full w-full max-w-md flex-col border-l border-outline-variant bg-surface-container-lowest shadow-raised">
+      <div className="animate-in slide-in-from-right fill-mode-both relative flex h-full w-full max-w-md flex-col border-l border-outline-variant bg-surface-container-lowest shadow-raised duration-300 ease-out">
         <div className="flex items-start gap-3 border-b border-outline-variant p-4">
           <div className="min-w-0 flex-1">
             <h2 className="text-title-lg text-on-surface">{title}</h2>
@@ -34,7 +43,7 @@ export function SidePanel({
           </div>
           <button
             onClick={onClose}
-            className="grid size-9 place-items-center rounded-full text-on-surface-variant hover:bg-surface-container"
+            className="grid size-9 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Close panel"
           >
             <Icon name="close" size={20} />

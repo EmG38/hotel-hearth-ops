@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import type { Reservation, Room } from "@/lib/hotel-types";
 import { isBlocked, isSellable, statusMeta } from "@/lib/room-status";
@@ -49,7 +50,9 @@ function ReservationRow({
       onClick={onClick}
       className={cn(
         "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-        active ? "border-primary bg-primary-container" : "border-outline-variant hover:bg-surface-container",
+        active
+          ? "border-primary bg-primary-container"
+          : "border-outline-variant hover:bg-surface-container",
       )}
     >
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-tertiary/10 text-tertiary">
@@ -58,11 +61,13 @@ function ReservationRow({
       <span className="min-w-0 flex-1">
         <span className="text-body flex items-center gap-1.5 font-medium text-on-surface">
           <span className="truncate">{reservation.guestName}</span>
-          {reservation.vip && <Icon name="workspace_premium" size={15} filled className="text-secondary" />}
+          {reservation.vip && (
+            <Icon name="workspace_premium" size={15} filled className="text-secondary" />
+          )}
         </span>
         <span className="text-label-sm block text-on-surface-subtle">
-          {reservation.code} · {reservation.roomType} · {reservation.nights}n ·{" "}
-          {reservation.guests} guests · ETA {reservation.expectedCheckIn}
+          {reservation.code} · {reservation.roomType} · {reservation.nights}n · {reservation.guests}{" "}
+          guests · ETA {reservation.expectedCheckIn}
         </span>
       </span>
       {reservation.status === "checked_in" && (
@@ -101,7 +106,16 @@ function NotReadyPanel({ room, onAlternate }: { room: Room; onAlternate: () => v
             <Button
               variant={room.rush ? "outline" : "primary"}
               icon="star"
-              onClick={() => toggleRush(room.id)}
+              onClick={() => {
+                const next = !room.rush;
+                toggleRush(room.id);
+                toast(
+                  next
+                    ? `Room ${room.number} flagged Rush — supervisor notified`
+                    : `Rush flag removed from Room ${room.number}`,
+                  { icon: <Icon name="star" size={18} filled /> },
+                );
+              }}
             >
               {room.rush ? "Rush flag active — remove" : "Flag as Rush"}
             </Button>
@@ -119,18 +133,29 @@ function NotReadyPanel({ room, onAlternate }: { room: Room; onAlternate: () => v
 }
 
 function CheckIn() {
-  const { rooms, reservations, checkIn, roomById } = useHotel();
+  const { rooms, reservations, checkIn, roomById, focusReservationId, setFocusReservationId } =
+    useHotel();
   const [query, setQuery] = useState("");
   const [resId, setResId] = useState<string | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [sameTypeOnly, setSameTypeOnly] = useState(true);
   const [alternates, setAlternates] = useState(false);
 
+  useEffect(() => {
+    if (!focusReservationId) return;
+    const res = reservations.find((r) => r.id === focusReservationId);
+    if (res) {
+      setResId(res.id);
+      setRoomId(res.roomId);
+    }
+    setFocusReservationId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusReservationId]);
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     return reservations.filter(
-      (r) =>
-        q === "" || r.guestName.toLowerCase().includes(q) || r.code.toLowerCase().includes(q),
+      (r) => q === "" || r.guestName.toLowerCase().includes(q) || r.code.toLowerCase().includes(q),
     );
   }, [reservations, query]);
 
@@ -142,7 +167,9 @@ function CheckIn() {
     return rooms
       .filter((r) => !isBlocked(r))
       .filter((r) => (sameTypeOnly && !alternates ? r.type === reservation.roomType : true))
-      .sort((a, b) => Number(isSellable(b)) - Number(isSellable(a)) || a.number.localeCompare(b.number))
+      .sort(
+        (a, b) => Number(isSellable(b)) - Number(isSellable(a)) || a.number.localeCompare(b.number),
+      )
       .slice(0, 24);
   }, [rooms, reservation, sameTypeOnly, alternates]);
 
@@ -216,7 +243,7 @@ function CheckIn() {
                   </p>
                 </div>
                 {reservation.status === "checked_in" && selectedRoom && (
-                  <span className="text-label inline-flex items-center gap-1.5 rounded-full border border-success/20 bg-success/10 px-3 py-1.5 text-success">
+                  <span className="text-label animate-in fade-in zoom-in-95 inline-flex items-center gap-1.5 rounded-full border border-success/20 bg-success/10 px-3 py-1.5 text-success duration-300">
                     <Icon name="check_circle" size={16} filled />
                     Checked in to {selectedRoom.number}
                   </span>
@@ -304,7 +331,17 @@ function CheckIn() {
                     !isSellable(selectedRoom) ||
                     reservation.status === "checked_in"
                   }
-                  onClick={() => selectedRoom && checkIn(reservation.id, selectedRoom.id)}
+                  onClick={() => {
+                    if (!selectedRoom) return;
+                    checkIn(reservation.id, selectedRoom.id);
+                    toast.success(
+                      `${reservation.guestName} checked in to Room ${selectedRoom.number}`,
+                      {
+                        description: "Welcome them in — have a great stay!",
+                        icon: <Icon name="celebration" size={18} filled />,
+                      },
+                    );
+                  }}
                 >
                   Check Guest In
                 </Button>

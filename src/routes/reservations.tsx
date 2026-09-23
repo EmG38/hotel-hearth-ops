@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import { Button, Card, Field, PageHeader, StatTile, inputClass } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
@@ -66,7 +67,10 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Field label="Expected check-in" hint={earlyCheckIn ? "Early arrival — room prioritised" : undefined}>
+        <Field
+          label="Expected check-in"
+          hint={earlyCheckIn ? "Early arrival — room prioritised" : undefined}
+        >
           <input
             type="time"
             value={checkIn}
@@ -101,7 +105,19 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
           </span>
         )}
         {room && earlyCheckIn && (
-          <Button variant="outline" icon="star" onClick={() => toggleRush(room.id)}>
+          <Button
+            variant="outline"
+            icon="star"
+            onClick={() => {
+              const next = !room.rush;
+              toggleRush(room.id);
+              toast(
+                next
+                  ? `Room ${room.number} flagged Rush`
+                  : `Rush flag removed from Room ${room.number}`,
+              );
+            }}
+          >
             {room.rush ? "Remove rush flag" : "Flag room as Rush"}
           </Button>
         )}
@@ -115,6 +131,10 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
               expectedCheckOut: checkOut,
             });
             setSaved(true);
+            toast.success(`${res.guestName}'s times updated`, {
+              description: "Housekeeping priority order refreshed",
+              icon: <Icon name="save" size={18} filled />,
+            });
           }}
         >
           Update reservation
@@ -140,7 +160,12 @@ function Reservations() {
       />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <StatTile label="Arrivals today" value={arrivals.length} icon="flight_land" tone="tertiary" />
+        <StatTile
+          label="Arrivals today"
+          value={arrivals.length}
+          icon="flight_land"
+          tone="tertiary"
+        />
         <StatTile label="In house" value={inHouse.length} icon="hotel" tone="info" />
         <StatTile
           label="Late checkouts"
