@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 import { useHotel } from "@/lib/hotel-store";
 import type { Role } from "@/lib/hotel-types";
+import logoAsset from "@/assets/hotel-logo.png.asset.json";
 
 const navSections: {
   role: Role;
@@ -86,8 +87,8 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       )}
     >
       <div className={cn("flex items-center gap-2 px-4", collapsed && "justify-center px-2")}>
-        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-on-primary">
-          <Icon name="apartment" size={20} filled />
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-container">
+          <img src={logoAsset.url} alt="Hotel App logo" className="size-7 object-contain" />
         </span>
         {!collapsed && (
           <div className="min-w-0">
