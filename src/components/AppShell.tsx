@@ -101,7 +101,8 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
 
       <nav className="flex-1 overflow-y-auto">
         {navSections.map((section) => {
-          const active = section.role === role;
+          const active =
+            section.role === role || section.items.some((i) => i.to === pathname);
           return (
             <div key={section.role} className={cn("mb-2", !active && "opacity-45")}>
               {!collapsed && (
