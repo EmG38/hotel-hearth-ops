@@ -96,7 +96,7 @@ export function buildRooms(): Room[] {
     for (let i = 1; i <= 20; i++) {
       const seq = (floor - 1) * 20 + i;
       const r = seeded(seq);
-      const status = statusPool[Math.floor(r * statusPool.length)];
+      const status = statusPool[Math.floor(r * statusPool.length)]!;
       const flags: Room["flags"] = [];
       if (seq % 37 === 0) flags.push("ooo");
       else if (seq % 29 === 0) flags.push("oos");
@@ -111,9 +111,9 @@ export function buildRooms(): Room[] {
         status,
         flags,
         attendantId: needsAttendant
-          ? staff[Math.floor(seeded(seq + 7) * staff.length)].id
+          ? staff[Math.floor(seeded(seq + 7) * staff.length)]!.id
           : seq % 5 === 0
-            ? staff[Math.floor(seeded(seq + 3) * staff.length)].id
+            ? staff[Math.floor(seeded(seq + 3) * staff.length)]!.id
             : null,
         rush: seq % 19 === 0 && status !== "inspected",
         eta:

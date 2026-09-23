@@ -189,7 +189,7 @@ export function Field({
 }: {
   label: string;
   children: ReactNode;
-  hint?: string;
+  hint?: string | undefined;
 }) {
   return (
     <label className="block">

@@ -51,7 +51,9 @@ function PropertyBoard() {
 
   const counts = useMemo(() => {
     const base: Record<string, number> = { dirty: 0, in_progress: 0, clean: 0, inspected: 0 };
-    rooms.forEach((r) => (base[r.status] += 1));
+    rooms.forEach((r) => {
+      base[r.status] = (base[r.status] ?? 0) + 1;
+    });
     return base;
   }, [rooms]);
 
@@ -70,12 +72,12 @@ function PropertyBoard() {
           <StatTile
             key={s}
             label={statusMeta[s].label}
-            value={counts[s]}
+            value={counts[s] ?? 0}
             icon={statusMeta[s].icon}
             tone={
               s === "dirty" ? "error" : s === "in_progress" ? "warning" : s === "clean" ? "info" : "success"
             }
-            hint={`${Math.round((counts[s] / rooms.length) * 100)}% of property`}
+            hint={`${Math.round(((counts[s] ?? 0) / rooms.length) * 100)}% of property`}
           />
         ))}
       </div>
