@@ -10,13 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AvailabilityRouteImport } from './routes/availability'
+import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as InspectionsRouteImport } from './routes/inspections'
 import { Route as IssuesRouteImport } from './routes/issues'
 import { Route as PerformanceRouteImport } from './routes/performance'
+import { Route as ReservationsRouteImport } from './routes/reservations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvailabilityRoute = AvailabilityRouteImport.update({
+  id: '/availability',
+  path: '/availability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckInRoute = CheckInRouteImport.update({
+  id: '/check-in',
+  path: '/check-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InspectionsRoute = InspectionsRouteImport.update({
@@ -34,39 +47,78 @@ const PerformanceRoute = PerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservationsRoute = ReservationsRouteImport.update({
+  id: '/reservations',
+  path: '/reservations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/availability': typeof AvailabilityRoute
+  '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
+  '/reservations': typeof ReservationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/availability': typeof AvailabilityRoute
+  '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
+  '/reservations': typeof ReservationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/availability': typeof AvailabilityRoute
+  '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
+  '/reservations': typeof ReservationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/inspections' | '/issues' | '/performance'
+  fullPaths:
+    | '/'
+    | '/availability'
+    | '/check-in'
+    | '/inspections'
+    | '/issues'
+    | '/performance'
+    | '/reservations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/inspections' | '/issues' | '/performance'
-  id: '__root__' | '/' | '/inspections' | '/issues' | '/performance'
+  to:
+    | '/'
+    | '/availability'
+    | '/check-in'
+    | '/inspections'
+    | '/issues'
+    | '/performance'
+    | '/reservations'
+  id:
+    | '__root__'
+    | '/'
+    | '/availability'
+    | '/check-in'
+    | '/inspections'
+    | '/issues'
+    | '/performance'
+    | '/reservations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AvailabilityRoute: typeof AvailabilityRoute
+  CheckInRoute: typeof CheckInRoute
   InspectionsRoute: typeof InspectionsRoute
   IssuesRoute: typeof IssuesRoute
   PerformanceRoute: typeof PerformanceRoute
+  ReservationsRoute: typeof ReservationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +128,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/availability': {
+      id: '/availability'
+      path: '/availability'
+      fullPath: '/availability'
+      preLoaderRoute: typeof AvailabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/check-in': {
+      id: '/check-in'
+      path: '/check-in'
+      fullPath: '/check-in'
+      preLoaderRoute: typeof CheckInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inspections': {
@@ -99,14 +165,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerformanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reservations': {
+      id: '/reservations'
+      path: '/reservations'
+      fullPath: '/reservations'
+      preLoaderRoute: typeof ReservationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AvailabilityRoute: AvailabilityRoute,
+  CheckInRoute: CheckInRoute,
   InspectionsRoute: InspectionsRoute,
   IssuesRoute: IssuesRoute,
   PerformanceRoute: PerformanceRoute,
+  ReservationsRoute: ReservationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
