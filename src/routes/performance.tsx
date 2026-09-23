@@ -41,7 +41,7 @@ function Bar({ value, tone }: { value: number; tone: string }) {
 }
 
 function Performance() {
-  const { staff } = useHotel();
+  const { staff, workload } = useHotel();
   const [shift, setShift] = useState<"Morning" | "Evening">("Morning");
   const totals = shift === "Morning" ? shiftTotals.morning : shiftTotals.evening;
   const shiftStaff = staff.filter((s) => s.shift === shift);
@@ -144,7 +144,7 @@ function Performance() {
                     <Bar value={s.passRate} tone="bg-success" />
                   </td>
                   <td className="text-body px-4 py-3 tabular-nums text-on-surface-variant">
-                    {useOpen(s.id)}
+                    {workload(s.id)}
                   </td>
                 </tr>
               ))}
@@ -154,9 +154,4 @@ function Performance() {
       </Card>
     </>
   );
-}
-
-function useOpen(staffId: string) {
-  const { workload } = useHotel();
-  return workload(staffId);
 }
