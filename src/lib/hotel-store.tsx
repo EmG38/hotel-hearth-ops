@@ -39,8 +39,8 @@ interface HotelState {
   setRoomStatus: (roomId: string, status: RoomStatus, note?: string) => void;
   toggleRush: (roomId: string) => void;
   toggleFlag: (roomId: string, flag: RoomFlag) => void;
-  /** Appends a timestamped note without changing room status — used for pause/break reasons. */
-  addRoomNote: (roomId: string, note: string) => void;
+  /** Replaces the room's single free-text note without changing its status. */
+  setRoomNote: (roomId: string, note: string) => void;
   setIssueStatus: (issueId: string, status: IssueStatus) => void;
   reportIssue: (input: {
     roomId: string;
@@ -106,8 +106,8 @@ export function HotelProvider({ children }: { children: ReactNode }) {
           ...r,
           flags: r.flags.includes(flag) ? r.flags.filter((f) => f !== flag) : [...r.flags, flag],
         })),
-      addRoomNote: (roomId, note) =>
-        patchRoom(roomId, (r) => ({ ...r, notes: [note, ...r.notes] })),
+      setRoomNote: (roomId, note) =>
+        patchRoom(roomId, (r) => ({ ...r, notes: note ? [note] : [] })),
       setIssueStatus: (issueId, status) =>
         setIssues((prev) => prev.map((i) => (i.id === issueId ? { ...i, status } : i))),
       reportIssue: ({ roomId, category, description, reportedBy, severity = "medium" }) =>

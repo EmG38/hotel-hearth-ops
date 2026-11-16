@@ -1,178 +1,166 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
-import { statusMeta } from "@/lib/room-status";
-import { Button, StatusChip, FlagChip } from "@/components/ui-kit";
+import { Button } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
-import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
-import { useHkT, PAUSE_REASONS } from "@/lib/housekeeper-i18n";
+import { MobileFrame } from "@/components/MobileFrame";
+import { useHkT, timeAgo } from "@/lib/housekeeper-i18n";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/housekeeper/room/$roomId")({
   component: RoomDetail,
 });
 
-function PauseSheet({
-  onPick,
-  onClose,
-}: {
-  onPick: (reasonId: string) => void;
-  onClose: () => void;
-}) {
-  const t = useHkT();
-  return (
-    <div
-      className="absolute inset-0 z-10 flex flex-col justify-end bg-on-surface/40"
-      onClick={onClose}
-    >
-      <div
-        className="rounded-t-3xl bg-surface-container-lowest p-4 pb-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <p className="text-title mb-3 text-on-surface">{t.t("whyPausing")}</p>
-        <div className="grid grid-cols-2 gap-2">
-          {PAUSE_REASONS.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => onPick(r.id)}
-              className="flex items-center gap-2 rounded-xl border border-outline-variant bg-surface px-3 py-3 text-left text-label text-on-surface hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <Icon name={r.icon} size={18} className="text-primary" />
-              {t.reason(r.id)}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+const heroTone: Record<string, string> = {
+  dirty: "from-error/80 to-error",
+  in_progress: "from-warning/80 to-warning",
+  clean: "from-info/80 to-info",
+  inspected: "from-success/80 to-success",
+};
+
+const pillTone: Record<string, string> = {
+  dirty: "bg-error/10 text-error",
+  in_progress: "bg-warning/10 text-warning",
+  clean: "bg-info/10 text-info",
+  inspected: "bg-success/10 text-success",
+};
 
 function RoomDetail() {
   const { roomId } = Route.useParams();
-  const { roomById, setRoomStatus, addRoomNote } = useHotel();
+  const { roomById, setRoomStatus, setRoomNote } = useHotel();
   const navigate = useNavigate();
   const t = useHkT();
-  const [showPause, setShowPause] = useState(false);
   const room = roomById(roomId);
+  const [note, setNote] = useState(room?.notes[0] ?? "");
+
+  useEffect(() => {
+    setNote(room?.notes[0] ?? "");
+  }, [room?.id]);
 
   if (!room) {
     return (
       <MobileFrame>
-        <MobileScreenHeader
-          title="Room not found"
-          onBack={() => navigate({ to: "/housekeeper" })}
-        />
+        <div className="flex flex-1 items-center justify-center">
+          <Button variant="outline" onClick={() => navigate({ to: "/housekeeper" })}>
+            {t.t("home")}
+          </Button>
+        </div>
       </MobileFrame>
     );
   }
 
-  const dnd = room.flags.includes("dnd");
-  const meta = statusMeta[room.status];
-  const rid = room.id;
-  const roomStatus = room.status;
-
-  function time() {
-    return new Date().toTimeString().slice(0, 5);
-  }
+  const status = room.status;
+  const statusLabel = {
+    dirty: t.t("statusDirty"),
+    in_progress: t.t("statusInProgress"),
+    clean: t.t("statusAwaiting"),
+    inspected: t.t("statusInspected"),
+  }[status];
 
   function advance() {
-    if (roomStatus === "dirty") {
-      setRoomStatus(rid, "in_progress", `${time()} · ${t.t("startCleaning")}`);
+    if (status === "dirty") {
+      setRoomStatus(room!.id, "in_progress");
       toast.success(t.t("startCleaning"));
-    } else if (roomStatus === "in_progress") {
-      setRoomStatus(rid, "clean", `${time()} · ${t.t("markDone")}`);
-      toast.success(t.t("submitted"));
+    } else if (status === "in_progress") {
+      setRoomStatus(room!.id, "clean");
+      toast.success(t.t("awaitingBanner"));
     }
-  }
-
-  function pause(reasonId: string) {
-    addRoomNote(rid, `${time()} · ${t.t("pause")} — ${t.reason(reasonId)}`);
-    setShowPause(false);
-    toast(t.reason(reasonId));
   }
 
   return (
     <MobileFrame>
-      <div className="relative flex flex-1 flex-col">
-        <MobileScreenHeader
-          title={`${room.number}`}
-          subtitle={`${t.t("category")}: ${room.type} · Floor ${room.floor}`}
-          onBack={() => navigate({ to: "/housekeeper" })}
-        />
-
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="flex items-center gap-2">
-            <StatusChip status={room.status} className="text-label" />
-            {room.flags.map((f) => (
-              <FlagChip key={f} flag={f} />
-            ))}
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <div
+          className={cn(
+            "relative flex h-56 shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br p-4",
+            heroTone[status],
+          )}
+        >
+          <Icon
+            name="bed"
+            size={140}
+            filled
+            className="pointer-events-none absolute -bottom-6 -right-6 text-white/15"
+          />
+          <div className="flex items-start justify-between">
+            <button
+              onClick={() => navigate({ to: "/housekeeper" })}
+              className="grid size-10 place-items-center rounded-full bg-white/90 text-on-surface shadow-soft"
+            >
+              <Icon name="chevron_left" size={22} />
+            </button>
+            <span className="text-label-sm rounded-full bg-white/25 px-3 py-1 font-medium text-white">
+              Floor {room.floor}
+            </span>
           </div>
-
-          {dnd && (
-            <div className="mt-4 flex items-start gap-2 rounded-2xl bg-on-surface-subtle/15 p-3 text-label text-on-surface">
-              <Icon name="bedtime" size={18} />
-              <span>{t.t("dndSkipped")}</span>
-            </div>
-          )}
-
-          {room.notes.length > 0 && (
-            <div className="mt-4">
-              <p className="text-label-sm uppercase text-on-surface-subtle">{t.t("notes")}</p>
-              <ul className="mt-2 space-y-1.5">
-                {room.notes.map((n, i) => (
-                  <li key={i} className="text-body text-on-surface-variant">
-                    {n}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {(room.status === "clean" || room.status === "inspected") && (
-            <p className="mt-6 flex items-center gap-2 text-body text-on-surface-variant">
-              <Icon name={meta.icon} size={18} className={meta.text} filled />
-              {room.status === "inspected" ? t.t("inspected") : t.t("submitted")}
-            </p>
-          )}
+          <div className="relative">
+            <p className="text-label-sm text-white/80">{room.type}</p>
+            <p className="text-2xl font-bold text-white">Room {room.number}</p>
+          </div>
         </div>
 
-        <div className="flex shrink-0 flex-col gap-2 border-t border-outline-variant p-4">
-          {(room.status === "dirty" || room.status === "in_progress") && (
-            <>
-              {dnd ? (
-                <Button variant="primary" className="w-full py-3" onClick={advance}>
-                  {t.t("retry")}
-                </Button>
-              ) : (
-                <Button variant="primary" className="w-full py-3" onClick={advance}>
-                  {room.status === "dirty" ? t.t("startCleaning") : t.t("markDone")}
-                </Button>
+        <div className="-mt-6 flex-1 rounded-t-3xl bg-surface p-4">
+          <div className="flex items-center justify-between">
+            <span
+              className={cn(
+                "text-label-sm inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium",
+                pillTone[status],
               )}
-              {room.status === "in_progress" && (
-                <Button
-                  variant="outline"
-                  className="w-full py-3"
-                  onClick={() => setShowPause(true)}
-                >
-                  <Icon name="pause" size={18} />
-                  {t.t("pause")}
-                </Button>
-              )}
-            </>
+            >
+              <span className="size-1.5 rounded-full bg-current" />
+              {statusLabel}
+            </span>
+            <span className="text-label-sm text-on-surface-subtle">
+              {t.t("updated")} {timeAgo(room.lastUpdated, t)}
+            </span>
+          </div>
+
+          {(status === "dirty" || status === "in_progress") && (
+            <button
+              onClick={advance}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
+            >
+              {status === "dirty" ? t.t("startCleaning") : t.t("markDone")}
+              <Icon name="check" size={18} />
+            </button>
           )}
-          <Button
-            variant="outline"
-            className="w-full py-3 text-error"
+
+          {status === "clean" && (
+            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-info/10 px-4 py-3 text-label font-medium text-info">
+              <Icon name="hourglass_top" size={18} filled />
+              {t.t("awaitingBanner")}
+            </div>
+          )}
+
+          {status === "inspected" && (
+            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-success/10 px-4 py-3 text-label font-medium text-success">
+              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-success text-on-primary">
+                <Icon name="check" size={16} />
+              </span>
+              {t.t("inspectedBanner")}
+            </div>
+          )}
+
+          <button
             onClick={() =>
               navigate({ to: "/housekeeper/report-issue/$roomId", params: { roomId: room.id } })
             }
+            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-surface py-3 text-label font-semibold text-error active:scale-[0.98]"
           >
-            <Icon name="report" size={18} />
+            <Icon name="error" size={18} />
             {t.t("reportIssue")}
-          </Button>
-        </div>
+          </button>
 
-        {showPause && <PauseSheet onPick={pause} onClose={() => setShowPause(false)} />}
+          <p className="text-label-sm mt-5 uppercase text-on-surface-subtle">{t.t("notes")}</p>
+          <textarea
+            className="mt-1.5 min-h-20 w-full resize-none rounded-2xl bg-surface-container-lowest p-3 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:ring-2 focus:ring-primary/30"
+            placeholder={t.t("notesPlaceholder")}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            onBlur={() => setRoomNote(room.id, note)}
+          />
+        </div>
       </div>
     </MobileFrame>
   );
