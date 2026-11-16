@@ -119,7 +119,7 @@ function RoomDetail() {
           {(status === "dirty" || status === "in_progress") && (
             <button
               onClick={advance}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
+              className="mt-4 flex w-full items-center justify-center gap-2 hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
             >
               {status === "dirty" ? t.t("startCleaning") : t.t("markDone")}
               <Icon name="check" size={18} />
@@ -127,14 +127,14 @@ function RoomDetail() {
           )}
 
           {status === "clean" && (
-            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-info/10 px-4 py-3 text-label font-medium text-info">
+            <div className="mt-4 flex items-center gap-2 hk-card bg-info/10 px-4 py-3 text-label font-medium text-info">
               <Icon name="hourglass_top" size={18} filled />
               {t.t("awaitingBanner")}
             </div>
           )}
 
           {status === "inspected" && (
-            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-success/10 px-4 py-3 text-label font-medium text-success">
+            <div className="mt-4 flex items-center gap-2 hk-card bg-success/10 px-4 py-3 text-label font-medium text-success">
               <span className="grid size-7 shrink-0 place-items-center rounded-full bg-success text-on-primary">
                 <Icon name="check" size={16} />
               </span>
@@ -146,7 +146,7 @@ function RoomDetail() {
             onClick={() =>
               navigate({ to: "/housekeeper/report-issue/$roomId", params: { roomId: room.id } })
             }
-            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl border border-error/30 bg-surface py-3 text-label font-semibold text-error active:scale-[0.98]"
+            className="mt-2.5 flex w-full items-center justify-center gap-2 hk-card border border-error/30 bg-surface py-3 text-label font-semibold text-error active:scale-[0.98]"
           >
             <Icon name="error" size={18} />
             {t.t("reportIssue")}
@@ -154,7 +154,7 @@ function RoomDetail() {
 
           <p className="text-label-sm mt-5 uppercase text-on-surface-subtle">{t.t("notes")}</p>
           <textarea
-            className="mt-1.5 min-h-20 w-full resize-none rounded-2xl bg-surface-container-lowest p-3 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:ring-2 focus:ring-primary/30"
+            className="mt-1.5 min-h-20 w-full resize-none hk-card bg-surface-container-lowest p-3 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:ring-2 focus:ring-primary/30"
             placeholder={t.t("notesPlaceholder")}
             value={note}
             onChange={(e) => setNote(e.target.value)}

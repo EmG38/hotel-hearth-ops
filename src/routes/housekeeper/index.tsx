@@ -42,7 +42,7 @@ function SignInPicker() {
           <button
             key={s.id}
             onClick={() => setCurrentStaffId(s.id)}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 transition-colors hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="flex flex-col items-center gap-2 hk-card border border-outline-variant bg-surface-container-lowest p-4 transition-all hover:bg-surface-container active:scale-[0.97] active:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <Avatar staff={s} size={56} />
             <span className="text-label text-on-surface">{s.name}</span>
@@ -202,7 +202,7 @@ function HousekeeperHome() {
             </div>
           </div>
 
-          <div className="mx-4 mt-4 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-success p-5 text-on-primary shadow-soft">
+          <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-success p-5 text-on-primary shadow-soft">
             <div className="flex items-center justify-between">
               <p className="text-label-sm font-semibold uppercase tracking-wide opacity-90">
                 {t.t("todaysShift")}
@@ -231,10 +231,7 @@ function HousekeeperHome() {
             <p className="text-title-sm text-on-surface">{t.t("statusOverview")}</p>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {STATUS_PILLS.map((p) => (
-                <div
-                  key={p.key}
-                  className={cn("rounded-2xl border px-2 py-2.5 text-center", p.tone)}
-                >
+                <div key={p.key} className={cn("hk-card border px-2 py-2.5 text-center", p.tone)}>
                   <span className={cn("mx-auto mb-1 block size-1.5 rounded-full", p.dot)} />
                   <p className={cn("text-title-lg font-bold", p.text)}>{byStatus[p.key].length}</p>
                   <p className="text-label-sm text-on-surface-subtle">{t.t(p.label)}</p>
@@ -258,7 +255,7 @@ function HousekeeperHome() {
                     onClick={() =>
                       navigate({ to: "/housekeeper/room/$roomId", params: { roomId: r.id } })
                     }
-                    className="relative h-28 w-36 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-error/80 to-error text-left"
+                    className="relative h-28 w-36 shrink-0 overflow-hidden hk-card bg-gradient-to-br from-error/80 to-error text-left transition-transform active:scale-[0.97]"
                   >
                     <Icon
                       name="bed"
@@ -288,7 +285,7 @@ function HousekeeperHome() {
                     {ready}/{floorRooms.length} {t.t("ready")}
                   </p>
                 </div>
-                <div className="mt-1.5 overflow-hidden rounded-2xl border border-outline-variant">
+                <div className="mt-1.5 overflow-hidden hk-card border border-outline-variant">
                   {floorRooms.map((r, i) => (
                     <button
                       key={r.id}
@@ -296,7 +293,7 @@ function HousekeeperHome() {
                         navigate({ to: "/housekeeper/room/$roomId", params: { roomId: r.id } })
                       }
                       className={cn(
-                        "flex w-full items-center gap-3 bg-surface-container-lowest px-3 py-3 text-left hover:bg-surface-container",
+                        "flex w-full items-center gap-3 bg-surface-container-lowest px-3 py-3 text-left transition-colors active:bg-surface-container",
                         i > 0 && "border-t border-outline-variant",
                       )}
                     >

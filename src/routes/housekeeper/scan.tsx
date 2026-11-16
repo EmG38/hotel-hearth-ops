@@ -61,11 +61,11 @@ function ScanRoom() {
   const foundRoomNumber = rooms.find((r) => r.id === foundRoom)?.number;
 
   return (
-    <MobileFrame>
+    <MobileFrame dark>
       <div className="relative flex flex-1 flex-col bg-[#0b0e11]">
         <button
           onClick={() => navigate({ to: "/housekeeper" })}
-          className="absolute left-4 top-4 z-10 grid size-10 place-items-center rounded-full bg-white/15 text-white"
+          className="absolute left-4 top-12 z-10 grid size-10 place-items-center rounded-full bg-white/15 text-white"
         >
           <Icon name="close" size={22} />
         </button>

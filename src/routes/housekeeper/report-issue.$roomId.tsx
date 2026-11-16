@@ -62,7 +62,7 @@ function ReportIssue() {
             {t.t("photo")} <span className="text-error">*</span>
           </p>
           {hasPhoto ? (
-            <div className="relative mt-2 flex h-40 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-primary/40">
+            <div className="relative mt-2 flex h-40 items-center justify-center overflow-hidden hk-card bg-gradient-to-br from-primary/20 to-primary/40">
               <Icon name="image" size={48} className="text-primary" filled />
               <button
                 onClick={() => setHasPhoto(false)}
@@ -76,7 +76,7 @@ function ReportIssue() {
               </span>
             </div>
           ) : (
-            <div className="mt-2 flex h-28 items-center justify-center gap-10 rounded-2xl border-2 border-dashed border-outline-variant">
+            <div className="mt-2 flex h-28 items-center justify-center gap-10 hk-card border-2 border-dashed border-outline-variant">
               <button
                 onClick={() => setHasPhoto(true)}
                 className="flex flex-col items-center gap-1.5 text-on-surface"

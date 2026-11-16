@@ -65,7 +65,7 @@ function ShiftSummary() {
           </div>
         </div>
 
-        <div className="mx-4 mt-4 shrink-0 rounded-3xl bg-gradient-to-br from-primary to-success p-5 text-center text-on-primary shadow-soft">
+        <div className="mx-4 mt-4 shrink-0 hk-card bg-gradient-to-br from-primary to-success p-5 text-center text-on-primary shadow-soft">
           <p className="text-label font-medium opacity-90">{t.t("yourPerformanceToday")}</p>
           <p className="mt-2 text-4xl font-bold">
             {completed}
@@ -73,18 +73,18 @@ function ShiftSummary() {
           </p>
           <p className="text-label opacity-90">{t.t("roomsCompleted")}</p>
           <div className="mt-4 flex justify-center gap-3">
-            <div className="rounded-2xl bg-white/20 px-5 py-2.5 text-center">
+            <div className="hk-card bg-white/20 px-5 py-2.5 text-center">
               <p className="text-title-lg font-bold">{me.avgMinutes} min</p>
               <p className="text-label-sm opacity-90">{t.t("avgPerRoomStat")}</p>
             </div>
-            <div className="rounded-2xl bg-white/20 px-5 py-2.5 text-center">
+            <div className="hk-card bg-white/20 px-5 py-2.5 text-center">
               <p className="text-title-lg font-bold">{me.passRate}%</p>
               <p className="text-label-sm opacity-90">{t.t("passRate")}</p>
             </div>
           </div>
         </div>
 
-        <div className="mx-4 mt-4 divide-y divide-outline-variant rounded-2xl bg-surface-container-lowest px-4">
+        <div className="mx-4 mt-4 divide-y divide-outline-variant hk-card bg-surface-container-lowest px-4">
           <Row label={t.t("roomsAssigned")} value={total} />
           <Row label={t.t("completed")} value={completed} tone="text-success" />
           <Row label={t.t("awaitingInspection")} value={awaiting} tone="text-info" />
@@ -92,7 +92,7 @@ function ShiftSummary() {
           <Row label={t.t("issuesReported")} value={myIssues} tone="text-error" />
         </div>
 
-        <div className="mx-4 mt-4 rounded-2xl bg-surface-container-lowest px-4">
+        <div className="mx-4 mt-4 hk-card bg-surface-container-lowest px-4">
           <p className="text-label-sm pt-3 uppercase text-on-surface-subtle">{t.t("yourTimes")}</p>
           <div className="divide-y divide-outline-variant">
             <Row label={t.t("shiftStart")} value={times.start} />
@@ -103,7 +103,7 @@ function ShiftSummary() {
           </div>
         </div>
 
-        <p className="text-label-sm mx-4 mt-4 flex items-start gap-2 rounded-2xl bg-surface-container px-3 py-2.5 text-on-surface-variant">
+        <p className="text-label-sm mx-4 mt-4 flex items-start gap-2 hk-card bg-surface-container px-3 py-2.5 text-on-surface-variant">
           <Icon name="info" size={16} className="mt-0.5 shrink-0" />
           {t.t("personalStatsNote")} {me.name.split(" ")[0]}.
         </p>
@@ -114,7 +114,7 @@ function ShiftSummary() {
               setCurrentStaffId(null);
               navigate({ to: "/housekeeper" });
             }}
-            className="w-full rounded-2xl bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
+            className="w-full hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
           >
             {t.t("doneSignOff")}
           </button>

@@ -49,6 +49,11 @@
 
   --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px rgb(15 23 42 / 0.06);
   --shadow-raised: 0 2px 4px rgb(15 23 42 / 0.05), 0 12px 32px rgb(15 23 42 / 0.1);
+
+  /* Housekeeper mobile preview — one consistent card radius, reused everywhere
+     instead of mixing rounded-xl/2xl/3xl, per native-vs-web UI research
+     (internetmenace.com design-preferences guide). */
+  --radius-hk: 22px;
 }
 
 @theme inline {
@@ -144,6 +149,34 @@
   border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-soft);
+}
+
+/* One shape language for every Housekeeper card/button/input, with the real
+   iOS "squircle" (continuous-corner superellipse) as a progressive
+   enhancement — unsupported browsers just get a normal rounded corner. */
+@utility hk-card {
+  border-radius: var(--radius-hk);
+  corner-shape: superellipse(2);
+}
+
+/* Mobile-native baseline (see the mobile-native skill) scoped to the phone
+   preview only — never applied to the desktop Supervisor/Reception console. */
+@layer base {
+  .hk-frame {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hk-frame button,
+  .hk-frame a,
+  .hk-frame [role="button"] {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .hk-frame input,
+  .hk-frame textarea {
+    font-size: 16px; /* iOS Safari zooms the page on focus below this */
+  }
 }
 
 @layer base {
