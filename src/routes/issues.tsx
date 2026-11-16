@@ -10,13 +10,13 @@ import type { IssueStatus } from "@/lib/hotel-types";
 export const Route = createFileRoute("/issues")({
   head: () => ({
     meta: [
-      { title: "Issue Triage — Hotel App" },
+      { title: "Issue Triage — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Triage housekeeper-reported room issues: send to maintenance or block the room from sale.",
       },
-      { property: "og:title", content: "Issue Triage — Hotel App" },
+      { property: "og:title", content: "Issue Triage — Golden Sands Hotel" },
       {
         property: "og:description",
         content:

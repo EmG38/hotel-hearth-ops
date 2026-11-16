@@ -16,7 +16,7 @@ const FLOOR_PREVIEW_MAX = 3;
 
 export const Route = createFileRoute("/housekeeper/")({
   head: () => ({
-    meta: [{ title: "Housekeeper App — Hotel App" }],
+    meta: [{ title: "Housekeeper App — Golden Sands Hotel" }],
   }),
   component: HousekeeperHome,
 });

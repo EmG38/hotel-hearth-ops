@@ -12,12 +12,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/availability")({
   head: () => ({
     meta: [
-      { title: "Availability Board — Hotel App" },
+      { title: "Availability Board — Golden Sands Hotel" },
       {
         name: "description",
         content: "Sellable room count and live inventory by type and floor for the front desk.",
       },
-      { property: "og:title", content: "Availability Board — Hotel App" },
+      { property: "og:title", content: "Availability Board — Golden Sands Hotel" },
       {
         property: "og:description",
         content: "Sellable room count and live inventory by type and floor for the front desk.",

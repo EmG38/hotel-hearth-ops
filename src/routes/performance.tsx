@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/performance")({
   head: () => ({
     meta: [
-      { title: "Performance — Hotel App" },
+      { title: "Performance — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Aggregate housekeeping throughput per shift plus a supervisor-only per-attendant table.",
       },
-      { property: "og:title", content: "Performance — Hotel App" },
+      { property: "og:title", content: "Performance — Golden Sands Hotel" },
       {
         property: "og:description",
         content:
@@ -138,10 +138,10 @@ function Performance() {
                     {s.avgMinutes} min
                   </td>
                   <td className="px-4 py-3">
-                    <Bar value={s.onTimePct} tone="bg-info" />
+                    <Bar value={s.onTimePct} tone="bg-primary" />
                   </td>
                   <td className="px-4 py-3">
-                    <Bar value={s.passRate} tone="bg-success" />
+                    <Bar value={s.passRate} tone="bg-secondary" />
                   </td>
                   <td className="text-body px-4 py-3 tabular-nums text-on-surface-variant">
                     {workload(s.id)}

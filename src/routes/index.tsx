@@ -13,13 +13,13 @@ import { Icon } from "@/components/Icon";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Property Board — Hotel App" },
+      { title: "Property Board — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
       },
-      { property: "og:title", content: "Property Board — Hotel App" },
+      { property: "og:title", content: "Property Board — Golden Sands Hotel" },
       {
         property: "og:description",
         content:

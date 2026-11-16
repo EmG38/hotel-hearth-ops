@@ -5,7 +5,7 @@ import { Icon } from "./Icon";
 import { GlobalSearch } from "./GlobalSearch";
 import { useHotel } from "@/lib/hotel-store";
 import type { Role } from "@/lib/hotel-types";
-import logoAsset from "@/assets/hotel-logo.png.asset.json";
+import logoAsset from "@/assets/golden-sands-emblem.png.asset.json";
 
 const navSections: {
   role: Role;
@@ -74,19 +74,20 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
     );
   }
   return (
-    <div className="mx-3 flex rounded-full bg-surface-container p-1">
+    <div className="mx-3 flex rounded-3xl bg-surface-container p-1">
       {navSections.map((s) => (
         <button
           key={s.role}
           onClick={() => setRole(s.role)}
           className={cn(
-            "text-label flex-1 rounded-full px-2 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            "text-label-sm flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-2xl px-0.5 py-1.5 tracking-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             role === s.role
               ? "bg-surface-container-lowest text-on-surface shadow-soft"
               : "text-on-surface-variant",
           )}
         >
-          {s.label}
+          <Icon name={roleIcon[s.role]} size={16} filled={role === s.role} />
+          <span className="whitespace-nowrap text-[10px] font-semibold leading-3">{s.label}</span>
         </button>
       ))}
     </div>
@@ -105,13 +106,13 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       )}
     >
       <div className={cn("flex items-center gap-2 px-4", collapsed && "justify-center px-2")}>
-        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-container">
-          <img src={logoAsset.url} alt="Hotel App logo" className="size-7 object-contain" />
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-container">
+          <img src={logoAsset.url} alt="Golden Sands Hotel logo" className="size-7 object-contain" />
         </span>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-title truncate text-on-surface">Hotel App</p>
-            <p className="text-label-sm text-on-surface-subtle">Ops console</p>
+            <p className="text-title truncate tracking-wide text-secondary">Golden Sands</p>
+            <p className="text-label-sm uppercase tracking-[0.2em] text-tertiary">Hotel · Ops</p>
           </div>
         )}
       </div>
