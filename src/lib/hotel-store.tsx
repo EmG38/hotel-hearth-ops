@@ -29,6 +29,9 @@ interface HotelState {
   /** Set by global search to ask Check-In to pre-select a reservation on next render. */
   focusReservationId: string | null;
   setFocusReservationId: (id: string | null) => void;
+  /** Which housekeeper is "signed in" on the mobile app preview (shared-device style, no password). */
+  currentStaffId: string | null;
+  setCurrentStaffId: (id: string | null) => void;
   roomById: (id: string | null) => Room | undefined;
   staffById: (id: string | null) => Staff | undefined;
   workload: (staffId: string) => number;
@@ -36,7 +39,16 @@ interface HotelState {
   setRoomStatus: (roomId: string, status: RoomStatus, note?: string) => void;
   toggleRush: (roomId: string) => void;
   toggleFlag: (roomId: string, flag: RoomFlag) => void;
+  /** Appends a timestamped note without changing room status — used for pause/break reasons. */
+  addRoomNote: (roomId: string, note: string) => void;
   setIssueStatus: (issueId: string, status: IssueStatus) => void;
+  reportIssue: (input: {
+    roomId: string;
+    category: string;
+    description: string;
+    reportedBy: string;
+    severity?: Issue["severity"];
+  }) => void;
   checkIn: (reservationId: string, roomId: string) => void;
   updateReservationTimes: (
     reservationId: string,
@@ -54,6 +66,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
   const [reservations, setReservations] = useState<Reservation[]>(seedReservations);
   const [focusRoomId, setFocusRoomId] = useState<string | null>(null);
   const [focusReservationId, setFocusReservationId] = useState<string | null>(null);
+  const [currentStaffId, setCurrentStaffId] = useState<string | null>(null);
 
   const patchRoom = useCallback((roomId: string, patch: (r: Room) => Room) => {
     setRooms((prev) => prev.map((r) => (r.id === roomId ? patch(r) : r)));
@@ -71,6 +84,8 @@ export function HotelProvider({ children }: { children: ReactNode }) {
       setFocusRoomId,
       focusReservationId,
       setFocusReservationId,
+      currentStaffId,
+      setCurrentStaffId,
       roomById: (id) => (id ? rooms.find((r) => r.id === id) : undefined),
       staffById: (id) => (id ? staff.find((s) => s.id === id) : undefined),
       workload: (staffId) =>
@@ -91,8 +106,26 @@ export function HotelProvider({ children }: { children: ReactNode }) {
           ...r,
           flags: r.flags.includes(flag) ? r.flags.filter((f) => f !== flag) : [...r.flags, flag],
         })),
+      addRoomNote: (roomId, note) =>
+        patchRoom(roomId, (r) => ({ ...r, notes: [note, ...r.notes] })),
       setIssueStatus: (issueId, status) =>
         setIssues((prev) => prev.map((i) => (i.id === issueId ? { ...i, status } : i))),
+      reportIssue: ({ roomId, category, description, reportedBy, severity = "medium" }) =>
+        setIssues((prev) => [
+          {
+            id: `i${prev.length + 1}-${roomId}`,
+            roomId,
+            title: category,
+            description,
+            category,
+            reportedBy,
+            reportedAt: new Date().toTimeString().slice(0, 5),
+            severity,
+            status: "open" as IssueStatus,
+            photos: [],
+          },
+          ...prev,
+        ]),
       checkIn: (reservationId, roomId) => {
         setReservations((prev) =>
           prev.map((b) =>
@@ -105,7 +138,17 @@ export function HotelProvider({ children }: { children: ReactNode }) {
           prev.map((b) => (b.id === reservationId ? { ...b, ...times } : b)),
         ),
     };
-  }, [role, rooms, staff, issues, reservations, patchRoom, focusRoomId, focusReservationId]);
+  }, [
+    role,
+    rooms,
+    staff,
+    issues,
+    reservations,
+    patchRoom,
+    focusRoomId,
+    focusReservationId,
+    currentStaffId,
+  ]);
 
   return <HotelContext.Provider value={value}>{children}</HotelContext.Provider>;
 }

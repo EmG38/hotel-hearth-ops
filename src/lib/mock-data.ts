@@ -6,11 +6,17 @@ function seeded(n: number) {
   return x - Math.floor(x);
 }
 
+/**
+ * Room attendants (housekeepers). Names reflect the real nationality mix on a Gulf
+ * hotel housekeeping floor — majority South/Southeast Asian — rather than the
+ * property's local Arab staff, who in practice concentrate at supervisor/front-desk
+ * level. See "Gulf Workforce Culture Research.md" in the project root.
+ */
 export const staff: Staff[] = [
   {
     id: "s1",
-    name: "Amina Hassan",
-    initials: "AH",
+    name: "Ligaya Santos",
+    initials: "LS",
     shift: "Morning",
     roomsCompleted: 14,
     avgMinutes: 26,
@@ -19,8 +25,8 @@ export const staff: Staff[] = [
   },
   {
     id: "s2",
-    name: "Youssef Nabil",
-    initials: "YN",
+    name: "Priya Sharma",
+    initials: "PS",
     shift: "Morning",
     roomsCompleted: 12,
     avgMinutes: 31,
@@ -29,8 +35,8 @@ export const staff: Staff[] = [
   },
   {
     id: "s3",
-    name: "Mariam Fouad",
-    initials: "MF",
+    name: "Sunita Gurung",
+    initials: "SG",
     shift: "Morning",
     roomsCompleted: 16,
     avgMinutes: 24,
@@ -39,8 +45,8 @@ export const staff: Staff[] = [
   },
   {
     id: "s4",
-    name: "Tarek Samir",
-    initials: "TS",
+    name: "Nazia Khan",
+    initials: "NK",
     shift: "Evening",
     roomsCompleted: 9,
     avgMinutes: 34,
@@ -49,8 +55,8 @@ export const staff: Staff[] = [
   },
   {
     id: "s5",
-    name: "Nour El Din",
-    initials: "ND",
+    name: "Chamari Perera",
+    initials: "CP",
     shift: "Evening",
     roomsCompleted: 11,
     avgMinutes: 29,
@@ -59,8 +65,8 @@ export const staff: Staff[] = [
   },
   {
     id: "s6",
-    name: "Salma Ibrahim",
-    initials: "SI",
+    name: "Nasrin Akter",
+    initials: "NA",
     shift: "Evening",
     roomsCompleted: 13,
     avgMinutes: 27,

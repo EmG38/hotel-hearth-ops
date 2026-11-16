@@ -60,4 +60,4 @@ export interface Reservation {
   vip: boolean;
 }
 
-export type Role = "supervisor" | "reception";
+export type Role = "supervisor" | "reception" | "housekeeper";

@@ -16,6 +16,10 @@ import { Route as InspectionsRouteImport } from './routes/inspections'
 import { Route as IssuesRouteImport } from './routes/issues'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as ReservationsRouteImport } from './routes/reservations'
+import { Route as HousekeeperIndexRouteImport } from './routes/housekeeper/index'
+import { Route as HousekeeperSummaryRouteImport } from './routes/housekeeper/summary'
+import { Route as HousekeeperReportIssueRoomIdRouteImport } from './routes/housekeeper/report-issue.$roomId'
+import { Route as HousekeeperRoomRoomIdRouteImport } from './routes/housekeeper/room.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +56,27 @@ const ReservationsRoute = ReservationsRouteImport.update({
   path: '/reservations',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HousekeeperIndexRoute = HousekeeperIndexRouteImport.update({
+  id: '/housekeeper/',
+  path: '/housekeeper/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HousekeeperSummaryRoute = HousekeeperSummaryRouteImport.update({
+  id: '/housekeeper/summary',
+  path: '/housekeeper/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HousekeeperReportIssueRoomIdRoute =
+  HousekeeperReportIssueRoomIdRouteImport.update({
+    id: '/housekeeper/report-issue/$roomId',
+    path: '/housekeeper/report-issue/$roomId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HousekeeperRoomRoomIdRoute = HousekeeperRoomRoomIdRouteImport.update({
+  id: '/housekeeper/room/$roomId',
+  path: '/housekeeper/room/$roomId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +86,10 @@ export interface FileRoutesByFullPath {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/summary': typeof HousekeeperSummaryRoute
+  '/housekeeper/': typeof HousekeeperIndexRoute
+  '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
+  '/housekeeper/room/$roomId': typeof HousekeeperRoomRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +99,10 @@ export interface FileRoutesByTo {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/summary': typeof HousekeeperSummaryRoute
+  '/housekeeper': typeof HousekeeperIndexRoute
+  '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
+  '/housekeeper/room/$roomId': typeof HousekeeperRoomRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +113,10 @@ export interface FileRoutesById {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/summary': typeof HousekeeperSummaryRoute
+  '/housekeeper/': typeof HousekeeperIndexRoute
+  '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
+  '/housekeeper/room/$roomId': typeof HousekeeperRoomRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +128,10 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/summary'
+    | '/housekeeper/'
+    | '/housekeeper/report-issue/$roomId'
+    | '/housekeeper/room/$roomId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +141,10 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/summary'
+    | '/housekeeper'
+    | '/housekeeper/report-issue/$roomId'
+    | '/housekeeper/room/$roomId'
   id:
     | '__root__'
     | '/'
@@ -109,6 +154,10 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/summary'
+    | '/housekeeper/'
+    | '/housekeeper/report-issue/$roomId'
+    | '/housekeeper/room/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +168,10 @@ export interface RootRouteChildren {
   IssuesRoute: typeof IssuesRoute
   PerformanceRoute: typeof PerformanceRoute
   ReservationsRoute: typeof ReservationsRoute
+  HousekeeperSummaryRoute: typeof HousekeeperSummaryRoute
+  HousekeeperIndexRoute: typeof HousekeeperIndexRoute
+  HousekeeperReportIssueRoomIdRoute: typeof HousekeeperReportIssueRoomIdRoute
+  HousekeeperRoomRoomIdRoute: typeof HousekeeperRoomRoomIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +225,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReservationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/housekeeper/': {
+      id: '/housekeeper/'
+      path: '/housekeeper'
+      fullPath: '/housekeeper/'
+      preLoaderRoute: typeof HousekeeperIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/housekeeper/summary': {
+      id: '/housekeeper/summary'
+      path: '/housekeeper/summary'
+      fullPath: '/housekeeper/summary'
+      preLoaderRoute: typeof HousekeeperSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/housekeeper/report-issue/$roomId': {
+      id: '/housekeeper/report-issue/$roomId'
+      path: '/housekeeper/report-issue/$roomId'
+      fullPath: '/housekeeper/report-issue/$roomId'
+      preLoaderRoute: typeof HousekeeperReportIssueRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/housekeeper/room/$roomId': {
+      id: '/housekeeper/room/$roomId'
+      path: '/housekeeper/room/$roomId'
+      fullPath: '/housekeeper/room/$roomId'
+      preLoaderRoute: typeof HousekeeperRoomRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +264,10 @@ const rootRouteChildren: RootRouteChildren = {
   IssuesRoute: IssuesRoute,
   PerformanceRoute: PerformanceRoute,
   ReservationsRoute: ReservationsRoute,
+  HousekeeperSummaryRoute: HousekeeperSummaryRoute,
+  HousekeeperIndexRoute: HousekeeperIndexRoute,
+  HousekeeperReportIssueRoomIdRoute: HousekeeperReportIssueRoomIdRoute,
+  HousekeeperRoomRoomIdRoute: HousekeeperRoomRoomIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

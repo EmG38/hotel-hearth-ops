@@ -31,7 +31,24 @@ const navSections: {
       { to: "/reservations", label: "Reservations", icon: "event_note" },
     ],
   },
+  {
+    role: "housekeeper",
+    label: "Housekeeper",
+    items: [{ to: "/housekeeper", label: "Housekeeper App", icon: "cleaning_services" }],
+  },
 ];
+
+const roleIcon: Record<Role, string> = {
+  supervisor: "supervisor_account",
+  reception: "concierge",
+  housekeeper: "cleaning_services",
+};
+
+const roleLabel: Record<Role, string> = {
+  supervisor: "Supervisor",
+  reception: "Reception",
+  housekeeper: "Housekeeper",
+};
 
 function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
   const { role, setRole } = useHotel();
@@ -50,7 +67,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
                 : "text-on-surface-variant hover:bg-surface-container",
             )}
           >
-            <Icon name={s.role === "supervisor" ? "supervisor_account" : "concierge"} size={18} />
+            <Icon name={roleIcon[s.role]} size={18} />
           </button>
         ))}
       </div>
@@ -166,12 +183,8 @@ function TopBar() {
           {rush} rush
         </span>
         <span className="text-label inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container px-3 py-1.5 text-on-surface-variant">
-          <Icon
-            name={role === "supervisor" ? "supervisor_account" : "concierge"}
-            size={16}
-            filled
-          />
-          {role === "supervisor" ? "Supervisor" : "Reception"}
+          <Icon name={roleIcon[role]} size={16} filled />
+          {roleLabel[role]}
         </span>
         <span className="grid size-9 place-items-center rounded-full bg-secondary text-label text-on-primary">
           EG
