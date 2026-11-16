@@ -19,13 +19,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/check-in")({
   head: () => ({
     meta: [
-      { title: "Check-In — Hotel App" },
+      { title: "Check-In — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Look up a reservation, assign an inspected room, flag rush cleans or offer an alternate.",
       },
-      { property: "og:title", content: "Check-In — Hotel App" },
+      { property: "og:title", content: "Check-In — Golden Sands Hotel" },
       {
         property: "og:description",
         content:

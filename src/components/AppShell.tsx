@@ -5,7 +5,7 @@ import { Icon } from "./Icon";
 import { GlobalSearch } from "./GlobalSearch";
 import { useHotel } from "@/lib/hotel-store";
 import type { Role } from "@/lib/hotel-types";
-import logoAsset from "@/assets/hotel-logo.png.asset.json";
+import logoAsset from "@/assets/golden-sands-emblem.png.asset.json";
 
 const navSections: {
   role: Role;
@@ -105,13 +105,13 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       )}
     >
       <div className={cn("flex items-center gap-2 px-4", collapsed && "justify-center px-2")}>
-        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-container">
-          <img src={logoAsset.url} alt="Hotel App logo" className="size-7 object-contain" />
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-container">
+          <img src={logoAsset.url} alt="Golden Sands Hotel logo" className="size-7 object-contain" />
         </span>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-title truncate text-on-surface">Hotel App</p>
-            <p className="text-label-sm text-on-surface-subtle">Ops console</p>
+            <p className="text-title truncate tracking-wide text-secondary">Golden Sands</p>
+            <p className="text-label-sm uppercase tracking-[0.2em] text-tertiary">Hotel · Ops</p>
           </div>
         )}
       </div>

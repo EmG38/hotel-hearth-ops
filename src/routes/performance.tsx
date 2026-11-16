@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/performance")({
   head: () => ({
     meta: [
-      { title: "Performance — Hotel App" },
+      { title: "Performance — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Aggregate housekeeping throughput per shift plus a supervisor-only per-attendant table.",
       },
-      { property: "og:title", content: "Performance — Hotel App" },
+      { property: "og:title", content: "Performance — Golden Sands Hotel" },
       {
         property: "og:description",
         content:

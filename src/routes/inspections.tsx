@@ -17,12 +17,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/inspections")({
   head: () => ({
     meta: [
-      { title: "Inspection Queue — Hotel App" },
+      { title: "Inspection Queue — Golden Sands Hotel" },
       {
         name: "description",
         content: "Inspect cleaned rooms against a four-area checklist and pass or reject them.",
       },
-      { property: "og:title", content: "Inspection Queue — Hotel App" },
+      { property: "og:title", content: "Inspection Queue — Golden Sands Hotel" },
       {
         property: "og:description",
         content: "Inspect cleaned rooms against a four-area checklist and pass or reject them.",

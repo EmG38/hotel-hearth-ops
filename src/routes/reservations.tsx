@@ -10,13 +10,13 @@ import { statusMeta } from "@/lib/room-status";
 export const Route = createFileRoute("/reservations")({
   head: () => ({
     meta: [
-      { title: "Reservations — Hotel App" },
+      { title: "Reservations — Golden Sands Hotel" },
       {
         name: "description",
         content:
           "Adjust expected arrival and departure times; changes reprioritise housekeeping order.",
       },
-      { property: "og:title", content: "Reservations — Hotel App" },
+      { property: "og:title", content: "Reservations — Golden Sands Hotel" },
       {
         property: "og:description",
         content:

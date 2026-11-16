@@ -26,7 +26,7 @@ function useOnline() {
 
 export const Route = createFileRoute("/housekeeper/")({
   head: () => ({
-    meta: [{ title: "Housekeeper App — Hotel App" }],
+    meta: [{ title: "Housekeeper App — Golden Sands Hotel" }],
   }),
   component: HousekeeperHome,
 });

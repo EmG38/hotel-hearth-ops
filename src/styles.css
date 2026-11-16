@@ -5,17 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Hotel App design system.
+ * Golden Sands Hotel design system.
  * All palette values are named theme tokens below — never hardcode hex in components.
  */
 
 @theme {
   /* Brand */
-  --color-primary: #16a34a;
+  --color-primary: #a87a2a;
   --color-on-primary: #ffffff;
-  --color-primary-container: #dcfce7;
-  --color-secondary: #47855e;
-  --color-tertiary: #387294;
+  --color-primary-container: #f8efdc;
+  --color-secondary: #7a5a1e;
+  --color-tertiary: #c9a45c;
 
   /* Room status */
   --color-success: #0d9488; /* available / inspected-ready */
@@ -28,7 +28,7 @@
   --color-oos: #94a3b8; /* out of service */
 
   /* Surfaces */
-  --color-surface: #fafafa;
+  --color-surface: #fbfaf7;
   --color-surface-container-lowest: #ffffff;
   --color-surface-container: #f1f5f9;
   --color-surface-container-high: #e2e8f0;
@@ -81,7 +81,7 @@
 
 :root {
   --radius: 0.75rem;
-  --background: #fafafa;
+  --background: #fbfaf7;
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
@@ -95,7 +95,7 @@
   --destructive-foreground: #ffffff;
   --border: #cbd5e1;
   --input: #cbd5e1;
-  --ring: #16a34a;
+  --ring: #a87a2a;
 }
 
 /* Material 3-like type scale */
