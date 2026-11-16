@@ -17,6 +17,9 @@
   --color-secondary: #7a5a1e;
   --color-tertiary: #c9a45c;
 
+  /* Brand ink — deep espresso for dark hero panels */
+  --color-brand-ink: #2b2014;
+
   /* Room status */
   --color-success: #0d9488; /* available / inspected-ready */
   --color-warning: #d97706; /* pending / in progress */
@@ -24,31 +27,31 @@
   --color-info: #4389b1; /* clean, awaiting inspection */
 
   /* Flags */
-  --color-ooo: #1e293b; /* out of order */
-  --color-oos: #94a3b8; /* out of service */
+  --color-ooo: #3a2f22; /* out of order */
+  --color-oos: #a89f91; /* out of service */
 
   /* Surfaces */
   --color-surface: #fbfaf7;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container: #f1f5f9;
-  --color-surface-container-high: #e2e8f0;
+  --color-surface-container: #f5efe3;
+  --color-surface-container-high: #ebe2d0;
 
   /* Content */
-  --color-on-surface: #0f172a;
-  --color-on-surface-variant: #475569;
-  --color-on-surface-subtle: #94a3b8;
+  --color-on-surface: #2a2218;
+  --color-on-surface-variant: #5f5444;
+  --color-on-surface-subtle: #a3977f;
 
   /* Lines */
-  --color-outline: #64748b;
-  --color-outline-variant: #cbd5e1;
+  --color-outline: #8a7c64;
+  --color-outline-variant: #e3d8c2;
 
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --radius-card: 16px;
   --radius-card-lg: 20px;
 
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px rgb(15 23 42 / 0.06);
-  --shadow-raised: 0 2px 4px rgb(15 23 42 / 0.05), 0 12px 32px rgb(15 23 42 / 0.1);
+  --shadow-soft: 0 1px 2px rgb(58 42 18 / 0.04), 0 4px 12px rgb(58 42 18 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(58 42 18 / 0.05), 0 12px 32px rgb(58 42 18 / 0.1);
 
   /* Housekeeper mobile preview — one consistent card radius, reused everywhere
      instead of mixing rounded-xl/2xl/3xl, per native-vs-web UI research
@@ -77,25 +80,31 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
 }
 
 :root {
   --radius: 0.75rem;
   --background: #fbfaf7;
-  --foreground: #0f172a;
+  --foreground: #2a2218;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #2a2218;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #475569;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
+  --popover-foreground: #2a2218;
+  --muted: #f5efe3;
+  --muted-foreground: #5f5444;
+  --accent: #f8efdc;
+  --accent-foreground: #2a2218;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #cbd5e1;
-  --input: #cbd5e1;
+  --border: #e3d8c2;
+  --input: #e3d8c2;
   --ring: #a87a2a;
+  --primary: #a87a2a;
+  --primary-foreground: #ffffff;
+  --secondary: #f8efdc;
+  --secondary-foreground: #7a5a1e;
 }
 
 /* Material 3-like type scale */

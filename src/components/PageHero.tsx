@@ -26,7 +26,7 @@ export function PageHero({
 }) {
   return (
     <section className="relative mb-10">
-      <div className="from-on-surface via-on-surface to-primary/25 relative overflow-hidden rounded-3xl bg-gradient-to-br px-6 pb-20 pt-7 text-on-primary sm:px-8 sm:pt-8">
+      <div className="from-brand-ink via-brand-ink to-primary/60 relative overflow-hidden rounded-3xl bg-gradient-to-br px-6 pb-20 pt-7 text-on-primary sm:px-8 sm:pt-8">
         <Icon
           name={ghostIcon}
           filled
