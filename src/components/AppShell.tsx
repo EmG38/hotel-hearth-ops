@@ -74,19 +74,20 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
     );
   }
   return (
-    <div className="mx-3 flex rounded-full bg-surface-container p-1">
+    <div className="mx-3 flex rounded-3xl bg-surface-container p-1">
       {navSections.map((s) => (
         <button
           key={s.role}
           onClick={() => setRole(s.role)}
           className={cn(
-            "text-label-sm min-w-0 flex-1 truncate rounded-full px-1 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            "text-label-sm flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-2xl px-0.5 py-1.5 tracking-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             role === s.role
               ? "bg-surface-container-lowest text-on-surface shadow-soft"
               : "text-on-surface-variant",
           )}
         >
-          {s.label}
+          <Icon name={roleIcon[s.role]} size={16} filled={role === s.role} />
+          <span className="whitespace-nowrap text-[10px] font-semibold leading-3">{s.label}</span>
         </button>
       ))}
     </div>
