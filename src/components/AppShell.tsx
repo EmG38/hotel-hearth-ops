@@ -80,7 +80,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
           key={s.role}
           onClick={() => setRole(s.role)}
           className={cn(
-            "text-label flex-1 rounded-full px-2 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            "text-label-sm min-w-0 flex-1 truncate rounded-full px-1 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             role === s.role
               ? "bg-surface-container-lowest text-on-surface shadow-soft"
               : "text-on-surface-variant",
