@@ -32,7 +32,7 @@ export function LoginFlow() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-[#15110b] px-6 pb-8 pt-8">
+    <div className="flex flex-1 flex-col bg-brand-ink px-6 pb-8 pt-8">
       <div className="flex flex-col items-center">
         <img
           src={goldenSandsLogo}
