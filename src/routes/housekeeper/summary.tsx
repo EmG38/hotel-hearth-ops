@@ -4,6 +4,7 @@ import { useHotel } from "@/lib/hotel-store";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
 import { useHkT } from "@/lib/housekeeper-i18n";
+import { useOnline } from "@/lib/use-online";
 
 export const Route = createFileRoute("/housekeeper/summary")({
   component: ShiftSummary,
@@ -27,6 +28,7 @@ function ShiftSummary() {
   const { rooms, issues, currentStaffId, setCurrentStaffId, staffById } = useHotel();
   const navigate = useNavigate();
   const t = useHkT();
+  const online = useOnline();
   const me = staffById(currentStaffId);
 
   const myRooms = useMemo(
@@ -65,7 +67,14 @@ function ShiftSummary() {
           </div>
         </div>
 
-        <div className="mx-4 mt-4 shrink-0 hk-card bg-gradient-to-br from-primary to-success p-5 text-center text-on-primary shadow-soft">
+        {!online && (
+          <div className="mt-3 flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
+            <Icon name="cloud_off" size={18} filled />
+            <span>{t.t("offlineBanner")}</span>
+          </div>
+        )}
+
+        <div className="mx-4 mt-4 shrink-0 hk-card bg-gradient-to-br from-primary to-secondary p-5 text-center text-on-primary shadow-soft">
           <p className="text-label font-medium opacity-90">{t.t("yourPerformanceToday")}</p>
           <p className="mt-2 text-4xl font-bold">
             {completed}

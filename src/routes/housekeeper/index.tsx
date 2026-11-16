@@ -1,28 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room } from "@/lib/hotel-types";
 import { Avatar } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
-import { useHkLang, setHkLang, useHkT, greetingKey, timeAgo } from "@/lib/housekeeper-i18n";
+import { RoomRow } from "@/components/housekeeper/RoomRow";
+import { LoginFlow } from "@/components/housekeeper/LoginFlow";
+import { sortByPriority } from "@/lib/housekeeper-room";
+import { useOnline } from "@/lib/use-online";
+import { useHkLang, setHkLang, useHkT, greetingKey } from "@/lib/housekeeper-i18n";
 import { cn } from "@/lib/utils";
 
-function useOnline() {
-  const [online, setOnline] = useState(true);
-  useEffect(() => {
-    setOnline(navigator.onLine);
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
-    return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
-    };
-  }, []);
-  return online;
-}
+const FLOOR_PREVIEW_MAX = 3;
 
 export const Route = createFileRoute("/housekeeper/")({
   head: () => ({
@@ -30,29 +20,6 @@ export const Route = createFileRoute("/housekeeper/")({
   }),
   component: HousekeeperHome,
 });
-
-function SignInPicker() {
-  const { staff, setCurrentStaffId } = useHotel();
-  const t = useHkT();
-  return (
-    <div className="flex flex-1 flex-col px-5 py-6">
-      <p className="text-title text-on-surface">{t.t("signIn")}</p>
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {staff.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => setCurrentStaffId(s.id)}
-            className="flex flex-col items-center gap-2 hk-card border border-outline-variant bg-surface-container-lowest p-4 transition-all hover:bg-surface-container active:scale-[0.97] active:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <Avatar staff={s} size={56} />
-            <span className="text-label text-on-surface">{s.name}</span>
-            <span className="text-label-sm text-on-surface-subtle">{s.shift} shift</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 const STATUS_PILLS = [
   {
@@ -84,23 +51,6 @@ const STATUS_PILLS = [
     dot: "bg-success",
   },
 ];
-
-const badgeTone: Record<Room["status"], string> = {
-  dirty: "bg-error/10 text-error",
-  in_progress: "bg-warning/10 text-warning",
-  clean: "bg-info/10 text-info",
-  inspected: "bg-success/10 text-success",
-};
-
-const statusLabelKey: Record<
-  Room["status"],
-  "statusDirty" | "statusInProgress" | "statusAwaiting" | "statusInspected"
-> = {
-  dirty: "statusDirty",
-  in_progress: "statusInProgress",
-  clean: "statusAwaiting",
-  inspected: "statusInspected",
-};
 
 function LangToggle() {
   const lang = useHkLang();
@@ -161,21 +111,23 @@ function HousekeeperHome() {
       .sort(([a], [b]) => a - b)
       .map(([floor, list]) => ({
         floor,
-        rooms: list.sort((a, b) => Number(a.number) - Number(b.number)),
+        total: list.length,
         ready: list.filter((r) => r.status === "inspected").length,
+        preview: sortByPriority(list).slice(0, FLOOR_PREVIEW_MAX),
+        hasMore: list.length > FLOOR_PREVIEW_MAX,
       }));
   }, [myRooms]);
 
   return (
-    <MobileFrame>
+    <MobileFrame dark={!me}>
       {!me ? (
-        <SignInPicker />
+        <LoginFlow />
       ) : (
         <div className="flex-1 overflow-y-auto">
           {!online && (
-            <div className="flex items-center justify-end gap-1.5 px-4 pt-3 text-label-sm text-on-surface-variant">
-              <Icon name="cloud_off" size={14} />
-              {t.t("offline")}
+            <div className="flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
+              <Icon name="cloud_off" size={18} filled />
+              <span>{t.t("offlineBanner")}</span>
             </div>
           )}
           <div className="flex items-center justify-between px-4 pt-4">
@@ -194,7 +146,7 @@ function HousekeeperHome() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-1.5">
-              <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-success/10 px-3 py-1.5 font-medium text-success">
+              <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 font-medium text-primary">
                 <Icon name="cleaning_services" size={14} filled />
                 {t.t("housekeeper")}
               </span>
@@ -202,7 +154,7 @@ function HousekeeperHome() {
             </div>
           </div>
 
-          <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-success p-5 text-on-primary shadow-soft">
+          <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-secondary p-5 text-on-primary shadow-soft">
             <div className="flex items-center justify-between">
               <p className="text-label-sm font-semibold uppercase tracking-wide opacity-90">
                 {t.t("todaysShift")}
@@ -244,7 +196,10 @@ function HousekeeperHome() {
             <div className="pt-5">
               <div className="flex items-center justify-between px-4">
                 <p className="text-title-sm text-on-surface">{t.t("needsAttention")}</p>
-                <button className="text-label-sm font-medium text-primary">
+                <button
+                  onClick={() => navigate({ to: "/housekeeper/attention" })}
+                  className="text-label-sm font-medium text-primary"
+                >
                   {t.t("seeAll")} →
                 </button>
               </div>
@@ -255,15 +210,26 @@ function HousekeeperHome() {
                     onClick={() =>
                       navigate({ to: "/housekeeper/room/$roomId", params: { roomId: r.id } })
                     }
-                    className="relative h-28 w-36 shrink-0 overflow-hidden hk-card bg-gradient-to-br from-error/80 to-error text-left transition-transform active:scale-[0.97]"
+                    className="relative h-28 w-36 shrink-0 overflow-hidden hk-card text-left transition-transform active:scale-[0.97]"
                   >
-                    <Icon
-                      name="bed"
-                      size={56}
-                      className="absolute -bottom-2 -right-2 text-white/20"
-                      filled
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2.5">
+                    {r.photo ? (
+                      <img
+                        src={r.photo}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-error/80 to-error" />
+                    )}
+                    {!r.photo && (
+                      <Icon
+                        name="bed"
+                        size={56}
+                        className="absolute -bottom-2 -right-2 text-white/20"
+                        filled
+                      />
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2.5">
                       <p className="text-label font-semibold text-white">Rm {r.number}</p>
                       <p className="text-label-sm text-white/80">{r.type}</p>
                     </div>
@@ -275,71 +241,47 @@ function HousekeeperHome() {
 
           <div className="px-4 pt-5 pb-4">
             <p className="text-title-sm text-on-surface">{t.t("allRooms")}</p>
-            {floors.map(({ floor, rooms: floorRooms, ready }) => (
+            {floors.map(({ floor, total, ready, preview, hasMore }) => (
               <div key={floor} className="mt-3">
-                <div className="flex items-center justify-between">
+                <button
+                  onClick={() =>
+                    navigate({ to: "/housekeeper/floor/$floor", params: { floor: String(floor) } })
+                  }
+                  className="flex w-full items-center justify-between py-1 active:opacity-60"
+                >
                   <p className="text-label-sm uppercase text-on-surface-subtle">
                     {t.t("floor")} {floor}
                   </p>
-                  <p className="text-label-sm text-on-surface-subtle">
-                    {ready}/{floorRooms.length} {t.t("ready")}
+                  <p className="text-label-sm inline-flex items-center gap-1 text-on-surface-subtle">
+                    {ready}/{total} {t.t("ready")}
+                    <Icon name="chevron_right" size={14} />
                   </p>
-                </div>
+                </button>
                 <div className="mt-1.5 overflow-hidden hk-card border border-outline-variant">
-                  {floorRooms.map((r, i) => (
-                    <button
+                  {preview.map((r, i) => (
+                    <RoomRow
                       key={r.id}
+                      room={r}
+                      divider={i > 0}
                       onClick={() =>
                         navigate({ to: "/housekeeper/room/$roomId", params: { roomId: r.id } })
                       }
-                      className={cn(
-                        "flex w-full items-center gap-3 bg-surface-container-lowest px-3 py-3 text-left transition-colors active:bg-surface-container",
-                        i > 0 && "border-t border-outline-variant",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "grid size-11 shrink-0 place-items-center rounded-xl text-title font-semibold",
-                          badgeTone[r.status],
-                        )}
-                      >
-                        {r.number}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <p className="text-label text-on-surface">{r.type}</p>
-                          {r.flags.includes("dnd") && (
-                            <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-surface-container px-1.5 py-0.5 text-on-surface-variant">
-                              <Icon name="do_not_disturb_on" size={12} />
-                              DND
-                            </span>
-                          )}
-                          {r.flags.includes("ooo") && (
-                            <span className="text-label-sm rounded-full bg-on-surface px-1.5 py-0.5 text-on-primary">
-                              Out of Order
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-label-sm text-on-surface-subtle">
-                          {timeAgo(r.lastUpdated, t)}
-                        </p>
-                      </div>
-                      <span
-                        className={cn(
-                          "text-label-sm inline-flex items-center gap-1.5 shrink-0",
-                          badgeTone[r.status].split(" ")[1],
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "size-1.5 rounded-full",
-                            STATUS_PILLS.find((p) => p.key === r.status)?.dot,
-                          )}
-                        />
-                        {t.t(statusLabelKey[r.status])}
-                      </span>
-                    </button>
+                    />
                   ))}
+                  {hasMore && (
+                    <button
+                      onClick={() =>
+                        navigate({
+                          to: "/housekeeper/floor/$floor",
+                          params: { floor: String(floor) },
+                        })
+                      }
+                      className="flex w-full items-center justify-center gap-1 border-t border-outline-variant bg-surface-container-lowest py-2.5 text-label font-medium text-primary active:bg-surface-container"
+                    >
+                      {t.t("viewAll")} {total} {t.t("roomsWord")}
+                      <Icon name="chevron_right" size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

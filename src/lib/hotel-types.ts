@@ -15,6 +15,9 @@ export interface Room {
   eta: string | null;
   lastUpdated: string;
   notes: string[];
+  /** Real room photo, keyed by room type when available; housekeeper screens
+   * fall back to an icon placeholder when this is unset. */
+  photo?: string;
 }
 
 export interface Staff {

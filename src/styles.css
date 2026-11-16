@@ -159,6 +159,22 @@
   corner-shape: superellipse(2);
 }
 
+/* Golden Sands Hotel brand — scoped to the Housekeeper phone preview only.
+   The desktop Supervisor/Reception console keeps the original green
+   (--color-primary is untouched at the theme level); this just overrides
+   the CSS custom property's *value* inside .hk-frame, so every existing
+   bg-primary/text-primary/border-primary utility already in use picks up
+   gold automatically — confirmed Tailwind v4 compiles those utilities as
+   `var(--color-primary)`, not an inlined literal. Status colors (dirty/
+   in-progress/awaiting/inspected) are deliberately left alone: brand color
+   and status color must never collide. */
+.hk-frame {
+  --color-primary: #96701e;
+  --color-primary-container: #f6ebd4;
+  --color-on-primary: #ffffff;
+  --color-secondary: #c9972c; /* lighter gold, for brand gradients only — e.g. from-primary to-secondary */
+}
+
 /* Mobile-native baseline (see the mobile-native skill) scoped to the phone
    preview only — never applied to the desktop Supervisor/Reception console. */
 @layer base {

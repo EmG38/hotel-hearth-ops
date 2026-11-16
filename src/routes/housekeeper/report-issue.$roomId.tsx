@@ -6,6 +6,7 @@ import { Button, Chip, inputClass } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { useHkT, ISSUE_CATEGORIES } from "@/lib/housekeeper-i18n";
+import { useOnline } from "@/lib/use-online";
 
 export const Route = createFileRoute("/housekeeper/report-issue/$roomId")({
   component: ReportIssue,
@@ -16,6 +17,7 @@ function ReportIssue() {
   const { roomById, reportIssue, currentStaffId } = useHotel();
   const navigate = useNavigate();
   const t = useHkT();
+  const online = useOnline();
   const room = roomById(roomId);
   const [category, setCategory] = useState<string>(ISSUE_CATEGORIES[0].id);
   const [hasPhoto, setHasPhoto] = useState(false);
@@ -43,6 +45,12 @@ function ReportIssue() {
         subtitle={`Room ${room.number}`}
         onBack={() => navigate({ to: "/housekeeper/room/$roomId", params: { roomId: room.id } })}
       />
+      {!online && (
+        <div className="flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
+          <Icon name="cloud_off" size={18} filled />
+          <span>{t.t("offlineBanner")}</span>
+        </div>
+      )}
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
         <div>
           <p className="text-label-sm uppercase text-on-surface-subtle">

@@ -1,4 +1,13 @@
 import type { Issue, Reservation, Room, RoomStatus, RoomType, Staff } from "./hotel-types";
+import roomStandardPhoto from "@/assets/photos/room-standard.jpg";
+import roomDeluxePhoto from "@/assets/photos/room-deluxe.jpg";
+import roomSuitePhoto from "@/assets/photos/room-suite.jpg";
+
+export const roomPhotoByType: Record<RoomType, string> = {
+  Standard: roomStandardPhoto,
+  Deluxe: roomDeluxePhoto,
+  Suite: roomSuitePhoto,
+};
 
 /** Deterministic pseudo-random so SSR and client agree. */
 function seeded(n: number) {
@@ -109,13 +118,15 @@ export function buildRooms(): Room[] {
       if (seq % 23 === 0) flags.push("dnd");
 
       const needsAttendant = status === "in_progress" || status === "clean";
+      const type = roomType(i);
       rooms.push({
         id: `r${floor}${String(i).padStart(2, "0")}`,
         number: `${floor}${String(i).padStart(2, "0")}`,
         floor,
-        type: roomType(i),
+        type,
         status,
         flags,
+        photo: roomPhotoByType[type],
         attendantId: needsAttendant
           ? staff[Math.floor(seeded(seq + 7) * staff.length)]!.id
           : seq % 5 === 0

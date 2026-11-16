@@ -6,6 +6,7 @@ import { Button } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
 import { useHkT, timeAgo } from "@/lib/housekeeper-i18n";
+import { useOnline } from "@/lib/use-online";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/housekeeper/room/$roomId")({
@@ -31,6 +32,7 @@ function RoomDetail() {
   const { roomById, setRoomStatus, setRoomNote } = useHotel();
   const navigate = useNavigate();
   const t = useHkT();
+  const online = useOnline();
   const room = roomById(roomId);
   const [note, setNote] = useState(room?.notes[0] ?? "");
 
@@ -71,19 +73,28 @@ function RoomDetail() {
   return (
     <MobileFrame>
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <div
-          className={cn(
-            "relative flex h-56 shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br p-4",
-            heroTone[status],
+        <div className="relative flex h-56 shrink-0 flex-col justify-between overflow-hidden p-4">
+          {room.photo ? (
+            <>
+              <img
+                src={room.photo}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/35" />
+            </>
+          ) : (
+            <>
+              <div className={cn("absolute inset-0 bg-gradient-to-br", heroTone[status])} />
+              <Icon
+                name="bed"
+                size={140}
+                filled
+                className="pointer-events-none absolute -bottom-6 -right-6 text-white/15"
+              />
+            </>
           )}
-        >
-          <Icon
-            name="bed"
-            size={140}
-            filled
-            className="pointer-events-none absolute -bottom-6 -right-6 text-white/15"
-          />
-          <div className="flex items-start justify-between">
+          <div className="relative flex items-start justify-between">
             <button
               onClick={() => navigate({ to: "/housekeeper" })}
               className="grid size-10 place-items-center rounded-full bg-white/90 text-on-surface shadow-soft"
@@ -101,6 +112,12 @@ function RoomDetail() {
         </div>
 
         <div className="-mt-6 flex-1 rounded-t-3xl bg-surface p-4">
+          {!online && (
+            <div className="-mx-4 -mt-4 mb-4 flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
+              <Icon name="cloud_off" size={18} filled />
+              <span>{t.t("offlineBanner")}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span
               className={cn(
