@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room } from "@/lib/hotel-types";
 import { Avatar } from "@/components/ui-kit";
@@ -363,8 +362,8 @@ function HousekeeperHome() {
             <span className="text-label-sm font-medium">{t.t("home")}</span>
           </button>
           <button
-            onClick={() => toast(t.t("scanNotAvailable"))}
-            className="-mt-6 grid size-14 place-items-center rounded-full bg-primary text-on-primary shadow-soft"
+            onClick={() => navigate({ to: "/housekeeper/scan" })}
+            className="-mt-6 grid size-14 place-items-center rounded-full bg-primary text-on-primary shadow-soft active:scale-95"
           >
             <Icon name="qr_code_scanner" size={24} />
           </button>

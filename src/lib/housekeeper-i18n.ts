@@ -131,12 +131,20 @@ const dict = {
   signIn: { en: "Who's signing in?", hi: "कौन साइन इन कर रहा है?" },
   switchUser: { en: "Switch user", hi: "उपयोगकर्ता बदलें" },
   offline: { en: "Offline", hi: "ऑफ़लाइन" },
-  scanNotAvailable: {
-    en: "Scan isn't available in this preview",
-    hi: "इस पूर्वावलोकन में स्कैन उपलब्ध नहीं है",
-  },
   home: { en: "Home", hi: "होम" },
   scan: { en: "Scan", hi: "स्कैन" },
+  scanRoom: { en: "Scan Room", hi: "कमरा स्कैन करें" },
+  pointAtCode: {
+    en: "Point your camera at the door's QR code",
+    hi: "दरवाज़े के QR कोड पर कैमरा रखें",
+  },
+  searching: { en: "Searching…", hi: "खोज रहे हैं…" },
+  roomFound: { en: "Room found", hi: "कमरा मिल गया" },
+  enterRoomInstead: { en: "Enter room number instead", hi: "इसके बजाय कमरा नंबर डालें" },
+  roomNumber: { en: "Room number", hi: "कमरा नंबर" },
+  go: { en: "Go", hi: "जाएँ" },
+  roomNotFound: { en: "No room found with that number", hi: "यह नंबर किसी कमरे का नहीं है" },
+  cancel: { en: "Cancel", hi: "रद्द करें" },
 } as const;
 
 export type HkDictKey = keyof typeof dict;

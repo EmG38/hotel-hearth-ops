@@ -17,6 +17,7 @@ import { Route as IssuesRouteImport } from './routes/issues'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as ReservationsRouteImport } from './routes/reservations'
 import { Route as HousekeeperIndexRouteImport } from './routes/housekeeper/index'
+import { Route as HousekeeperScanRouteImport } from './routes/housekeeper/scan'
 import { Route as HousekeeperSummaryRouteImport } from './routes/housekeeper/summary'
 import { Route as HousekeeperReportIssueRoomIdRouteImport } from './routes/housekeeper/report-issue.$roomId'
 import { Route as HousekeeperRoomRoomIdRouteImport } from './routes/housekeeper/room.$roomId'
@@ -61,6 +62,11 @@ const HousekeeperIndexRoute = HousekeeperIndexRouteImport.update({
   path: '/housekeeper/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HousekeeperScanRoute = HousekeeperScanRouteImport.update({
+  id: '/housekeeper/scan',
+  path: '/housekeeper/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HousekeeperSummaryRoute = HousekeeperSummaryRouteImport.update({
   id: '/housekeeper/summary',
   path: '/housekeeper/summary',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/scan': typeof HousekeeperScanRoute
   '/housekeeper/summary': typeof HousekeeperSummaryRoute
   '/housekeeper/': typeof HousekeeperIndexRoute
   '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/scan': typeof HousekeeperScanRoute
   '/housekeeper/summary': typeof HousekeeperSummaryRoute
   '/housekeeper': typeof HousekeeperIndexRoute
   '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/issues': typeof IssuesRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
+  '/housekeeper/scan': typeof HousekeeperScanRoute
   '/housekeeper/summary': typeof HousekeeperSummaryRoute
   '/housekeeper/': typeof HousekeeperIndexRoute
   '/housekeeper/report-issue/$roomId': typeof HousekeeperReportIssueRoomIdRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/scan'
     | '/housekeeper/summary'
     | '/housekeeper/'
     | '/housekeeper/report-issue/$roomId'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/scan'
     | '/housekeeper/summary'
     | '/housekeeper'
     | '/housekeeper/report-issue/$roomId'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/issues'
     | '/performance'
     | '/reservations'
+    | '/housekeeper/scan'
     | '/housekeeper/summary'
     | '/housekeeper/'
     | '/housekeeper/report-issue/$roomId'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   IssuesRoute: typeof IssuesRoute
   PerformanceRoute: typeof PerformanceRoute
   ReservationsRoute: typeof ReservationsRoute
+  HousekeeperScanRoute: typeof HousekeeperScanRoute
   HousekeeperSummaryRoute: typeof HousekeeperSummaryRoute
   HousekeeperIndexRoute: typeof HousekeeperIndexRoute
   HousekeeperReportIssueRoomIdRoute: typeof HousekeeperReportIssueRoomIdRoute
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HousekeeperIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/housekeeper/scan': {
+      id: '/housekeeper/scan'
+      path: '/housekeeper/scan'
+      fullPath: '/housekeeper/scan'
+      preLoaderRoute: typeof HousekeeperScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/housekeeper/summary': {
       id: '/housekeeper/summary'
       path: '/housekeeper/summary'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   IssuesRoute: IssuesRoute,
   PerformanceRoute: PerformanceRoute,
   ReservationsRoute: ReservationsRoute,
+  HousekeeperScanRoute: HousekeeperScanRoute,
   HousekeeperSummaryRoute: HousekeeperSummaryRoute,
   HousekeeperIndexRoute: HousekeeperIndexRoute,
   HousekeeperReportIssueRoomIdRoute: HousekeeperReportIssueRoomIdRoute,
