@@ -13,7 +13,7 @@ const buttonVariants: Record<ButtonVariant, string> = {
   outline:
     "border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container",
   ghost: "text-on-surface-variant hover:bg-surface-container",
-  tonal: "bg-primary-container text-secondary hover:bg-primary-container/70",
+  tonal: "bg-tertiary-container text-tertiary hover:bg-tertiary-container/70",
   danger: "bg-error text-on-primary hover:bg-error/90",
   success: "bg-success text-on-primary hover:bg-success/90",
 };

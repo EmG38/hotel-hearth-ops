@@ -157,7 +157,7 @@ function Performance() {
                 </div>
                 <div className="mt-2.5 space-y-1.5">
                   {st.inspected > 0 ? (
-                    <Bar value={passRate} tone="bg-secondary" />
+                    <Bar value={passRate} tone="bg-tertiary" />
                   ) : (
                     <p className="text-label-sm text-on-surface-subtle">No inspections yet</p>
                   )}

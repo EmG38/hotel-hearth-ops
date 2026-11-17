@@ -15,7 +15,11 @@
   --color-on-primary: #ffffff;
   --color-primary-container: #fdeadb;
   --color-secondary: #1b2f55;
-  --color-tertiary: #6fb3dc;
+  /* Tertiary = the Gulf livery's light sky blue (sampled from the reference
+     images: #2D93CE vivid / #83AEC8 powder). Used as the third identity accent
+     alongside orange primary and navy secondary. */
+  --color-tertiary: #2d93ce;
+  --color-tertiary-container: #dceefb;
 
   /* Brand ink — deep espresso for dark hero panels */
   --color-brand-ink: #14233f;

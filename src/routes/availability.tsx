@@ -168,7 +168,12 @@ function AvailabilityBoard() {
                       <td className="text-body px-4 py-2.5 text-on-surface-variant">{r.type}</td>
                       <td className="px-4 py-2.5">
                         <span className="text-body-sm inline-flex items-center gap-1 text-on-surface-variant">
-                          <Icon name={viewIcon[r.view]} size={14} filled={r.view === "gulf"} />
+                          <Icon
+                            name={viewIcon[r.view]}
+                            size={14}
+                            filled={r.view === "gulf"}
+                            className="text-tertiary"
+                          />
                           {viewLabel[r.view]}
                         </span>
                       </td>

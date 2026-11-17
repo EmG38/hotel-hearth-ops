@@ -124,7 +124,12 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
           return (
             <div key={section.role} className={cn("mb-2", !active && "opacity-45")}>
               {!collapsed && (
-                <p className="text-label-sm px-5 py-2 uppercase text-on-surface-subtle">
+                <p
+                  className={cn(
+                    "text-label-sm px-5 py-2 uppercase",
+                    active ? "text-tertiary" : "text-on-surface-subtle",
+                  )}
+                >
                   {section.label}
                 </p>
               )}
@@ -183,7 +188,7 @@ function TopBar() {
           {rush} rush
         </span>
         <span className="text-label inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container px-3 py-1.5 text-on-surface-variant">
-          <Icon name={roleIcon[role]} size={16} filled />
+          <Icon name={roleIcon[role]} size={16} filled className="text-tertiary" />
           {roleLabel[role]}
         </span>
         <span className="grid size-9 place-items-center rounded-full bg-secondary text-label text-on-primary">

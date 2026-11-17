@@ -141,7 +141,7 @@ function Performance() {
                     <Bar value={s.onTimePct} tone="bg-primary" />
                   </td>
                   <td className="px-4 py-3">
-                    <Bar value={s.passRate} tone="bg-secondary" />
+                    <Bar value={s.passRate} tone="bg-tertiary" />
                   </td>
                   <td className="text-body px-4 py-3 tabular-nums text-on-surface-variant">
                     {workload(s.id)}
