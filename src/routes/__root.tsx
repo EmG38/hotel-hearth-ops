@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import { HotelProvider } from "@/lib/hotel-store";
+import { I18nProvider } from "@/lib/i18n";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -99,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
@@ -133,11 +134,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <HotelProvider>
-        <AppShell>
+        <I18nProvider>
+          <AppShell>
           {/* Required: nested routes render here. */}
           <Outlet />
-        </AppShell>
-        <Toaster position="bottom-right" richColors closeButton expand={false} />
+          </AppShell>
+          <Toaster position="bottom-right" richColors closeButton expand={false} />
+        </I18nProvider>
       </HotelProvider>
     </QueryClientProvider>
   );

@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 import type { Room, Staff } from "@/lib/hotel-types";
 import { flagMeta, statusMeta } from "@/lib/room-status";
+import { useFlagText, useStatusText } from "@/lib/i18n";
 
 /* ---------- Buttons ---------- */
 
@@ -68,6 +69,7 @@ export function Chip({
 
 export function StatusChip({ status, className }: { status: Room["status"]; className?: string }) {
   const meta = statusMeta[status];
+  const statusText = useStatusText();
   return (
     <span
       className={cn(
@@ -77,13 +79,14 @@ export function StatusChip({ status, className }: { status: Room["status"]; clas
       )}
     >
       <Icon name={meta.icon} size={14} filled />
-      {meta.label}
+      {statusText[status].label}
     </span>
   );
 }
 
 export function FlagChip({ flag }: { flag: Room["flags"][number] }) {
   const meta = flagMeta[flag];
+  const flagText = useFlagText();
   return (
     <span
       className={cn(
@@ -92,7 +95,7 @@ export function FlagChip({ flag }: { flag: Room["flags"][number] }) {
       )}
     >
       <Icon name={meta.icon} size={13} filled />
-      {meta.label}
+      {flagText[flag]}
     </span>
   );
 }

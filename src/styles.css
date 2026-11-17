@@ -224,3 +224,69 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+/* ── Urdu (RTL) ──
+ * The console is built with physical spacing utilities (ml-auto, border-r,
+ * text-left…), so when the language switch sets dir="rtl" on <html> we flip
+ * the handful of physical utilities that would otherwise sit on the wrong
+ * side. Flexbox/grid direction already follows the document direction. */
+@layer base {
+  [dir="rtl"] body {
+    font-family: "Noto Naskh Arabic", var(--font-sans);
+  }
+  /* Naskh sits small; nudge Urdu text up a touch for parity with Inter. */
+  [dir="rtl"] body {
+    font-size: 105%;
+  }
+  [dir="rtl"] .uppercase {
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  [dir="rtl"] .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  [dir="rtl"] .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+  }
+  [dir="rtl"] .text-left {
+    text-align: right;
+  }
+  [dir="rtl"] .text-right {
+    text-align: left;
+  }
+  [dir="rtl"] .border-r {
+    border-right-width: 0;
+    border-left-width: 1px;
+  }
+  [dir="rtl"] .border-l {
+    border-left-width: 0;
+    border-right-width: 1px;
+  }
+  [dir="rtl"] .pl-10 {
+    padding-left: 0.75rem;
+    padding-right: 2.5rem;
+  }
+  [dir="rtl"] .pr-8 {
+    padding-right: 0.75rem;
+    padding-left: 2rem;
+  }
+  [dir="rtl"] .left-3 {
+    left: auto;
+    right: 0.75rem;
+  }
+  [dir="rtl"] .-right-8 {
+    right: auto;
+    left: -2rem;
+  }
+  [dir="rtl"] .-right-6 {
+    right: auto;
+    left: -1.5rem;
+  }
+  /* Directional chevrons/arrows point the other way in RTL. */
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+}

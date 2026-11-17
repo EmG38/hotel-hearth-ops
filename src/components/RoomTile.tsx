@@ -3,6 +3,7 @@ import { Icon } from "./Icon";
 import type { Room } from "@/lib/hotel-types";
 import { flagMeta, isBlocked, statusMeta } from "@/lib/room-status";
 import { useHotel } from "@/lib/hotel-store";
+import { useStatusText, useTypeText } from "@/lib/i18n";
 
 export function RoomTile({
   room,
@@ -15,6 +16,8 @@ export function RoomTile({
 }) {
   const { staffById } = useHotel();
   const meta = statusMeta[room.status];
+  const statusText = useStatusText();
+  const typeText = useTypeText();
   const attendant = staffById(room.attendantId);
   const blocked = isBlocked(room);
 
@@ -43,11 +46,11 @@ export function RoomTile({
         </span>
       </div>
 
-      <span className="text-label-sm uppercase text-on-surface-subtle">{room.type}</span>
+      <span className="text-label-sm uppercase text-on-surface-subtle">{typeText[room.type]}</span>
 
       <span className={cn("text-label-sm flex items-center gap-1", meta.text)}>
         <Icon name={meta.icon} size={13} filled />
-        {meta.short}
+        {statusText[room.status].short}
       </span>
 
       {blocked && (

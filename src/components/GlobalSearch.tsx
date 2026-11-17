@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "./Icon";
 import { useHotel } from "@/lib/hotel-store";
-import { statusMeta } from "@/lib/room-status";
-import { wings } from "@/lib/mock-data";
+import { useI18n, useStatusText, useTypeText, useWingName } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ResultItem =
@@ -12,6 +11,10 @@ type ResultItem =
 
 export function GlobalSearch() {
   const { rooms, reservations, setFocusRoomId, setFocusReservationId } = useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const typeText = useTypeText();
+  const wingName = useWingName();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -27,14 +30,14 @@ export function GlobalSearch() {
         (r) =>
           r.number.toLowerCase().includes(q) ||
           r.type.toLowerCase().includes(q) ||
-          wings[r.wing].name.toLowerCase().includes(q),
+          wingName(r.wing).toLowerCase().includes(q),
       )
       .slice(0, 5)
       .map((r) => ({
         kind: "room",
         id: r.id,
-        primary: `Room ${r.number}`,
-        secondary: `${wings[r.wing].name} · ${r.type} · ${statusMeta[r.status].label}`,
+        primary: t("common.roomN", { n: r.number }),
+        secondary: `${wingName(r.wing)} · ${typeText[r.type]} · ${statusText[r.status].label}`,
         icon: "meeting_room",
       }));
 
@@ -45,12 +48,12 @@ export function GlobalSearch() {
         kind: "reservation",
         id: r.id,
         primary: r.guestName,
-        secondary: `${r.code} · ${r.roomType} · ${r.status === "checked_in" ? "In house" : "Expected " + r.expectedCheckIn}`,
+        secondary: `${r.code} · ${typeText[r.roomType]} · ${r.status === "checked_in" ? t("shell.inHouse") : t("shell.expectedAt", { t: r.expectedCheckIn })}`,
         icon: "event_note",
       }));
 
     return [...roomMatches, ...reservationMatches];
-  }, [query, rooms, reservations]);
+  }, [query, rooms, reservations, t, statusText, typeText, wingName]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -106,7 +109,7 @@ export function GlobalSearch() {
             selectResult(results[activeIndex]);
           }
         }}
-        placeholder="Search room, guest or reservation"
+        placeholder={t("shell.searchPlaceholder")}
         className="text-body w-full rounded-full border border-outline-variant bg-surface-container py-2 pl-10 pr-3 text-on-surface outline-none transition-colors placeholder:text-on-surface-subtle focus:border-primary focus:bg-surface-container-lowest focus-visible:ring-2 focus-visible:ring-primary/30"
       />
 
@@ -116,7 +119,7 @@ export function GlobalSearch() {
             <div className="flex flex-col items-center gap-1.5 px-4 py-8 text-center">
               <Icon name="search_off" size={26} className="text-on-surface-subtle" />
               <p className="text-body-sm text-on-surface-variant">
-                No rooms or reservations match "{query}"
+                {t("shell.noMatch", { q: query })}
               </p>
             </div>
           ) : (
@@ -149,7 +152,7 @@ export function GlobalSearch() {
                         {item.secondary}
                       </span>
                     </span>
-                    <Icon name="chevron_right" size={18} className="text-on-surface-subtle" />
+                    <Icon name="chevron_right" size={18} className="rtl-flip text-on-surface-subtle" />
                   </button>
                 </li>
               ))}

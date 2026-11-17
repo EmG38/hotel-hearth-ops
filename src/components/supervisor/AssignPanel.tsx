@@ -6,11 +6,17 @@ import { Icon } from "../Icon";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room, RoomStatus } from "@/lib/hotel-types";
 import { STATUS_ORDER, flagMeta, statusMeta } from "@/lib/room-status";
-import { wings } from "@/lib/mock-data";
+import { useFlagText, useI18n, useShiftName, useStatusText, useTypeText, useWingName } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () => void }) {
   const { staff, workload, assignRoom, toggleRush, toggleFlag, setRoomStatus, issues } = useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const flagText = useFlagText();
+  const typeText = useTypeText();
+  const wingName = useWingName();
+  const shiftName = useShiftName();
   const [picked, setPicked] = useState<string | null>(null);
 
   if (!room) return null;
@@ -20,13 +26,17 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
   return (
     <SidePanel
       open
-      title={`Room ${room.number}`}
-      subtitle={`${wings[room.wing].name} · ${room.type} · updated ${room.lastUpdated}`}
+      title={t("common.roomN", { n: room.number })}
+      subtitle={t("ap.subtitle", {
+        wing: wingName(room.wing),
+        type: typeText[room.type],
+        t: room.lastUpdated,
+      })}
       onClose={onClose}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="primary"
@@ -36,14 +46,14 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
               if (selected) {
                 assignRoom(room.id, selected);
                 const name = staff.find((s) => s.id === selected)?.name ?? "attendant";
-                toast.success(`Room ${room.number} assigned to ${name}`, {
+                toast.success(t("ap.toastAssigned", { n: room.number, name }), {
                   icon: <Icon name="assignment_ind" size={18} filled />,
                 });
               }
               onClose();
             }}
           >
-            {room.attendantId ? "Reassign room" : "Assign room"}
+            {room.attendantId ? t("ap.reassign") : t("ap.assign")}
           </Button>
         </>
       }
@@ -56,13 +66,13 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
           ))}
           {room.rush && (
             <span className="text-label-sm inline-flex items-center gap-1 rounded-full border border-warning/20 bg-warning/10 px-2 py-0.5 uppercase text-warning">
-              <Icon name="star" size={13} filled /> Rush
+              <Icon name="star" size={13} filled /> {t("common.rush")}
             </span>
           )}
         </div>
 
         <section>
-          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Housekeeper</p>
+          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">{t("ap.housekeeper")}</p>
           <ul className="space-y-1.5">
             {staff.map((s) => {
               const load = workload(s.id);
@@ -84,7 +94,11 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
                         {s.name}
                       </span>
                       <span className="text-label-sm block text-on-surface-subtle">
-                        {s.shift} shift · {load} open {load === 1 ? "room" : "rooms"}
+                        {t("ap.openRooms", {
+                          shift: shiftName(s.shift),
+                          n: load,
+                          rooms: load === 1 ? t("ap.openRooms.one") : t("ap.openRooms.other"),
+                        })}
                       </span>
                     </span>
                     {active && (
@@ -98,7 +112,9 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
         </section>
 
         <section>
-          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Override status</p>
+          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">
+            {t("ap.overrideStatus")}
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {STATUS_ORDER.map((s: RoomStatus) => (
               <Chip
@@ -107,20 +123,20 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
                 onClick={() => {
                   if (room.status === s) return;
                   setRoomStatus(room.id, s);
-                  toast(`Room ${room.number} marked ${statusMeta[s].label}`, {
+                  toast(t("ap.toastMarked", { n: room.number, status: statusText[s].label }), {
                     icon: <Icon name={statusMeta[s].icon} size={18} filled />,
                   });
                 }}
               >
                 <Icon name={statusMeta[s].icon} size={14} filled />
-                {statusMeta[s].short}
+                {statusText[s].short}
               </Chip>
             ))}
           </div>
         </section>
 
         <section>
-          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Flags</p>
+          <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">{t("ap.flags")}</p>
           <div className="flex flex-wrap gap-1.5">
             <Chip
               active={room.rush}
@@ -129,15 +145,15 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
                 toggleRush(room.id);
                 toast(
                   next
-                    ? `Room ${room.number} flagged Rush`
-                    : `Rush flag removed from Room ${room.number}`,
+                    ? t("ap.toastRush", { n: room.number })
+                    : t("ap.toastUnrush", { n: room.number }),
                   {
                     icon: <Icon name="star" size={18} filled />,
                   },
                 );
               }}
             >
-              <Icon name="star" size={14} filled /> Rush
+              <Icon name="star" size={14} filled /> {t("common.rush")}
             </Chip>
             {(["ooo", "oos", "dnd"] as const).map((flag) => (
               <Chip
@@ -147,12 +163,16 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
                   const willAdd = !room.flags.includes(flag);
                   toggleFlag(room.id, flag);
                   toast(
-                    `${flagMeta[flag].label} ${willAdd ? "added to" : "cleared from"} Room ${room.number}`,
+                    t("ap.toastFlag", {
+                      flag: flagText[flag],
+                      action: willAdd ? t("ap.flagAdded") : t("ap.flagCleared"),
+                      n: room.number,
+                    }),
                     { icon: <Icon name={flagMeta[flag].icon} size={18} filled /> },
                   );
                 }}
               >
-                <Icon name={flagMeta[flag].icon} size={14} filled /> {flagMeta[flag].label}
+                <Icon name={flagMeta[flag].icon} size={14} filled /> {flagText[flag]}
               </Chip>
             ))}
           </div>
@@ -160,7 +180,7 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
 
         {roomIssues.length > 0 && (
           <section>
-            <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Open issues</p>
+            <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">{t("ap.openIssues")}</p>
             <ul className="space-y-1.5">
               {roomIssues.map((i) => (
                 <li
@@ -179,7 +199,7 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
 
         {room.notes.length > 0 && (
           <section>
-            <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">Activity</p>
+            <p className="text-label-sm mb-2 uppercase text-on-surface-subtle">{t("ap.activity")}</p>
             <ul className="text-body-sm space-y-1 text-on-surface-variant">
               {room.notes.map((n, idx) => (
                 <li key={idx} className="rounded-xl bg-surface-container p-2.5">

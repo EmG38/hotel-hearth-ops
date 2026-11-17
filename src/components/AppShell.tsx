@@ -4,32 +4,34 @@ import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 import { GlobalSearch } from "./GlobalSearch";
 import { useHotel } from "@/lib/hotel-store";
+import { useI18n } from "@/lib/i18n";
+import type { DictKey } from "@/lib/translations";
 import type { Role } from "@/lib/hotel-types";
 import logoAsset from "@/assets/golden-sands-emblem.png.asset.json";
 
 const navSections: {
   role: Role;
-  label: string;
-  items: { to: string; label: string; icon: string }[];
+  labelKey: DictKey;
+  items: { to: string; labelKey: DictKey; icon: string }[];
 }[] = [
   {
     role: "supervisor",
-    label: "Supervisor",
-    items: [{ to: "/supervisor", label: "Supervisor App", icon: "supervisor_account" }],
+    labelKey: "role.supervisor",
+    items: [{ to: "/supervisor", labelKey: "nav.supervisorApp", icon: "supervisor_account" }],
   },
   {
     role: "reception",
-    label: "Reception",
+    labelKey: "role.reception",
     items: [
-      { to: "/availability", label: "Availability", icon: "meeting_room" },
-      { to: "/check-in", label: "Check-In", icon: "how_to_reg" },
-      { to: "/reservations", label: "Reservations", icon: "event_note" },
+      { to: "/availability", labelKey: "nav.availability", icon: "meeting_room" },
+      { to: "/check-in", labelKey: "nav.checkIn", icon: "how_to_reg" },
+      { to: "/reservations", labelKey: "nav.reservations", icon: "event_note" },
     ],
   },
   {
     role: "housekeeper",
-    label: "Housekeeper",
-    items: [{ to: "/housekeeper", label: "Housekeeper App", icon: "cleaning_services" }],
+    labelKey: "role.housekeeper",
+    items: [{ to: "/housekeeper", labelKey: "nav.housekeeperApp", icon: "cleaning_services" }],
   },
 ];
 
@@ -39,14 +41,15 @@ const roleIcon: Record<Role, string> = {
   housekeeper: "cleaning_services",
 };
 
-const roleLabel: Record<Role, string> = {
-  supervisor: "Supervisor",
-  reception: "Reception",
-  housekeeper: "Housekeeper",
+const roleLabelKey: Record<Role, DictKey> = {
+  supervisor: "role.supervisor",
+  reception: "role.reception",
+  housekeeper: "role.housekeeper",
 };
 
 function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
   const { role, setRole } = useHotel();
+  const { t } = useI18n();
   if (collapsed) {
     return (
       <div className="flex flex-col gap-1 px-2">
@@ -54,7 +57,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
           <button
             key={s.role}
             onClick={() => setRole(s.role)}
-            title={s.label}
+            title={t(s.labelKey)}
             className={cn(
               "grid h-9 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               role === s.role
@@ -82,7 +85,9 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
           )}
         >
           <Icon name={roleIcon[s.role]} size={16} filled={role === s.role} />
-          <span className="whitespace-nowrap text-[10px] font-semibold leading-3">{s.label}</span>
+          <span className="whitespace-nowrap text-[10px] font-semibold leading-3">
+            {t(s.labelKey)}
+          </span>
         </button>
       ))}
     </div>
@@ -91,6 +96,7 @@ function RoleSwitcher({ collapsed }: { collapsed: boolean }) {
 
 function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const { role } = useHotel();
+  const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
@@ -110,8 +116,10 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         </span>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-title truncate tracking-wide text-secondary">Golden Sands</p>
-            <p className="text-label-sm uppercase tracking-[0.2em] text-tertiary">Hotel · Ops</p>
+            <p className="text-title truncate tracking-wide text-secondary">{t("app.name")}</p>
+            <p className="text-label-sm uppercase tracking-[0.2em] text-tertiary">
+              {t("app.tag")}
+            </p>
           </div>
         )}
       </div>
@@ -130,7 +138,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
                     active ? "text-tertiary" : "text-on-surface-subtle",
                   )}
                 >
-                  {section.label}
+                  {t(section.labelKey)}
                 </p>
               )}
               <ul className="space-y-0.5 px-2">
@@ -140,7 +148,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
                     <li key={item.to}>
                       <Link
                         to={item.to}
-                        title={item.label}
+                        title={t(item.labelKey)}
                         className={cn(
                           "text-body flex items-center gap-3 rounded-full px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                           collapsed && "justify-center px-0",
@@ -150,7 +158,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
                         )}
                       >
                         <Icon name={item.icon} size={20} filled={isActive} />
-                        {!collapsed && <span className="truncate">{item.label}</span>}
+                        {!collapsed && <span className="truncate">{t(item.labelKey)}</span>}
                       </Link>
                     </li>
                   );
@@ -168,28 +176,58 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
           collapsed && "justify-center px-0",
         )}
       >
-        <Icon name={collapsed ? "chevron_right" : "chevron_left"} size={20} />
-        {!collapsed && "Collapse"}
+        <Icon name={collapsed ? "chevron_right" : "chevron_left"} size={20} className="rtl-flip" />
+        {!collapsed && t("shell.collapse")}
       </button>
     </aside>
   );
 }
 
+function LangSwitcher() {
+  const { lang, setLang } = useI18n();
+  return (
+    <div className="flex items-center rounded-full border border-outline-variant bg-surface-container p-0.5">
+      {(
+        [
+          { key: "en", label: "EN" },
+          { key: "ur", label: "اردو" },
+        ] as const
+      ).map((l) => (
+        <button
+          key={l.key}
+          onClick={() => setLang(l.key)}
+          aria-pressed={lang === l.key}
+          className={cn(
+            "text-label-sm rounded-full px-2.5 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            lang === l.key
+              ? "bg-surface-container-lowest text-on-surface shadow-soft"
+              : "text-on-surface-variant",
+          )}
+        >
+          {l.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function TopBar() {
   const { role, rooms } = useHotel();
+  const { t } = useI18n();
   const rush = rooms.filter((r) => r.rush).length;
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-outline-variant bg-surface-container-lowest px-4 md:px-6">
       <GlobalSearch />
 
       <div className="ml-auto flex items-center gap-3">
+        <LangSwitcher />
         <span className="text-label hidden items-center gap-1.5 rounded-full border border-warning/20 bg-warning/10 px-3 py-1.5 text-warning sm:inline-flex">
           <Icon name="star" size={16} filled />
-          {rush} rush
+          {t("shell.rushCount", { n: rush })}
         </span>
         <span className="text-label inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container px-3 py-1.5 text-on-surface-variant">
           <Icon name={roleIcon[role]} size={16} filled className="text-tertiary" />
-          {roleLabel[role]}
+          {t(roleLabelKey[role])}
         </span>
         <span className="grid size-9 place-items-center rounded-full bg-secondary text-label text-on-primary">
           EG

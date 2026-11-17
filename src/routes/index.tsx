@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useHotel } from "@/lib/hotel-store";
-import type { Room, RoomStatus } from "@/lib/hotel-types";
+import type { Room, RoomStatus, RoomType } from "@/lib/hotel-types";
 import { STATUS_ORDER, statusMeta } from "@/lib/room-status";
 import { Card, Chip, Select, StatTile } from "@/components/ui-kit";
 import { PageHero } from "@/components/PageHero";
@@ -9,7 +9,7 @@ import { RoomTile } from "@/components/RoomTile";
 import { StatusLegend } from "@/components/StatusLegend";
 import { AssignPanel } from "@/components/supervisor/AssignPanel";
 import { Icon } from "@/components/Icon";
-import { wings } from "@/lib/mock-data";
+import { useI18n, useStatusText, useTypeText, useWingName } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,10 +31,14 @@ export const Route = createFileRoute("/")({
   component: PropertyBoard,
 });
 
-const ROOM_TYPES = ["Standard", "Deluxe", "Suite"] as const;
+const ROOM_TYPES: RoomType[] = ["Standard", "Deluxe", "Suite"];
 
 function PropertyBoard() {
   const { rooms, staff, focusRoomId, setFocusRoomId } = useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const typeText = useTypeText();
+  const wingName = useWingName();
   const [wing, setWing] = useState<string>("all");
   const [status, setStatus] = useState<RoomStatus | "all">("all");
   const [attendant, setAttendant] = useState<string>("all");
@@ -82,15 +86,19 @@ function PropertyBoard() {
     <>
       <PageHero
         ghostIcon="apartment"
-        eyebrow="Supervisor"
-        title="Property Board"
-        subtitle={`${rooms.length} rooms · ${filtered.length} shown · ${rooms.filter((r) => r.rush).length} rush flagged`}
+        eyebrow={t("role.supervisor")}
+        title={t("pb.title")}
+        subtitle={t("pb.subtitle", {
+          total: rooms.length,
+          shown: filtered.length,
+          rush: rooms.filter((r) => r.rush).length,
+        })}
       >
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {STATUS_ORDER.map((s) => (
             <StatTile
               key={s}
-              label={statusMeta[s].label}
+              label={statusText[s].label}
               value={counts[s] ?? 0}
               icon={statusMeta[s].icon}
               tone={
@@ -102,7 +110,7 @@ function PropertyBoard() {
                       ? "info"
                       : "success"
               }
-              hint={`${Math.round(((counts[s] ?? 0) / rooms.length) * 100)}% of property`}
+              hint={t("pb.ofProperty", { n: Math.round(((counts[s] ?? 0) / rooms.length) * 100) })}
             />
           ))}
         </div>
@@ -111,40 +119,42 @@ function PropertyBoard() {
       <Card className="mb-5 p-4">
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-28">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Wing</span>
+            <span className="text-label-sm uppercase text-on-surface-subtle">{t("pb.wing")}</span>
             <Select value={wing} onChange={(e) => setWing(e.target.value)} className="mt-1.5">
-              <option value="all">All wings</option>
+              <option value="all">{t("common.allWings")}</option>
               {([1, 2, 3, 4, 5] as const).map((w) => (
                 <option key={w} value={w}>
-                  {wings[w].name}
+                  {wingName(w)}
                 </option>
               ))}
             </Select>
           </label>
           <label className="min-w-40">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Status</span>
+            <span className="text-label-sm uppercase text-on-surface-subtle">{t("pb.status")}</span>
             <Select
               value={status}
               onChange={(e) => setStatus(e.target.value as RoomStatus | "all")}
               className="mt-1.5"
             >
-              <option value="all">All statuses</option>
+              <option value="all">{t("common.allStatuses")}</option>
               {STATUS_ORDER.map((s) => (
                 <option key={s} value={s}>
-                  {statusMeta[s].label}
+                  {statusText[s].label}
                 </option>
               ))}
             </Select>
           </label>
           <label className="min-w-40">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Attendant</span>
+            <span className="text-label-sm uppercase text-on-surface-subtle">
+              {t("pb.attendant")}
+            </span>
             <Select
               value={attendant}
               onChange={(e) => setAttendant(e.target.value)}
               className="mt-1.5"
             >
-              <option value="all">Anyone</option>
-              <option value="none">Unassigned</option>
+              <option value="all">{t("common.anyone")}</option>
+              <option value="none">{t("common.unassigned")}</option>
               {staff.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -154,7 +164,7 @@ function PropertyBoard() {
           </label>
           <Chip active={rushOnly} onClick={() => setRushOnly((v) => !v)} className="mb-0.5">
             <Icon name="star" size={15} filled />
-            Rush only
+            {t("pb.rushOnly")}
           </Chip>
         </div>
         <StatusLegend className="mt-4 border-t border-outline-variant pt-3" />
@@ -167,19 +177,19 @@ function PropertyBoard() {
           return (
             <Card key={w} className="p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-title-lg text-on-surface">{wings[w].name}</h2>
+                <h2 className="text-title-lg text-on-surface">{wingName(w)}</h2>
                 <span className="text-label-sm text-on-surface-subtle">
-                  {wingRooms.length} rooms
+                  {t("common.roomsCount", { n: wingRooms.length })}
                 </span>
               </div>
               <div className="space-y-3">
-                {ROOM_TYPES.map((t) => {
-                  const typeRooms = wingRooms.filter((r) => r.type === t);
+                {ROOM_TYPES.map((ty) => {
+                  const typeRooms = wingRooms.filter((r) => r.type === ty);
                   if (typeRooms.length === 0) return null;
                   return (
-                    <div key={t}>
+                    <div key={ty}>
                       <p className="text-label-sm mb-1.5 uppercase text-on-surface-subtle">
-                        {t} · {typeRooms.length}
+                        {typeText[ty]} · {typeRooms.length}
                       </p>
                       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10">
                         {typeRooms.map((r) => (
