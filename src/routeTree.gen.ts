@@ -14,6 +14,7 @@ import { Route as AvailabilityRouteImport } from './routes/availability'
 import { Route as CheckInRouteImport } from './routes/check-in'
 import { Route as InspectionsRouteImport } from './routes/inspections'
 import { Route as IssuesRouteImport } from './routes/issues'
+import { Route as ManagerRouteImport } from './routes/manager'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as ReservationsRouteImport } from './routes/reservations'
 import { Route as HousekeeperIndexRouteImport } from './routes/housekeeper/index'
@@ -54,6 +55,11 @@ const InspectionsRoute = InspectionsRouteImport.update({
 const IssuesRoute = IssuesRouteImport.update({
   id: '/issues',
   path: '/issues',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagerRoute = ManagerRouteImport.update({
+  id: '/manager',
+  path: '/manager',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerformanceRoute = PerformanceRouteImport.update({
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
+  '/manager': typeof ManagerRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
   '/housekeeper/attention': typeof HousekeeperAttentionRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
+  '/manager': typeof ManagerRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
   '/housekeeper/attention': typeof HousekeeperAttentionRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/check-in': typeof CheckInRoute
   '/inspections': typeof InspectionsRoute
   '/issues': typeof IssuesRoute
+  '/manager': typeof ManagerRoute
   '/performance': typeof PerformanceRoute
   '/reservations': typeof ReservationsRoute
   '/housekeeper/attention': typeof HousekeeperAttentionRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/check-in'
     | '/inspections'
     | '/issues'
+    | '/manager'
     | '/performance'
     | '/reservations'
     | '/housekeeper/attention'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/check-in'
     | '/inspections'
     | '/issues'
+    | '/manager'
     | '/performance'
     | '/reservations'
     | '/housekeeper/attention'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/check-in'
     | '/inspections'
     | '/issues'
+    | '/manager'
     | '/performance'
     | '/reservations'
     | '/housekeeper/attention'
@@ -286,6 +298,7 @@ export interface RootRouteChildren {
   CheckInRoute: typeof CheckInRoute
   InspectionsRoute: typeof InspectionsRoute
   IssuesRoute: typeof IssuesRoute
+  ManagerRoute: typeof ManagerRoute
   PerformanceRoute: typeof PerformanceRoute
   ReservationsRoute: typeof ReservationsRoute
   HousekeeperAttentionRoute: typeof HousekeeperAttentionRoute
@@ -339,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/issues'
       fullPath: '/issues'
       preLoaderRoute: typeof IssuesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/performance': {
@@ -462,6 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckInRoute: CheckInRoute,
   InspectionsRoute: InspectionsRoute,
   IssuesRoute: IssuesRoute,
+  ManagerRoute: ManagerRoute,
   PerformanceRoute: PerformanceRoute,
   ReservationsRoute: ReservationsRoute,
   HousekeeperAttentionRoute: HousekeeperAttentionRoute,
