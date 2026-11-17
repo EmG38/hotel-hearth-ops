@@ -162,7 +162,7 @@ function Avatar({ p, className }: { p: PinLoginProfile; className?: string }) {
  * for real staff photos when wiring real data. */
 const MALE_FIRST_NAMES = new Set(["khalid", "ahmed", "omar", "ali", "raj", "jose", "mohammed"]);
 function photoFor(p: PinLoginProfile) {
-  const first = p.name.split(" ")[0].toLowerCase();
+  const first = (p.name.split(" ")[0] ?? "").toLowerCase();
   const set = MALE_FIRST_NAMES.has(first) ? "men" : "women";
   let h = 0;
   for (const c of p.id) h = (h * 31 + c.charCodeAt(0)) % 90;
