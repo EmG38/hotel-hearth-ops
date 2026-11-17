@@ -20,9 +20,9 @@ export function RoomRow({
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-stretch gap-3 rounded-[22px] bg-surface-container-lowest p-2 pr-3 text-left shadow-soft transition-transform active:scale-[0.98]"
+      className="flex w-full items-stretch gap-2.5 rounded-[22px] bg-surface-container-lowest p-2 pr-2.5 text-left shadow-soft transition-transform active:scale-[0.98]"
     >
-      <span className="relative w-[84px] shrink-0 overflow-hidden rounded-2xl bg-surface-container">
+      <span className="relative w-[68px] shrink-0 overflow-hidden rounded-2xl bg-surface-container">
         {room.photo ? (
           <img src={room.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
         ) : (
@@ -32,9 +32,9 @@ export function RoomRow({
       </span>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 py-1">
         <div className="flex items-baseline justify-between gap-2">
-          <p className="min-w-0 truncate text-lg font-semibold leading-tight tracking-tight text-on-surface">
-            {room.number}
-            <span className="ml-2 text-label-sm font-normal text-on-surface-subtle">{room.type}</span>
+          <p className="flex min-w-0 items-baseline text-lg font-semibold leading-tight tracking-tight text-on-surface">
+            <span className="shrink-0">{room.number}</span>
+            <span className="ml-2 min-w-0 truncate text-label-sm font-normal text-on-surface-subtle">{room.type}</span>
           </p>
           <span className="inline-flex shrink-0 items-center gap-1 text-label-sm text-on-surface-subtle">
             <Icon name="schedule" size={12} />
@@ -44,13 +44,12 @@ export function RoomRow({
         <div className="flex flex-wrap items-center gap-1">
           <span
             className={cn(
-              "text-label-sm inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-semibold",
+              "text-label-sm inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-full px-2.5 py-1 font-semibold",
               statusTextTone[room.status],
             )}
             style={{ backgroundColor: "color-mix(in oklab, currentColor 10%, transparent)" }}
           >
-            <span className={cn("size-1.5 rounded-full", statusDot[room.status])} />
-            {t.t(statusLabelKey[room.status])}
+            <span className="truncate">{t.t(statusLabelKey[room.status])}</span>
           </span>
           {room.view === "gulf" && (
             <span className="text-label-sm inline-flex items-center gap-1 rounded-full border border-outline-variant px-2 py-1 text-on-surface-variant">
@@ -71,7 +70,6 @@ export function RoomRow({
           )}
         </div>
       </div>
-      <Icon name="chevron_right" size={18} className="shrink-0 self-center text-on-surface-subtle" />
     </button>
   );
 }
