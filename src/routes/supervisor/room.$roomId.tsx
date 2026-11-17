@@ -47,7 +47,7 @@ function SupervisorRoomDetail() {
   return (
     <MobileFrame dark>
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <div className="relative flex h-80 shrink-0 flex-col justify-between overflow-hidden p-5 pt-14">
+        <div className="relative flex h-80 shrink-0 flex-col justify-between overflow-hidden p-5 pb-12 pt-14">
           {room.photo ? (
             <>
               <img
