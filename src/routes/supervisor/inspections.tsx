@@ -4,6 +4,7 @@ import { useHotel } from "@/lib/hotel-store";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/inspections")({
@@ -19,7 +20,7 @@ function InspectionQueue() {
     () =>
       rooms
         .filter((r) => r.status === "clean")
-        .sort((a, b) => Number(b.rush) - Number(a.rush) || a.floor - b.floor),
+        .sort((a, b) => Number(b.rush) - Number(a.rush) || a.wing - b.wing),
     [rooms],
   );
 
@@ -60,7 +61,7 @@ function InspectionQueue() {
                       {r.rush && <Icon name="star" size={14} filled className="text-warning" />}
                     </span>
                     <span className="text-label-sm block text-on-surface-subtle">
-                      Floor {r.floor} · {attendant?.name ?? "Unassigned"}
+                      {wings[r.wing].name} · {attendant?.name ?? "Unassigned"}
                     </span>
                   </span>
                   <Icon name="chevron_right" size={20} className="text-on-surface-subtle" />

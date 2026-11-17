@@ -10,9 +10,10 @@ import { LoginFlow } from "@/components/housekeeper/LoginFlow";
 import { sortByPriority } from "@/lib/housekeeper-room";
 import { useOnline } from "@/lib/use-online";
 import { useHkLang, setHkLang, useHkT, greetingKey } from "@/lib/housekeeper-i18n";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-const FLOOR_PREVIEW_MAX = 3;
+const WING_PREVIEW_MAX = 3;
 
 export const Route = createFileRoute("/housekeeper/")({
   head: () => ({
@@ -100,21 +101,21 @@ function HousekeeperHome() {
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
   const needsAttention = byStatus.dirty.slice(0, 6);
 
-  const floors = useMemo(() => {
+  const wingGroups = useMemo(() => {
     const map = new Map<number, Room[]>();
     myRooms.forEach((r) => {
-      const list = map.get(r.floor) ?? [];
+      const list = map.get(r.wing) ?? [];
       list.push(r);
-      map.set(r.floor, list);
+      map.set(r.wing, list);
     });
     return [...map.entries()]
       .sort(([a], [b]) => a - b)
-      .map(([floor, list]) => ({
-        floor,
+      .map(([wing, list]) => ({
+        wing,
         total: list.length,
         ready: list.filter((r) => r.status === "inspected").length,
-        preview: sortByPriority(list).slice(0, FLOOR_PREVIEW_MAX),
-        hasMore: list.length > FLOOR_PREVIEW_MAX,
+        preview: sortByPriority(list).slice(0, WING_PREVIEW_MAX),
+        hasMore: list.length > WING_PREVIEW_MAX,
       }));
   }, [myRooms]);
 
@@ -241,16 +242,16 @@ function HousekeeperHome() {
 
           <div className="px-4 pt-5 pb-4">
             <p className="text-title-sm text-on-surface">{t.t("allRooms")}</p>
-            {floors.map(({ floor, total, ready, preview, hasMore }) => (
-              <div key={floor} className="mt-3">
+            {wingGroups.map(({ wing, total, ready, preview, hasMore }) => (
+              <div key={wing} className="mt-3">
                 <button
                   onClick={() =>
-                    navigate({ to: "/housekeeper/floor/$floor", params: { floor: String(floor) } })
+                    navigate({ to: "/housekeeper/wing/$wing", params: { wing: String(wing) } })
                   }
                   className="flex w-full items-center justify-between py-1 active:opacity-60"
                 >
                   <p className="text-label-sm uppercase text-on-surface-subtle">
-                    {t.t("floor")} {floor}
+                    {wings[wing as 1 | 2 | 3 | 4 | 5]?.name ?? `${t.t("wing")} ${wing}`}
                   </p>
                   <p className="text-label-sm inline-flex items-center gap-1 text-on-surface-subtle">
                     {ready}/{total} {t.t("ready")}
@@ -272,8 +273,8 @@ function HousekeeperHome() {
                     <button
                       onClick={() =>
                         navigate({
-                          to: "/housekeeper/floor/$floor",
-                          params: { floor: String(floor) },
+                          to: "/housekeeper/wing/$wing",
+                          params: { wing: String(wing) },
                         })
                       }
                       className="flex w-full items-center justify-center gap-1 border-t border-outline-variant bg-surface-container-lowest py-2.5 text-label font-medium text-primary active:bg-surface-container"
@@ -285,7 +286,7 @@ function HousekeeperHome() {
                 </div>
               </div>
             ))}
-            {floors.length === 0 && (
+            {wingGroups.length === 0 && (
               <p className="text-body mt-6 text-center text-on-surface-subtle">
                 No rooms assigned yet
               </p>

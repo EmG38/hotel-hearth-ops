@@ -5,6 +5,7 @@ import { useHotel } from "@/lib/hotel-store";
 import { Avatar, Button, Card, Chip, EmptyState, PageHeader, StatTile } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
+import { wings } from "@/lib/mock-data";
 import type { IssueStatus } from "@/lib/hotel-types";
 
 export const Route = createFileRoute("/issues")({
@@ -127,7 +128,7 @@ function IssueTriage() {
                     <div className="text-label-sm mt-2 flex flex-wrap items-center gap-3 text-on-surface-subtle">
                       <span className="flex items-center gap-1">
                         <Icon name="meeting_room" size={14} />
-                        Room {room?.number} · Floor {room?.floor}
+                        Room {room?.number} · {room ? wings[room.wing].name : ""}
                       </span>
                       {reporter && (
                         <span className="flex items-center gap-1.5">

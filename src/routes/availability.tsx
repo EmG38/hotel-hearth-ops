@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useHotel } from "@/lib/hotel-store";
-import type { RoomType } from "@/lib/hotel-types";
+import type { Room, RoomType } from "@/lib/hotel-types";
 import { isBlocked, isSellable, statusMeta } from "@/lib/room-status";
 import { Card, Chip, EmptyState, Select, StatTile } from "@/components/ui-kit";
 import { PageHero } from "@/components/PageHero";
 import { StatusLegend } from "@/components/StatusLegend";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
+import { wings } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/availability")({
   head: () => ({
@@ -15,17 +16,24 @@ export const Route = createFileRoute("/availability")({
       { title: "Availability Board — Golden Sands Hotel" },
       {
         name: "description",
-        content: "Sellable room count and live inventory by type and floor for the front desk.",
+        content: "Sellable room count and live inventory by type and wing for the front desk.",
       },
       { property: "og:title", content: "Availability Board — Golden Sands Hotel" },
       {
         property: "og:description",
-        content: "Sellable room count and live inventory by type and floor for the front desk.",
+        content: "Sellable room count and live inventory by type and wing for the front desk.",
       },
     ],
   }),
   component: AvailabilityBoard,
 });
+
+const viewLabel: Record<Room["view"], string> = {
+  gulf: "Gulf View",
+  garden: "Garden View",
+  courtyard: "Courtyard View",
+};
+const viewIcon: Record<Room["view"], string> = { gulf: "waves", garden: "park", courtyard: "deck" };
 
 const ROOM_TYPES: RoomType[] = ["Standard", "Deluxe", "Suite"];
 
@@ -33,7 +41,7 @@ function AvailabilityBoard() {
   const { rooms, staffById } = useHotel();
   const [showAll, setShowAll] = useState(false);
   const [type, setType] = useState<string>("all");
-  const [floor, setFloor] = useState<string>("all");
+  const [wing, setWing] = useState<string>("all");
 
   const sellable = rooms.filter(isSellable);
 
@@ -43,11 +51,11 @@ function AvailabilityBoard() {
         .filter(
           (r) =>
             (type === "all" || r.type === type) &&
-            (floor === "all" || r.floor === Number(floor)) &&
+            (wing === "all" || r.wing === Number(wing)) &&
             (showAll || isSellable(r)),
         )
         .sort((a, b) => a.number.localeCompare(b.number)),
-    [rooms, type, floor, showAll],
+    [rooms, type, wing, showAll],
   );
 
   return (
@@ -105,12 +113,12 @@ function AvailabilityBoard() {
             </Select>
           </label>
           <label className="min-w-28">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Floor</span>
-            <Select value={floor} onChange={(e) => setFloor(e.target.value)} className="mt-1.5">
-              <option value="all">All floors</option>
-              {[1, 2, 3, 4, 5].map((f) => (
-                <option key={f} value={f}>
-                  Floor {f}
+            <span className="text-label-sm uppercase text-on-surface-subtle">Wing</span>
+            <Select value={wing} onChange={(e) => setWing(e.target.value)} className="mt-1.5">
+              <option value="all">All wings</option>
+              {([1, 2, 3, 4, 5] as const).map((w) => (
+                <option key={w} value={w}>
+                  {wings[w].name}
                 </option>
               ))}
             </Select>
@@ -135,8 +143,9 @@ function AvailabilityBoard() {
               <thead>
                 <tr className="text-label-sm bg-surface-container uppercase text-on-surface-subtle">
                   <th className="px-4 py-2.5 font-semibold">Room</th>
-                  <th className="px-4 py-2.5 font-semibold">Floor</th>
+                  <th className="px-4 py-2.5 font-semibold">Wing</th>
                   <th className="px-4 py-2.5 font-semibold">Type</th>
+                  <th className="px-4 py-2.5 font-semibold">View</th>
                   <th className="px-4 py-2.5 font-semibold">Status</th>
                   <th className="px-4 py-2.5 font-semibold">Flags</th>
                   <th className="px-4 py-2.5 font-semibold">ETA</th>
@@ -155,8 +164,14 @@ function AvailabilityBoard() {
                           {r.rush && <Icon name="star" size={14} filled className="text-warning" />}
                         </span>
                       </td>
-                      <td className="text-body px-4 py-2.5 text-on-surface-variant">{r.floor}</td>
+                      <td className="text-body px-4 py-2.5 text-on-surface-variant">{wings[r.wing].name}</td>
                       <td className="text-body px-4 py-2.5 text-on-surface-variant">{r.type}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="text-body-sm inline-flex items-center gap-1 text-on-surface-variant">
+                          <Icon name={viewIcon[r.view]} size={14} filled={r.view === "gulf"} />
+                          {viewLabel[r.view]}
+                        </span>
+                      </td>
                       <td className="px-4 py-2.5">
                         <span className={cn("text-body-sm flex items-center gap-1.5", meta.text)}>
                           <span className={cn("size-2 rounded-full", meta.dot)} />

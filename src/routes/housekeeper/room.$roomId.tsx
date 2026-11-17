@@ -2,11 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
-import { Button } from "@/components/ui-kit";
+import { Button, Chip } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
 import { useHkT, timeAgo } from "@/lib/housekeeper-i18n";
 import { useOnline } from "@/lib/use-online";
+import { wings, skipReasons, zoneLabel } from "@/lib/mock-data";
+import { checklistProgress } from "@/lib/checklist";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/housekeeper/room/$roomId")({
@@ -29,12 +31,25 @@ const pillTone: Record<string, string> = {
 
 function RoomDetail() {
   const { roomId } = Route.useParams();
-  const { roomById, setRoomStatus, setRoomNote } = useHotel();
+  const {
+    roomById,
+    setRoomNote,
+    currentStaffId,
+    startCleaning,
+    toggleChecklistItem,
+    skipChecklistItem,
+    attachChecklistPhoto,
+    markRoomClean,
+  } = useHotel();
   const navigate = useNavigate();
   const t = useHkT();
   const online = useOnline();
   const room = roomById(roomId);
+  const actor = currentStaffId ?? "";
   const [note, setNote] = useState(room?.notes[0] ?? "");
+  const [photoItem, setPhotoItem] = useState<string | null>(null);
+  const [skipItem, setSkipItem] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     setNote(room?.notes[0] ?? "");
@@ -60,14 +75,21 @@ function RoomDetail() {
     inspected: t.t("statusInspected"),
   }[status];
 
-  function advance() {
-    if (status === "dirty") {
-      setRoomStatus(room!.id, "in_progress");
-      toast.success(t.t("startCleaning"));
-    } else if (status === "in_progress") {
-      setRoomStatus(room!.id, "clean");
-      toast.success(t.t("awaitingBanner"));
+  const progress = checklistProgress(room);
+  const zones = Array.from(new Set(progress.list.map((it) => it.zone)));
+
+  function tapItem(itemId: string, needsPhoto: boolean) {
+    if (status !== "in_progress") {
+      toast.info(
+        status === "dirty" ? t.t("startCleaningFirst") : t.t("checklistClosed"),
+      );
+      return;
     }
+    if (needsPhoto && !room!.checklist[itemId]) {
+      setPhotoItem(itemId);
+      return;
+    }
+    toggleChecklistItem(room!.id, itemId, actor);
   }
 
   return (
@@ -101,9 +123,17 @@ function RoomDetail() {
             >
               <Icon name="chevron_left" size={22} />
             </button>
-            <span className="text-label-sm rounded-full bg-white/25 px-3 py-1 font-medium text-white">
-              Floor {room.floor}
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-label-sm rounded-full bg-white/25 px-3 py-1 font-medium text-white">
+                {wings[room.wing].name}
+              </span>
+              {room.view === "gulf" && (
+                <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-white/25 px-3 py-1 font-medium text-white">
+                  <Icon name="waves" size={13} filled />
+                  {t.t("gulfView")}
+                </span>
+              )}
+            </div>
           </div>
           <div className="relative">
             <p className="text-label-sm text-white/80">{room.type}</p>
@@ -133,14 +163,174 @@ function RoomDetail() {
             </span>
           </div>
 
-          {(status === "dirty" || status === "in_progress") && (
+          {status === "dirty" && (
             <button
-              onClick={advance}
+              onClick={() => {
+                startCleaning(room.id, actor);
+                toast.success(t.t("startedCleaning"));
+              }}
               className="mt-4 flex w-full items-center justify-center gap-2 hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
             >
-              {status === "dirty" ? t.t("startCleaning") : t.t("markDone")}
+              {t.t("startCleaning")}
               <Icon name="check" size={18} />
             </button>
+          )}
+
+          {status === "in_progress" && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-label-sm uppercase text-on-surface-subtle">
+                  {t.t("checklist")} · {progress.done}/{progress.total}
+                </p>
+                <p className="text-label-sm text-on-surface-subtle">{progress.percent}%</p>
+              </div>
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${progress.percent}%` }}
+                />
+              </div>
+
+              {zones.map((zone) => (
+                <div key={zone} className="mt-4">
+                  <p className="text-label-sm font-semibold uppercase text-on-surface-subtle">
+                    {zoneLabel[zone]}
+                  </p>
+                  <div className="mt-1.5 space-y-1.5">
+                    {progress.list
+                      .filter((it) => it.zone === zone)
+                      .map((it) => {
+                        const res = room.checklist[it.id];
+                        const done = res?.status === "done";
+                        const skipped = res?.status === "skipped";
+                        return (
+                          <div key={it.id}>
+                            <button
+                              onClick={() => tapItem(it.id, it.photo)}
+                              className={cn(
+                                "flex w-full items-center gap-2.5 hk-card border px-3 py-2.5 text-left transition-colors",
+                                done
+                                  ? "border-success/30 bg-success/5"
+                                  : skipped
+                                    ? "border-outline-variant bg-surface-container-lowest opacity-60"
+                                    : "border-outline-variant bg-surface-container-lowest active:bg-surface-container",
+                              )}
+                            >
+                              <Icon
+                                name={done ? "check_circle" : skipped ? "block" : "radio_button_unchecked"}
+                                size={20}
+                                filled={done}
+                                className={done ? "text-success" : skipped ? "text-on-surface-subtle" : "text-on-surface-subtle"}
+                              />
+                              <span className="min-w-0 flex-1">
+                                <span className="text-label block text-on-surface">{it.label}</span>
+                                <span className="text-label-sm flex flex-wrap items-center gap-1.5 text-on-surface-subtle">
+                                  {it.mandatory && !res && <em className="not-italic text-warning">{t.t("required")}</em>}
+                                  {it.photo && (
+                                    <em className="not-italic inline-flex items-center gap-0.5">
+                                      <Icon name="photo_camera" size={11} /> {t.t("photo")}
+                                    </em>
+                                  )}
+                                  {skipped && res?.skipReason}
+                                </span>
+                              </span>
+                              {res?.photo && <Icon name="image" size={16} className="shrink-0 text-success" />}
+                            </button>
+                            {status === "in_progress" && !it.mandatory && !res && (
+                              <button
+                                onClick={() => setSkipItem(it.id)}
+                                className="mt-1 pl-3 text-label-sm font-medium text-on-surface-variant"
+                              >
+                                {t.t("skip")}
+                              </button>
+                            )}
+                            {photoItem === it.id && (
+                              <div className="mt-1.5 flex h-20 items-center justify-center gap-8 hk-card border-2 border-dashed border-outline-variant">
+                                <button
+                                  onClick={() => {
+                                    attachChecklistPhoto(room.id, it.id, actor);
+                                    setPhotoItem(null);
+                                    toast.success(t.t("photoSaved"));
+                                  }}
+                                  className="flex flex-col items-center gap-1 text-on-surface"
+                                >
+                                  <span className="grid size-9 place-items-center rounded-full bg-success/10 text-success">
+                                    <Icon name="photo_camera" size={18} />
+                                  </span>
+                                  <span className="text-label-sm">{t.t("camera")}</span>
+                                </button>
+                                <button
+                                  onClick={() => setPhotoItem(null)}
+                                  className="text-label-sm text-on-surface-variant"
+                                >
+                                  {t.t("cancel")}
+                                </button>
+                              </div>
+                            )}
+                            {skipItem === it.id && (
+                              <div className="mt-1.5 flex flex-wrap gap-1.5 pl-3">
+                                {skipReasons.map((r) => (
+                                  <Chip
+                                    key={r}
+                                    onClick={() => {
+                                      skipChecklistItem(room.id, it.id, r);
+                                      setSkipItem(null);
+                                    }}
+                                  >
+                                    {r}
+                                  </Chip>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              ))}
+
+              {!confirming ? (
+                <button
+                  disabled={!progress.canComplete}
+                  onClick={() => setConfirming(true)}
+                  className="mt-5 flex w-full items-center justify-center gap-2 hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98] disabled:opacity-40"
+                >
+                  {progress.canComplete
+                    ? t.t("markCleanBtn")
+                    : `${progress.missingCount} ${t.t("requiredLeft")}`}
+                </button>
+              ) : (
+                <div className="mt-5 hk-card border border-outline-variant bg-surface-container-lowest p-3.5">
+                  <p className="text-body font-semibold text-on-surface">{t.t("confirmMarkClean")}</p>
+                  <p className="text-label-sm mt-1 text-on-surface-subtle">
+                    {progress.done} {t.t("itemsDone").toLowerCase()} · {progress.skipped}{" "}
+                    {t.t("skippedWord").toLowerCase()}
+                  </p>
+                  <p className="text-label-sm mt-2 text-on-surface-subtle">
+                    {t.t("supervisorWillBeNotified")}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={() => {
+                        markRoomClean(room.id, actor);
+                        setConfirming(false);
+                        toast.success(t.t("awaitingBanner"));
+                        navigate({ to: "/housekeeper" });
+                      }}
+                      className="flex-1 hk-card bg-primary py-3 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
+                    >
+                      {t.t("confirmMarkCleanBtn")}
+                    </button>
+                    <button
+                      onClick={() => setConfirming(false)}
+                      className="px-3 text-label font-medium text-on-surface-variant"
+                    >
+                      {t.t("cancel")}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {status === "clean" && (

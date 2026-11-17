@@ -1,11 +1,21 @@
 import type {
+  ChecklistItem,
+  CleaningZone,
+  GuestRequest,
+  Inspection,
+  InspectionPoint,
   Issue,
   Reservation,
   Room,
   RoomStatus,
   RoomType,
+  RoomView,
   Staff,
   SupervisorProfile,
+  TaskType,
+  Wing,
+  WingId,
+  WingProximity,
 } from "./hotel-types";
 import roomStandardPhoto from "@/assets/photos/room-standard.jpg";
 import roomDeluxePhoto from "@/assets/photos/room-deluxe.jpg";
@@ -99,6 +109,27 @@ export const supervisors: SupervisorProfile[] = [
   { id: "sup2", name: "Khalid Al Otaibi", initials: "KO", shift: "Evening" },
 ];
 
+/**
+ * The resort sits on the Gulf shoreline as five low-rise wings running along
+ * the water, not stacked floors — each wing's position relative to the shore
+ * (rather than its room number) is what determines whether its rooms can be
+ * sold with a Gulf view. See docs discussion: don't carry Riwaq's heritage
+ * wing theme over, this property is a beachfront resort, not a heritage inn.
+ */
+export const wings: Record<WingId, Wing> = {
+  1: { id: 1, name: "Marina Wing", proximity: "beachfront" },
+  2: { id: 2, name: "Lagoon Wing", proximity: "beachfront" },
+  3: { id: 3, name: "Palm Wing", proximity: "midground" },
+  4: { id: 4, name: "Dune Wing", proximity: "midground" },
+  5: { id: 5, name: "Oasis Wing", proximity: "garden" },
+};
+
+function viewFor(proximity: WingProximity, unitInWing: number): RoomView {
+  if (proximity === "beachfront") return unitInWing <= 14 ? "gulf" : "garden";
+  if (proximity === "midground") return unitInWing <= 10 ? "garden" : "courtyard";
+  return unitInWing <= 4 ? "garden" : "courtyard";
+}
+
 function roomType(index: number): RoomType {
   if (index >= 18) return "Suite";
   if (index >= 13) return "Deluxe";
@@ -120,11 +151,143 @@ const statusPool: RoomStatus[] = [
   "inspected",
 ];
 
+const taskTypePool: TaskType[] = ["departure", "departure", "stayover"];
+
+/* ───────────────────────── Housekeeper cleaning checklist ─────────────────────────
+ * What the housekeeper works through, in order, while actually cleaning — distinct
+ * from the supervisor's post-clean inspection rubric below. Departure (checkout) is
+ * the full clean; stayover (guest still in-house) is a lighter touch; a re-clean
+ * (sent back after a failed inspection) reuses the full departure template. */
+
+const item = (
+  id: string,
+  zone: CleaningZone,
+  label: string,
+  mandatory = true,
+  photo = false,
+): ChecklistItem => ({ id, zone, label, mandatory, photo });
+
+export const checklistTemplates: Record<"departure" | "stayover", ChecklistItem[]> = {
+  departure: [
+    item("d1", "entry_waste", "Open balcony doors to air the room", false),
+    item("d2", "entry_waste", "Empty all bins & replace liners"),
+    item("d3", "entry_waste", "Clear room-service trays to corridor", false),
+    item("d4", "linen", "Strip all bed linen & towels"),
+    item("d5", "linen", "Inspect mattress & pillows for stains or damage"),
+    item("d6", "dusting", "Dust high to low: fixtures to furniture"),
+    item("d7", "dusting", "Disinfect remote, phone, switches & door handles"),
+    item("d8", "bathroom", "Disinfect toilet"),
+    item("d9", "bathroom", "Clean sink, vanity & countertops", true, true),
+    item("d10", "bathroom", "Clean shower / tub & glass"),
+    item("d11", "bathroom", "Polish mirrors & chrome fixtures", false),
+    item("d12", "restock", "Make bed to brand standard", true, true),
+    item("d13", "restock", "Restock towels & toiletries"),
+    item("d14", "restock", "Restock minibar, coffee & water", false),
+    item("d15", "floor", "Vacuum carpet & rugs"),
+    item("d16", "floor", "Mop hard flooring"),
+    item("d17", "final_check", "Check all lights & AC"),
+    item("d18", "final_check", "Align curtains, furniture & balcony chairs", false),
+    item("d19", "final_check", "Lock door & balcony securely"),
+  ],
+  stayover: [
+    item("s1", "entry_waste", "Empty bins & replace liners"),
+    item("s2", "linen", "Replace used towels"),
+    item("s3", "dusting", "Wipe down high-touch surfaces"),
+    item("s4", "bathroom", "Clean toilet, sink & shower"),
+    item("s5", "restock", "Make bed", true, true),
+    item("s6", "restock", "Restock toiletries"),
+    item("s7", "restock", "Restock coffee & water", false),
+    item("s8", "floor", "Vacuum traffic areas", false),
+    item("s9", "final_check", "Tidy guest belongings — don't move valuables", false),
+    item("s10", "final_check", "Lock door & balcony securely"),
+  ],
+};
+
+export function checklistTemplateFor(taskType: TaskType): ChecklistItem[] {
+  return taskType === "stayover" ? checklistTemplates.stayover : checklistTemplates.departure;
+}
+
+export const zoneLabel: Record<CleaningZone, string> = {
+  entry_waste: "Entry & Waste",
+  linen: "Linen",
+  dusting: "Dusting",
+  bathroom: "Bathroom",
+  restock: "Restock",
+  floor: "Floor",
+  final_check: "Final Check",
+};
+
+export const skipReasons = [
+  "Guest belongings in the way",
+  "Supplies not available",
+  "Not needed this visit",
+  "Other",
+];
+
+/* ───────────────────────── Supervisor inspection rubric ─────────────────────────
+ * A separate, weighted checklist the supervisor uses to pass or fail a room after
+ * the housekeeper has marked it clean. A critical point failing auto-fails the
+ * inspection no matter the overall score. */
+
+const pt = (
+  id: string,
+  zone: InspectionPoint["zone"],
+  label: string,
+  weight: 1 | 2 | 3,
+  critical = false,
+): InspectionPoint => ({ id, zone, label, weight, critical });
+
+export const inspectionPoints: InspectionPoint[] = [
+  pt("i1", "Bedroom", "Bed made to brand standard, no wrinkles", 3),
+  pt("i2", "Bedroom", "Linen clean, no hair or stains", 3, true),
+  pt("i3", "Bedroom", "Surfaces dust-free", 2),
+  pt("i4", "Bedroom", "Carpet / floor clean", 2),
+  pt("i5", "Bathroom", "Toilet sanitized", 3, true),
+  pt("i6", "Bathroom", "Sink & vanity spotless", 2),
+  pt("i7", "Bathroom", "Shower / tub & glass clean", 2),
+  pt("i8", "Bathroom", "Towels complete & folded", 2),
+  pt("i9", "Amenities", "Toiletries complete", 2),
+  pt("i10", "Amenities", "Minibar, coffee & water stocked", 1),
+  pt("i11", "Amenities", "Welcome items placed", 1),
+  pt("i12", "Safety", "TV, AC & lights working", 2),
+  pt("i13", "Safety", "Safe open & empty", 3, true),
+  pt("i14", "Safety", "Door & balcony door lock secure", 3, true),
+  pt("i15", "View & Balcony", "Balcony door & windows clean, view unobstructed", 2),
+  pt("i16", "View & Balcony", "Balcony furniture clean & aligned", 1),
+  pt("i17", "View & Balcony", "No pests or odors present", 3, true),
+];
+
+export function scoreInspection(results: Record<string, boolean>) {
+  let total = 0;
+  let got = 0;
+  let criticalFail = false;
+  for (const point of inspectionPoints) {
+    total += point.weight;
+    if (results[point.id] !== false) got += point.weight;
+    if (point.critical && results[point.id] === false) criticalFail = true;
+  }
+  return { score: Math.round((got / total) * 100), criticalFail };
+}
+
+export const PASS_SCORE = 90;
+
+function buildChecklistState(taskType: TaskType, fillRatio: number, seed: number) {
+  const list = checklistTemplateFor(taskType === "reclean" ? "departure" : taskType);
+  const state: Room["checklist"] = {};
+  list.forEach((it, i) => {
+    if (seeded(seed + i) < fillRatio) {
+      state[it.id] = { status: "done", at: `${9 + ((seed + i) % 8)}:${String(((seed + i) * 7) % 60).padStart(2, "0")}` };
+    }
+  });
+  return state;
+}
+
 export function buildRooms(): Room[] {
   const rooms: Room[] = [];
-  for (let floor = 1; floor <= 5; floor++) {
+  for (let wing = 1; wing <= 5; wing++) {
+    const wingMeta = wings[wing as WingId];
     for (let i = 1; i <= 20; i++) {
-      const seq = (floor - 1) * 20 + i;
+      const seq = (wing - 1) * 20 + i;
       const r = seeded(seq);
       const status = statusPool[Math.floor(r * statusPool.length)]!;
       const flags: Room["flags"] = [];
@@ -134,12 +297,47 @@ export function buildRooms(): Room[] {
 
       const needsAttendant = status === "in_progress" || status === "clean";
       const type = roomType(i);
+      const taskType = taskTypePool[Math.floor(seeded(seq + 11) * taskTypePool.length)]!;
+      const level: 1 | 2 = i <= 10 ? 1 : 2;
+
+      const checklist =
+        status === "in_progress"
+          ? buildChecklistState(taskType, 0.45, seq)
+          : status === "clean" || status === "inspected"
+            ? buildChecklistState(taskType, 1, seq)
+            : {};
+
+      const anomalies: Room["anomalies"] =
+        (status === "clean" || status === "inspected") && seq % 31 === 0
+          ? ["bulk_tick"]
+          : (status === "clean" || status === "inspected") && seq % 41 === 0
+            ? ["too_fast"]
+            : [];
+
+      const inspections: Inspection[] =
+        status === "inspected"
+          ? [
+              {
+                by: seq % 2 === 0 ? "sup1" : "sup2",
+                at: `${10 + (seq % 6)}:${String((seq * 11) % 60).padStart(2, "0")}`,
+                score: 92 + (seq % 8),
+                result: "passed",
+                failedPoints: [],
+                note: undefined,
+                remote: undefined,
+              },
+            ]
+          : [];
+
       rooms.push({
-        id: `r${floor}${String(i).padStart(2, "0")}`,
-        number: `${floor}${String(i).padStart(2, "0")}`,
-        floor,
+        id: `r${wing}${String(i).padStart(2, "0")}`,
+        number: `${wing}${String(i).padStart(2, "0")}`,
+        wing: wing as WingId,
+        level,
+        view: viewFor(wingMeta.proximity, i),
         type,
         status,
+        taskType,
         flags,
         photo: roomPhotoByType[type],
         attendantId: needsAttendant
@@ -156,6 +354,10 @@ export function buildRooms(): Room[] {
               : null,
         lastUpdated: `${9 + (seq % 8)}:${String((seq * 7) % 60).padStart(2, "0")}`,
         notes: [],
+        checklist,
+        cleaningStartedAt: status === "in_progress" ? `${9 + (seq % 5)}:${String((seq * 3) % 60).padStart(2, "0")}` : undefined,
+        anomalies,
+        inspections,
       });
     }
   }
@@ -191,7 +393,7 @@ export const issues: Issue[] = [
     id: "i3",
     roomId: "r112",
     title: "Torn bedsheet",
-    description: "Fitted sheet ripped at the corner, replaced with spare from floor store.",
+    description: "Fitted sheet ripped at the corner, replaced with spare from wing store.",
     category: "Linen",
     reportedBy: "s2",
     reportedAt: "10:31",
@@ -341,4 +543,45 @@ export const reservations: Reservation[] = [
 export const shiftTotals = {
   morning: { completed: 42, avgMinutes: 27, onTimePct: 91, passRate: 94, assigned: 46 },
   evening: { completed: 33, avgMinutes: 30, onTimePct: 85, passRate: 89, assigned: 39 },
+};
+
+/** Guest-services requests routed to housekeeping — extra amenities, late
+ * checkout and the like. Distinct from Issues, which are maintenance defects
+ * nobody asked for. */
+export const guestRequests: GuestRequest[] = [
+  {
+    id: "gr1",
+    roomId: "r215",
+    type: "towels",
+    note: "2 extra bath towels",
+    requestedAt: "10:15",
+    status: "pending",
+    assignedTo: null,
+  },
+  {
+    id: "gr2",
+    roomId: "r419",
+    type: "late_checkout",
+    note: "Requesting checkout at 14:00 instead of 11:00",
+    requestedAt: "09:40",
+    status: "acknowledged",
+    assignedTo: "s5",
+  },
+  {
+    id: "gr3",
+    roomId: "r215",
+    type: "amenities",
+    note: "Extra pillows and bottled water",
+    requestedAt: "08:05",
+    status: "completed",
+    assignedTo: "s1",
+  },
+];
+
+export const guestRequestLabel: Record<GuestRequest["type"], string> = {
+  towels: "Extra towels",
+  amenities: "Extra amenities",
+  late_checkout: "Late checkout",
+  housekeeping: "Extra housekeeping",
+  other: "Other request",
 };

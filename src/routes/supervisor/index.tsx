@@ -8,6 +8,7 @@ import { MobileLoginFlow } from "@/components/supervisor/MobileLoginFlow";
 import { RoomRow } from "@/components/supervisor/RoomRow";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
 import { useOnline } from "@/lib/use-online";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/")({
@@ -60,7 +61,14 @@ const STATUS_PILLS = [
 ];
 
 function SupervisorBoard() {
-  const { rooms, staffById, currentSupervisorId, setCurrentSupervisorId, supervisors } = useHotel();
+  const {
+    rooms,
+    staffById,
+    currentSupervisorId,
+    setCurrentSupervisorId,
+    supervisors,
+    guestRequests,
+  } = useHotel();
   const navigate = useNavigate();
   const online = useOnline();
   const me = supervisors.find((s) => s.id === currentSupervisorId);
@@ -87,20 +95,22 @@ function SupervisorBoard() {
     return list;
   }, [rooms, filter, rushOnly]);
 
-  const floors = useMemo(() => {
+  const wingGroups = useMemo(() => {
     const map = new Map<number, Room[]>();
     filtered.forEach((r) => {
-      const list = map.get(r.floor) ?? [];
+      const list = map.get(r.wing) ?? [];
       list.push(r);
-      map.set(r.floor, list);
+      map.set(r.wing, list);
     });
     return [...map.entries()]
       .sort(([a], [b]) => a - b)
-      .map(([floor, list]) => ({
-        floor,
+      .map(([wing, list]) => ({
+        wing,
         rooms: list.sort((a, b) => Number(a.number) - Number(b.number)),
       }));
   }, [filtered]);
+
+  const pendingRequests = guestRequests.filter((g) => g.status !== "completed").length;
 
   return (
     <MobileFrame dark={!me}>
@@ -131,10 +141,23 @@ function SupervisorBoard() {
                 <p className="text-title text-on-surface">{me.name}</p>
               </div>
             </div>
-            <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 font-medium text-primary">
-              <Icon name="supervisor_account" size={14} filled />
-              Supervisor
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate({ to: "/supervisor/requests" })}
+                className="relative grid size-9 place-items-center rounded-full bg-surface-container text-on-surface-variant"
+              >
+                <Icon name="room_service" size={18} />
+                {pendingRequests > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-error text-[10px] font-semibold text-on-primary">
+                    {pendingRequests}
+                  </span>
+                )}
+              </button>
+              <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 font-medium text-primary">
+                <Icon name="supervisor_account" size={14} filled />
+                Supervisor
+              </span>
+            </div>
           </div>
 
           <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-secondary p-5 text-on-primary shadow-soft">
@@ -207,7 +230,7 @@ function SupervisorBoard() {
           </div>
 
           <div className="px-4 pb-4 pt-4">
-            {floors.length === 0 ? (
+            {wingGroups.length === 0 ? (
               <div className="mt-10 flex flex-col items-center gap-2 text-center">
                 <span className="grid size-14 place-items-center rounded-full bg-success/10 text-success">
                   <Icon name="task_alt" size={28} filled />
@@ -215,11 +238,13 @@ function SupervisorBoard() {
                 <p className="text-body text-on-surface-subtle">Nothing matches this filter</p>
               </div>
             ) : (
-              floors.map(({ floor, rooms: floorRooms }) => (
-                <div key={floor} className="mt-3">
-                  <p className="text-label-sm uppercase text-on-surface-subtle">Floor {floor}</p>
+              wingGroups.map(({ wing, rooms: wingRooms }) => (
+                <div key={wing} className="mt-3">
+                  <p className="text-label-sm uppercase text-on-surface-subtle">
+                    {wings[wing as 1 | 2 | 3 | 4 | 5]?.name ?? `Wing ${wing}`}
+                  </p>
                   <div className="mt-1.5 overflow-hidden hk-card border border-outline-variant">
-                    {floorRooms.map((r, i) => (
+                    {wingRooms.map((r, i) => (
                       <RoomRow
                         key={r.id}
                         room={r}

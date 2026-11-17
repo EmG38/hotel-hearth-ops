@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/room/$roomId")({
@@ -84,7 +85,7 @@ function SupervisorRoomDetail() {
                 </button>
               )}
               <span className="text-label-sm rounded-full bg-white/25 px-3 py-1 font-medium text-white">
-                Floor {room.floor}
+                {wings[room.wing].name}
               </span>
             </div>
           </div>
@@ -106,6 +107,26 @@ function SupervisorRoomDetail() {
               {statusLabel[status]}
             </span>
             <span className="text-label-sm text-on-surface-subtle">Updated {room.lastUpdated}</span>
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-surface-container px-2 py-0.5 text-on-surface-variant">
+              <Icon
+                name={room.view === "gulf" ? "waves" : room.view === "garden" ? "park" : "deck"}
+                size={12}
+                filled
+              />
+              {room.view === "gulf"
+                ? "Gulf View"
+                : room.view === "garden"
+                  ? "Garden View"
+                  : "Courtyard View"}
+            </span>
+            {room.taskType === "reclean" && (
+              <span className="text-label-sm rounded-full bg-error/10 px-2 py-0.5 font-medium text-error">
+                Re-clean
+              </span>
+            )}
           </div>
 
           {room.flags.length > 0 && (

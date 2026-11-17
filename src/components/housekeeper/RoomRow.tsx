@@ -4,7 +4,7 @@ import type { Room } from "@/lib/hotel-types";
 import { useHkT, timeAgo } from "@/lib/housekeeper-i18n";
 import { badgeTone, statusDot, statusLabelKey, statusTextTone } from "@/lib/housekeeper-room";
 
-/** One room list row — shared by Home, the Floor view and the Needs
+/** One room list row — shared by Home, the Wing view and the Needs
  * Attention "See All" screen so the three stay visually identical. */
 export function RoomRow({
   room,
@@ -35,6 +35,12 @@ export function RoomRow({
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <p className="text-label text-on-surface">{room.type}</p>
+          {room.view === "gulf" && (
+            <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-info/10 px-1.5 py-0.5 text-info">
+              <Icon name="waves" size={12} filled />
+              {t.t("gulfView")}
+            </span>
+          )}
           {room.flags.includes("dnd") && (
             <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-surface-container px-1.5 py-0.5 text-on-surface-variant">
               <Icon name="do_not_disturb_on" size={12} />

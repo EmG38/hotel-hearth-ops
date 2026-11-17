@@ -20,7 +20,7 @@ function Attention() {
     () =>
       rooms
         .filter((r) => r.attendantId === currentStaffId && r.status === "dirty")
-        .sort((a, b) => a.floor - b.floor || Number(a.number) - Number(b.number)),
+        .sort((a, b) => a.wing - b.wing || Number(a.number) - Number(b.number)),
     [rooms, currentStaffId],
   );
 

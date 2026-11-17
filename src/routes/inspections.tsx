@@ -13,6 +13,7 @@ import {
 } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
+import { wings } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/inspections")({
   head: () => ({
@@ -69,7 +70,7 @@ function InspectionCard({ roomId }: { roomId: string }) {
               {room.rush && <Icon name="star" size={16} filled className="text-warning" />}
             </p>
             <p className="text-label-sm text-on-surface-subtle">
-              Floor {room.floor} · {room.type} · cleaned {room.lastUpdated}
+              {wings[room.wing].name} · {room.type} · cleaned {room.lastUpdated}
             </p>
           </div>
         </div>

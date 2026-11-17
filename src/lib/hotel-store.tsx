@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type {
+  GuestRequest,
+  GuestRequestStatus,
   Issue,
   IssueStatus,
   Reservation,
@@ -11,12 +13,27 @@ import type {
   SupervisorProfile,
 } from "./hotel-types";
 import {
+  PASS_SCORE,
   buildRooms,
+  guestRequests as seedGuestRequests,
   issues as seedIssues,
   reservations as seedReservations,
   staff as seedStaff,
   supervisors as seedSupervisors,
 } from "./mock-data";
+import { detectAnomalies, scoreInspection } from "./checklist";
+
+function nowClock() {
+  return new Date().toTimeString().slice(0, 5);
+}
+
+/** Minutes between two "HH:MM" clock strings — good enough for this demo's
+ * mock clock, same simplification Riwaq's own demo clock uses. */
+function minutesBetween(start: string, end: string) {
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  return Math.max(0, eh! * 60 + em! - (sh! * 60 + sm!));
+}
 
 interface HotelState {
   role: Role;
@@ -25,6 +42,7 @@ interface HotelState {
   staff: Staff[];
   issues: Issue[];
   reservations: Reservation[];
+  guestRequests: GuestRequest[];
   /** Set by global search to ask the Property Board to open a room's panel on next render. */
   focusRoomId: string | null;
   setFocusRoomId: (id: string | null) => void;
@@ -60,6 +78,28 @@ interface HotelState {
     reservationId: string,
     times: { expectedCheckIn?: string; expectedCheckOut?: string },
   ) => void;
+  /** ── Housekeeper cleaning checklist ── */
+  startCleaning: (roomId: string, actor: string) => void;
+  toggleChecklistItem: (roomId: string, itemId: string, actor: string) => void;
+  skipChecklistItem: (roomId: string, itemId: string, reason: string) => void;
+  attachChecklistPhoto: (roomId: string, itemId: string, actor: string) => void;
+  markRoomClean: (roomId: string, actor: string) => void;
+  /** ── Supervisor inspection ── */
+  submitInspection: (
+    roomId: string,
+    actor: string,
+    results: Record<string, boolean>,
+    opts?: { note?: string; remote?: boolean },
+  ) => boolean;
+  remoteApprove: (roomId: string, actor: string) => boolean;
+  /** A supervisor can't inspect a room they themselves cleaned. */
+  canInspectRoom: (roomId: string, supervisorId: string) => boolean;
+  /** ── Guest requests ── */
+  setGuestRequestStatus: (
+    requestId: string,
+    status: GuestRequestStatus,
+    assignedTo?: string | null,
+  ) => void;
 }
 
 const HotelContext = createContext<HotelState | null>(null);
@@ -70,6 +110,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
   const [staff] = useState<Staff[]>(seedStaff);
   const [issues, setIssues] = useState<Issue[]>(seedIssues);
   const [reservations, setReservations] = useState<Reservation[]>(seedReservations);
+  const [guestRequests, setGuestRequests] = useState<GuestRequest[]>(seedGuestRequests);
   const [focusRoomId, setFocusRoomId] = useState<string | null>(null);
   const [focusReservationId, setFocusReservationId] = useState<string | null>(null);
   const [currentStaffId, setCurrentStaffId] = useState<string | null>(null);
@@ -79,6 +120,65 @@ export function HotelProvider({ children }: { children: ReactNode }) {
     setRooms((prev) => prev.map((r) => (r.id === roomId ? patch(r) : r)));
   }, []);
 
+  const submitInspection = useCallback(
+    (
+      roomId: string,
+      actor: string,
+      results: Record<string, boolean>,
+      opts: { note?: string; remote?: boolean } = {},
+    ) => {
+      const { score, criticalFail } = scoreInspection(results);
+      const passed = score >= PASS_SCORE && !criticalFail;
+      const failedPoints = Object.entries(results)
+        .filter(([, ok]) => ok === false)
+        .map(([id]) => id);
+      patchRoom(roomId, (r) => {
+        const inspection = {
+          by: actor,
+          at: nowClock(),
+          score,
+          result: (passed ? "passed" : "failed") as "passed" | "failed",
+          failedPoints,
+          note: opts.note,
+          remote: opts.remote,
+        };
+        return passed
+          ? {
+              ...r,
+              status: "inspected" as const,
+              rush: false,
+              inspections: [...r.inspections, inspection],
+            }
+          : {
+              ...r,
+              status: "dirty" as const,
+              taskType: "reclean" as const,
+              checklist: {},
+              cleaningStartedAt: undefined,
+              anomalies: [],
+              notes: opts.note ? [`Rejected: ${opts.note}`, ...r.notes] : r.notes,
+              inspections: [...r.inspections, inspection],
+            };
+      });
+      return passed;
+    },
+    [patchRoom],
+  );
+
+  const remoteApprove = useCallback(
+    (roomId: string, actor: string) => {
+      const allPointIds = [
+        "i1","i2","i3","i4","i5","i6","i7","i8","i9","i10","i11","i12","i13","i14","i15","i16","i17",
+      ];
+      const results = Object.fromEntries(allPointIds.map((id) => [id, true]));
+      return submitInspection(roomId, actor, results, {
+        remote: true,
+        note: "Manager remote approval from housekeeper's photos",
+      });
+    },
+    [submitInspection],
+  );
+
   const value = useMemo<HotelState>(() => {
     return {
       role,
@@ -87,6 +187,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
       staff,
       issues,
       reservations,
+      guestRequests,
       focusRoomId,
       setFocusRoomId,
       focusReservationId,
@@ -147,6 +248,67 @@ export function HotelProvider({ children }: { children: ReactNode }) {
         setReservations((prev) =>
           prev.map((b) => (b.id === reservationId ? { ...b, ...times } : b)),
         ),
+
+      startCleaning: (roomId, actor) =>
+        patchRoom(roomId, (r) => ({
+          ...r,
+          status: "in_progress",
+          attendantId: r.attendantId ?? actor,
+          cleaningStartedAt: nowClock(),
+        })),
+
+      toggleChecklistItem: (roomId, itemId) =>
+        patchRoom(roomId, (r) => {
+          const checklist = { ...r.checklist };
+          if (checklist[itemId]) delete checklist[itemId];
+          else checklist[itemId] = { status: "done", at: nowClock() };
+          return { ...r, checklist };
+        }),
+
+      skipChecklistItem: (roomId, itemId, reason) =>
+        patchRoom(roomId, (r) => ({
+          ...r,
+          checklist: {
+            ...r.checklist,
+            [itemId]: { status: "skipped", at: nowClock(), skipReason: reason },
+          },
+        })),
+
+      attachChecklistPhoto: (roomId, itemId) =>
+        patchRoom(roomId, (r) => ({
+          ...r,
+          checklist: { ...r.checklist, [itemId]: { status: "done", at: nowClock(), photo: true } },
+        })),
+
+      markRoomClean: (roomId, actor) =>
+        patchRoom(roomId, (r) => {
+          const minutes = r.cleaningStartedAt ? minutesBetween(r.cleaningStartedAt, nowClock()) : undefined;
+          const anomalies = detectAnomalies(r, minutes);
+          return {
+            ...r,
+            status: "clean",
+            rush: r.rush,
+            anomalies,
+            notes: [`Marked clean by ${actor}`, ...r.notes],
+          };
+        }),
+
+      submitInspection,
+      remoteApprove,
+
+      canInspectRoom: (roomId, supervisorId) => {
+        const room = rooms.find((r) => r.id === roomId);
+        return !room || room.attendantId !== supervisorId;
+      },
+
+      setGuestRequestStatus: (requestId, status, assignedTo) =>
+        setGuestRequests((prev) =>
+          prev.map((g) =>
+            g.id === requestId
+              ? { ...g, status, assignedTo: assignedTo !== undefined ? assignedTo : g.assignedTo }
+              : g,
+          ),
+        ),
     };
   }, [
     role,
@@ -154,7 +316,10 @@ export function HotelProvider({ children }: { children: ReactNode }) {
     staff,
     issues,
     reservations,
+    guestRequests,
     patchRoom,
+    submitInspection,
+    remoteApprove,
     focusRoomId,
     focusReservationId,
     currentStaffId,

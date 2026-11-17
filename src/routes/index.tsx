@@ -9,6 +9,7 @@ import { RoomTile } from "@/components/RoomTile";
 import { StatusLegend } from "@/components/StatusLegend";
 import { AssignPanel } from "@/components/supervisor/AssignPanel";
 import { Icon } from "@/components/Icon";
+import { wings } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,13 +18,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
+          "Live status of all 100 rooms by wing and room type, with rush flags and filters.",
       },
       { property: "og:title", content: "Property Board — Golden Sands Hotel" },
       {
         property: "og:description",
         content:
-          "Live status of all 100 rooms by floor and room type, with rush flags and filters.",
+          "Live status of all 100 rooms by wing and room type, with rush flags and filters.",
       },
     ],
   }),
@@ -34,7 +35,7 @@ const ROOM_TYPES = ["Standard", "Deluxe", "Suite"] as const;
 
 function PropertyBoard() {
   const { rooms, staff, focusRoomId, setFocusRoomId } = useHotel();
-  const [floor, setFloor] = useState<string>("all");
+  const [wing, setWing] = useState<string>("all");
   const [status, setStatus] = useState<RoomStatus | "all">("all");
   const [attendant, setAttendant] = useState<string>("all");
   const [rushOnly, setRushOnly] = useState(false);
@@ -43,13 +44,13 @@ function PropertyBoard() {
     () =>
       rooms.filter(
         (r) =>
-          (floor === "all" || r.floor === Number(floor)) &&
+          (wing === "all" || r.wing === Number(wing)) &&
           (status === "all" || r.status === status) &&
           (attendant === "all" ||
             (attendant === "none" ? r.attendantId === null : r.attendantId === attendant)) &&
           (!rushOnly || r.rush),
       ),
-    [rooms, floor, status, attendant, rushOnly],
+    [rooms, wing, status, attendant, rushOnly],
   );
 
   const counts = useMemo(() => {
@@ -61,14 +62,14 @@ function PropertyBoard() {
   }, [rooms]);
 
   const [selected, setSelected] = useState<Room | null>(null);
-  const floors = [5, 4, 3, 2, 1];
+  const wingIds = [5, 4, 3, 2, 1] as const;
 
   useEffect(() => {
     if (!focusRoomId) return;
     const room = rooms.find((r) => r.id === focusRoomId);
     if (room) {
       setSelected(room);
-      setFloor("all");
+      setWing("all");
       setStatus("all");
       setAttendant("all");
       setRushOnly(false);
@@ -110,12 +111,12 @@ function PropertyBoard() {
       <Card className="mb-5 p-4">
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-28">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Floor</span>
-            <Select value={floor} onChange={(e) => setFloor(e.target.value)} className="mt-1.5">
-              <option value="all">All floors</option>
-              {[1, 2, 3, 4, 5].map((f) => (
-                <option key={f} value={f}>
-                  Floor {f}
+            <span className="text-label-sm uppercase text-on-surface-subtle">Wing</span>
+            <Select value={wing} onChange={(e) => setWing(e.target.value)} className="mt-1.5">
+              <option value="all">All wings</option>
+              {([1, 2, 3, 4, 5] as const).map((w) => (
+                <option key={w} value={w}>
+                  {wings[w].name}
                 </option>
               ))}
             </Select>
@@ -160,20 +161,20 @@ function PropertyBoard() {
       </Card>
 
       <div className="space-y-4">
-        {floors.map((f) => {
-          const floorRooms = filtered.filter((r) => r.floor === f);
-          if (floorRooms.length === 0) return null;
+        {wingIds.map((w) => {
+          const wingRooms = filtered.filter((r) => r.wing === w);
+          if (wingRooms.length === 0) return null;
           return (
-            <Card key={f} className="p-4">
+            <Card key={w} className="p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-title-lg text-on-surface">Floor {f}</h2>
+                <h2 className="text-title-lg text-on-surface">{wings[w].name}</h2>
                 <span className="text-label-sm text-on-surface-subtle">
-                  {floorRooms.length} rooms
+                  {wingRooms.length} rooms
                 </span>
               </div>
               <div className="space-y-3">
                 {ROOM_TYPES.map((t) => {
-                  const typeRooms = floorRooms.filter((r) => r.type === t);
+                  const typeRooms = wingRooms.filter((r) => r.type === t);
                   if (typeRooms.length === 0) return null;
                   return (
                     <div key={t}>

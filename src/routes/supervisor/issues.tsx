@@ -6,6 +6,7 @@ import type { IssueStatus } from "@/lib/hotel-types";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/issues")({
@@ -82,7 +83,7 @@ function IssueTriage() {
                   </div>
                   <p className="text-body-sm mt-1 text-on-surface-variant">{issue.description}</p>
                   <p className="text-label-sm mt-2 text-on-surface-subtle">
-                    Room {room?.number} · Floor {room?.floor}
+                    Room {room?.number} · {room ? wings[room.wing].name : ""}
                     {reporter ? ` · ${reporter.name}` : ""} · {issue.reportedAt}
                   </p>
 

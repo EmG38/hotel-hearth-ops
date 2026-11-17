@@ -6,6 +6,7 @@ import { Icon } from "../Icon";
 import { useHotel } from "@/lib/hotel-store";
 import type { Room, RoomStatus } from "@/lib/hotel-types";
 import { STATUS_ORDER, flagMeta, statusMeta } from "@/lib/room-status";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () => void }) {
@@ -20,7 +21,7 @@ export function AssignPanel({ room, onClose }: { room: Room | null; onClose: () 
     <SidePanel
       open
       title={`Room ${room.number}`}
-      subtitle={`Floor ${room.floor} · ${room.type} · updated ${room.lastUpdated}`}
+      subtitle={`${wings[room.wing].name} · ${room.type} · updated ${room.lastUpdated}`}
       onClose={onClose}
       footer={
         <>

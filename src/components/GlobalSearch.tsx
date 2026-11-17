@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "./Icon";
 import { useHotel } from "@/lib/hotel-store";
 import { statusMeta } from "@/lib/room-status";
+import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 type ResultItem =
@@ -26,14 +27,14 @@ export function GlobalSearch() {
         (r) =>
           r.number.toLowerCase().includes(q) ||
           r.type.toLowerCase().includes(q) ||
-          `floor ${r.floor}`.includes(q),
+          wings[r.wing].name.toLowerCase().includes(q),
       )
       .slice(0, 5)
       .map((r) => ({
         kind: "room",
         id: r.id,
         primary: `Room ${r.number}`,
-        secondary: `Floor ${r.floor} · ${r.type} · ${statusMeta[r.status].label}`,
+        secondary: `${wings[r.wing].name} · ${r.type} · ${statusMeta[r.status].label}`,
         icon: "meeting_room",
       }));
 
