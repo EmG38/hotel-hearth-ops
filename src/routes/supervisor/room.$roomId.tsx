@@ -214,31 +214,47 @@ function SupervisorRoomDetail() {
               onClick={() => {
                 const willAdd = !room.flags.includes("oos");
                 toggleFlag(room.id, "oos");
-                toast(`Room ${room.number} ${willAdd ? "marked Out of Service" : "cleared"}`);
+                toast(willAdd ? `Room ${room.number} marked Out of Service` : `Room ${room.number} back in service`);
               }}
+              aria-pressed={room.flags.includes("oos")}
               className={cn(
-                "hk-card border px-3 py-3 text-label font-medium",
+                "flex flex-col items-start gap-1 hk-card border-2 px-3 py-3 text-left text-label font-semibold transition-colors",
                 room.flags.includes("oos")
-                  ? "border-oos bg-oos/20 text-on-surface"
-                  : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
+                  ? "border-oos bg-oos text-on-primary shadow-soft"
+                  : "border-dashed border-outline-variant bg-surface-container-lowest text-on-surface-variant",
               )}
             >
+              <span className="flex w-full items-center justify-between">
+                <Icon name="build_circle" size={20} filled={room.flags.includes("oos")} />
+                <Icon name={room.flags.includes("oos") ? "toggle_on" : "toggle_off"} size={24} filled />
+              </span>
               Out of Service
+              <span className="text-label-sm font-medium opacity-80">
+                {room.flags.includes("oos") ? "Active · tap to clear" : "Not set · tap to mark"}
+              </span>
             </button>
             <button
               onClick={() => {
                 const willAdd = !room.flags.includes("ooo");
                 toggleFlag(room.id, "ooo");
-                toast(`Room ${room.number} ${willAdd ? "marked Out of Order" : "cleared"}`);
+                toast(willAdd ? `Room ${room.number} marked Out of Order` : `Room ${room.number} Out of Order cleared`);
               }}
+              aria-pressed={room.flags.includes("ooo")}
               className={cn(
-                "hk-card border px-3 py-3 text-label font-medium",
+                "flex flex-col items-start gap-1 hk-card border-2 px-3 py-3 text-left text-label font-semibold transition-colors",
                 room.flags.includes("ooo")
-                  ? "border-ooo bg-ooo text-on-primary"
-                  : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
+                  ? "border-ooo bg-ooo text-on-primary shadow-soft"
+                  : "border-dashed border-outline-variant bg-surface-container-lowest text-on-surface-variant",
               )}
             >
+              <span className="flex w-full items-center justify-between">
+                <Icon name="block" size={20} filled={room.flags.includes("ooo")} />
+                <Icon name={room.flags.includes("ooo") ? "toggle_on" : "toggle_off"} size={24} filled />
+              </span>
               Out of Order
+              <span className="text-label-sm font-medium opacity-80">
+                {room.flags.includes("ooo") ? "Active · tap to clear" : "Not set · tap to mark"}
+              </span>
             </button>
           </div>
         </div>

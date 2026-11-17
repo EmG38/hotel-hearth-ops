@@ -333,3 +333,13 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-md-bob, .animate-md-wave, .animate-md-wave-slow, .text-md-shimmer { animation: none; }
 }
+
+/* Toasts for phone personas stay inside the device screen. */
+.phone-toaster [data-sonner-toaster] {
+  position: absolute !important;
+  --width: calc(100% - 24px) !important;
+  left: 12px !important;
+  right: 12px !important;
+  transform: none !important;
+  z-index: 50;
+}

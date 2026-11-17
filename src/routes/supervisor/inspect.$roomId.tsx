@@ -119,6 +119,13 @@ function Inspect() {
           </div>
         )}
 
+        <button
+          onClick={() => setResults(Object.fromEntries(inspectionPoints.map((p) => [p.id, true])))}
+          className="mt-4 flex w-full items-center justify-center gap-1.5 hk-card border border-success/40 bg-success/10 py-2.5 text-label font-semibold text-success"
+        >
+          <Icon name="done_all" size={16} /> Pass all points
+        </button>
+
         <p className="text-label-sm mt-4 uppercase text-on-surface-subtle">
           {answered}/{inspectionPoints.length} points checked · score {answered ? `${score}%` : "—"}{" "}
           · pass ≥ {PASS_SCORE}%{criticalFail ? " · critical fail" : ""}
@@ -244,15 +251,22 @@ function Inspect() {
         ) : (
           <>
             <button
-              disabled={!canApprove || selfInspect}
+              aria-disabled={!canApprove || selfInspect}
               onClick={() => {
+                if (selfInspect) return void toast.error("You cleaned this room — another supervisor must inspect it");
+                if (!allAnswered)
+                  return void toast.warning(
+                    `${inspectionPoints.length - answered} point${inspectionPoints.length - answered > 1 ? "s" : ""} left — tick ✓ or ✗ on each, or use Pass zone`,
+                  );
+                if (criticalFail) return void toast.error("A critical point failed — reject for re-clean");
+                if (score < PASS_SCORE) return void toast.error(`Score ${score}% is below ${PASS_SCORE}% — reject for re-clean`);
                 submitInspection(room.id, currentSupervisorId ?? "", results);
                 toast.success(`Room ${room.number} passed — ${score}% — ready to sell`);
                 back();
               }}
-              className="hk-card bg-success py-3.5 text-label font-semibold text-on-primary shadow-soft disabled:opacity-40"
+              className="hk-card bg-success py-3.5 text-label font-semibold text-on-primary shadow-soft aria-disabled:opacity-50"
             >
-              Approve
+              {allAnswered ? "Approve" : `Approve · ${inspectionPoints.length - answered} left`}
             </button>
             <button
               disabled={!anyFail || selfInspect}

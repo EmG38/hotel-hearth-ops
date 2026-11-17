@@ -9,6 +9,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
+import { Toaster } from "@/components/ui/sonner";
 
 function useClock() {
   // Starts empty and fills in after mount: a wall-clock value in the first
@@ -108,6 +109,10 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
               </div>
             ) : null}
           </PhoneOverlayContext.Provider>
+
+          <div className="phone-toaster">
+            <Toaster position="top-center" richColors expand={false} offset={52} />
+          </div>
 
           {/* Home indicator */}
           <div className="pointer-events-none absolute inset-x-0 bottom-1.5 z-30 flex justify-center">

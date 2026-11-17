@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
   type ErrorComponentProps,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -128,6 +129,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Phone personas render their own toaster inside the device mockup. */
+function ConsoleToaster() {
+  const path = useRouterState({ select: (st) => st.location.pathname });
+  if (path.startsWith("/housekeeper") || path.startsWith("/supervisor")) return null;
+  return <Toaster position="bottom-right" richColors closeButton expand={false} />;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -139,7 +147,7 @@ function RootComponent() {
           {/* Required: nested routes render here. */}
           <Outlet />
           </AppShell>
-          <Toaster position="bottom-right" richColors closeButton expand={false} />
+          <ConsoleToaster />
         </I18nProvider>
       </HotelProvider>
     </QueryClientProvider>

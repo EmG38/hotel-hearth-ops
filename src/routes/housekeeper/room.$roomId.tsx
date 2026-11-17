@@ -85,7 +85,7 @@ function RoomDetail() {
       );
       return;
     }
-    if (needsPhoto && !room!.checklist[itemId]) {
+    if (needsPhoto && !room!.checklist[itemId]?.photo) {
       setPhotoItem(itemId);
       return;
     }
@@ -226,6 +226,9 @@ function RoomDetail() {
                                 <span className="text-label block text-on-surface">{it.label}</span>
                                 <span className="text-label-sm flex flex-wrap items-center gap-1.5 text-on-surface-subtle">
                                   {it.mandatory && !res && <em className="not-italic text-warning">{t.t("required")}</em>}
+                                  {it.photo && done && !res?.photo && (
+                                    <em className="not-italic font-medium text-error">{t.t("photo")} · {t.t("required")}</em>
+                                  )}
                                   {it.photo && (
                                     <em className="not-italic inline-flex items-center gap-0.5">
                                       <Icon name="photo_camera" size={11} /> {t.t("photo")}
@@ -291,9 +294,17 @@ function RoomDetail() {
 
               {!confirming ? (
                 <button
-                  disabled={!progress.canComplete}
-                  onClick={() => setConfirming(true)}
-                  className="mt-5 flex w-full items-center justify-center gap-2 hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98] disabled:opacity-40"
+                  aria-disabled={!progress.canComplete}
+                  onClick={() => {
+                    if (progress.canComplete) { setConfirming(true); return; }
+                    const missing = progress.list.find(
+                      (it) =>
+                        (it.mandatory && room.checklist[it.id]?.status !== "done") ||
+                        (it.photo && room.checklist[it.id]?.status === "done" && !room.checklist[it.id]?.photo),
+                    );
+                    if (missing) toast.warning(`${missing.label} · ${t.t("required")}`);
+                  }}
+                  className="mt-5 flex w-full items-center justify-center gap-2 hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98] aria-disabled:opacity-50"
                 >
                   {progress.canComplete
                     ? t.t("markCleanBtn")
