@@ -148,7 +148,8 @@ function IssueTriage() {
                   {issue.status !== "resolved" && (
                     <>
                       <Button
-                        variant="outline"
+                        variant={room?.flags.includes("oos") ? "primary" : "outline"}
+                        className={room?.flags.includes("oos") ? "!bg-oos !text-on-primary" : undefined}
                         icon="do_not_disturb_on"
                         onClick={() => {
                           if (!room) return;
@@ -162,7 +163,8 @@ function IssueTriage() {
                         {room?.flags.includes("oos") ? "Clear Out of Service" : "Out of Service"}
                       </Button>
                       <Button
-                        variant="outline"
+                        variant={room?.flags.includes("ooo") ? "primary" : "outline"}
+                        className={room?.flags.includes("ooo") ? "!bg-ooo !text-on-primary" : undefined}
                         icon="build"
                         onClick={() => {
                           if (!room) return;

@@ -104,8 +104,15 @@ function IssueTriage() {
                               `Room ${room.number} ${willAdd ? "marked Out of Service" : "cleared"}`,
                             );
                           }}
-                          className="text-label-sm rounded-full border border-outline-variant px-3 py-1.5 font-medium text-on-surface-variant active:bg-surface-container"
+                          aria-pressed={room?.flags.includes("oos")}
+                          className={cn(
+                            "text-label-sm inline-flex items-center gap-1 rounded-full border px-3 py-1.5 font-semibold",
+                            room?.flags.includes("oos")
+                              ? "border-oos bg-oos text-on-primary"
+                              : "border-dashed border-outline-variant text-on-surface-variant active:bg-surface-container",
+                          )}
                         >
+                          {room?.flags.includes("oos") && <Icon name="check" size={13} />}
                           {room?.flags.includes("oos") ? "Clear OOS" : "Out of Service"}
                         </button>
                         <button
@@ -117,8 +124,15 @@ function IssueTriage() {
                               `Room ${room.number} ${willAdd ? "marked Out of Order" : "cleared"}`,
                             );
                           }}
-                          className="text-label-sm rounded-full border border-outline-variant px-3 py-1.5 font-medium text-on-surface-variant active:bg-surface-container"
+                          aria-pressed={room?.flags.includes("ooo")}
+                          className={cn(
+                            "text-label-sm inline-flex items-center gap-1 rounded-full border px-3 py-1.5 font-semibold",
+                            room?.flags.includes("ooo")
+                              ? "border-ooo bg-ooo text-on-primary"
+                              : "border-dashed border-outline-variant text-on-surface-variant active:bg-surface-container",
+                          )}
                         >
+                          {room?.flags.includes("ooo") && <Icon name="check" size={13} />}
                           {room?.flags.includes("ooo") ? "Clear OOO" : "Out of Order"}
                         </button>
                       </>

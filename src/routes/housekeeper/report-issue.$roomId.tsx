@@ -28,6 +28,10 @@ function ReportIssue() {
   const canSubmit = Boolean(category) && hasPhoto;
 
   function submit() {
+    if (!hasPhoto) {
+      toast.warning(`${t.t("photo")} · ${t.t("required")}`);
+      return;
+    }
     reportIssue({
       roomId: room!.id,
       category: ISSUE_CATEGORIES.find((c) => c.id === category)?.en ?? category,
@@ -119,7 +123,7 @@ function ReportIssue() {
         </div>
       </div>
       <div className="shrink-0 border-t border-outline-variant p-4">
-        <Button variant="primary" className="w-full py-3" disabled={!canSubmit} onClick={submit}>
+        <Button variant="primary" className={`w-full py-3 ${canSubmit ? "" : "opacity-50"}`} aria-disabled={!canSubmit} onClick={submit}>
           {t.t("submitReport")}
         </Button>
       </div>
