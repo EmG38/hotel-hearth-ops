@@ -18,14 +18,14 @@ const shiftTimes = {
 
 function StatCard({ icon, label, value, tone }: { icon: string; label: string; value: number; tone: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-[22px] bg-surface-container-lowest p-3 shadow-soft">
+    <div className="flex min-w-0 flex-col items-start gap-2 rounded-[22px] bg-surface-container-lowest p-3 shadow-soft">
       <span
-        className={`grid size-10 shrink-0 place-items-center rounded-2xl ${tone}`}
+        className={`grid size-9 shrink-0 place-items-center rounded-xl ${tone}`}
         style={{ backgroundColor: "color-mix(in oklab, currentColor 12%, transparent)" }}
       >
         <Icon name={icon} size={20} filled />
       </span>
-      <div className="min-w-0">
+      <div className="min-w-0 w-full">
         <p className="text-xl font-semibold leading-none tracking-tight text-on-surface">{value}</p>
         <p className="text-label-sm mt-1 leading-tight text-on-surface-subtle">{label}</p>
       </div>
