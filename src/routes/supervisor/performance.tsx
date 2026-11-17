@@ -86,15 +86,16 @@ function Performance() {
               <button
                 key={s}
                 onClick={() => setShift(s)}
+                title={`${s} shift`}
                 className={cn(
-                  "text-label-sm inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-medium",
+                  "grid size-9 place-items-center rounded-full border",
                   shift === s
                     ? "border-primary bg-primary text-on-primary"
                     : "border-outline-variant text-on-surface-variant",
                 )}
               >
-                <Icon name={s === "Morning" ? "wb_sunny" : "nights_stay"} size={13} filled />
-                {s}
+                <Icon name={s === "Morning" ? "wb_sunny" : "nights_stay"} size={15} filled />
+                <span className="sr-only">{s}</span>
               </button>
             ))}
           </div>

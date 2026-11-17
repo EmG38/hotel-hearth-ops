@@ -36,7 +36,7 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
         <div
           className={cn(
             "hk-frame relative flex aspect-[402/874] flex-col overflow-hidden rounded-[44px] bg-surface",
-            "w-[min(390px,calc(100vw-56px))]",
+            "w-[min(390px,calc(100vw-112px))]",
           )}
         >
           {/* Notch */}
