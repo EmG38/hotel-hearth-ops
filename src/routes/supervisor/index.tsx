@@ -91,75 +91,79 @@ function SupervisorBoard() {
               <span>You're offline — changes are saved here and will sync automatically</span>
             </div>
           )}
-          <div className="flex items-center justify-between px-4 pt-4">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setCurrentSupervisorId(null)}
-                title="Switch user"
-                className="relative"
-              >
-                <span className="grid size-11 place-items-center rounded-full bg-secondary text-title font-semibold text-on-primary">
-                  {me.initials}
-                </span>
-                <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-surface bg-success" />
-              </button>
-              <div>
-                <p className="text-label-sm text-on-surface-subtle">Good day,</p>
-                <p className="text-title text-on-surface">{me.name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate({ to: "/supervisor/requests" })}
-                className="relative grid size-9 place-items-center rounded-full bg-surface-container text-on-surface-variant"
-              >
-                <Icon name="room_service" size={18} />
-                {pendingRequests > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-error text-[10px] font-semibold text-on-primary">
-                    {pendingRequests}
-                  </span>
-                )}
-              </button>
-              <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 font-medium text-primary">
-                <Icon name="supervisor_account" size={14} filled />
-                Supervisor
+          <div className="flex items-center justify-between px-5 pt-3">
+            <button
+              onClick={() => setCurrentSupervisorId(null)}
+              title="Switch user"
+              className="relative"
+            >
+              <span className="grid size-[46px] place-items-center rounded-full bg-secondary text-title font-semibold text-on-primary">
+                {me.initials}
               </span>
-            </div>
-          </div>
-
-          <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-secondary p-5 text-on-primary shadow-soft">
-            <div className="flex items-center justify-between">
-              <p className="text-label-sm font-semibold uppercase tracking-wide opacity-90">
-                Property Status
-              </p>
-              {rushCount > 0 && (
-                <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 font-medium">
-                  <Icon name="star" size={13} filled />
-                  {rushCount} rush
+              <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface bg-success" />
+            </button>
+            <button
+              onClick={() => navigate({ to: "/supervisor/requests" })}
+              className="relative grid size-11 place-items-center rounded-full bg-surface-container-lowest text-on-surface shadow-soft"
+              aria-label="Guest requests"
+            >
+              <Icon name="room_service" size={20} />
+              {pendingRequests > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid size-5 place-items-center rounded-full bg-error text-[10px] font-semibold text-on-primary">
+                  {pendingRequests}
                 </span>
               )}
-            </div>
-            <p className="mt-2 text-3xl font-bold">
-              {byStatus.inspected.length}
-              <span className="text-xl opacity-80">/{total}</span>
-            </p>
-            <p className="text-label opacity-90">rooms ready to sell</p>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
-              <div className="h-full rounded-full bg-white" style={{ width: `${readyPct}%` }} />
-            </div>
-            <p className="text-label-sm mt-2 opacity-90">{readyPct}% of property ready</p>
+            </button>
           </div>
 
-          <div className="mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          <div className="px-5 pt-5">
+            <p className="text-label text-on-surface-subtle">Good day, {me.name.split(" ")[0]}</p>
+            <h1 className="text-[28px] font-semibold leading-[1.15] tracking-tight text-on-surface">
+              Property board,
+              <br />
+              {total - byStatus.inspected.length} rooms need action
+            </h1>
+          </div>
+
+          <div className="relative mx-5 mt-5 h-48 overflow-hidden rounded-[28px] shadow-soft">
+            {rooms.find((r) => r.photo)?.photo ? (
+              <img src={rooms.find((r) => r.photo)!.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+            <span className="text-label-sm absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 font-semibold text-on-surface">
+              <Icon name="supervisor_account" size={14} filled className="text-primary" />
+              Property status
+            </span>
+            {rushCount > 0 && (
+              <span className="text-label-sm absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-warning px-3 py-1.5 font-semibold text-on-primary">
+                <Icon name="star" size={13} filled />
+                {rushCount} rush
+              </span>
+            )}
+            <div className="absolute inset-x-4 bottom-4 text-white">
+              <p className="text-4xl font-semibold tracking-tight">
+                {byStatus.inspected.length}
+                <span className="text-xl opacity-75">/{total}</span>
+              </p>
+              <p className="text-label opacity-90">rooms ready to sell · {readyPct}%</p>
+              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${readyPct}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 flex gap-2 overflow-x-auto px-5 pb-1">
             {STATUS_TABS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "text-label-sm shrink-0 rounded-full border px-3 py-1.5 font-medium transition-colors",
+                  "text-label shrink-0 rounded-full border px-4 py-2 font-medium transition-colors",
                   filter === f.key
-                    ? "border-primary bg-primary text-on-primary"
-                    : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
+                    ? "border-on-surface bg-on-surface text-surface"
+                    : "border-transparent bg-surface-container-lowest text-on-surface-variant shadow-soft",
                 )}
               >
                 {f.label} · {tabCount(f.key)}
@@ -167,7 +171,7 @@ function SupervisorBoard() {
             ))}
           </div>
 
-          <div className="mt-2 flex items-center gap-2 overflow-x-auto px-4 pb-1">
+          <div className="mt-2 flex items-center gap-2 overflow-x-auto px-5 pb-1">
             <select
               value={wing}
               onChange={(e) => setWing(e.target.value)}
@@ -206,7 +210,7 @@ function SupervisorBoard() {
             </button>
           </div>
 
-          <div className="px-4 pb-4 pt-3">
+          <div className="px-5 pb-4 pt-4">
             {filtered.length === 0 ? (
               <div className="mt-10 flex flex-col items-center gap-2 text-center">
                 <span className="grid size-14 place-items-center rounded-full bg-success/10 text-success">
@@ -215,7 +219,7 @@ function SupervisorBoard() {
                 <p className="text-body text-on-surface-subtle">Nothing matches this filter</p>
               </div>
             ) : (
-              <div className="overflow-hidden hk-card border border-outline-variant">
+              <div className="flex flex-col gap-2.5">
                 {filtered.map((r, i) => (
                   <RoomRow
                     key={r.id}

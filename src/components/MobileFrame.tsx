@@ -58,7 +58,7 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
           </div>
 
           <div
-            className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto pb-1", dark && "-mt-11")}
+            className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto", dark && "-mt-11")}
           >
             {children}
           </div>
@@ -87,12 +87,12 @@ export function MobileScreenHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="flex shrink-0 items-center gap-3 border-b border-outline-variant bg-surface-container-lowest px-4 py-3">
+    <header className="flex shrink-0 items-center gap-3 bg-surface px-4 pb-3 pt-2">
       {onBack ? (
         <button
           onClick={onBack}
           className={cn(
-            "grid size-10 shrink-0 place-items-center rounded-full text-on-surface-variant active:bg-surface-container",
+            "grid size-10 shrink-0 place-items-center rounded-full bg-surface-container-lowest text-on-surface shadow-soft active:scale-95",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
           )}
           aria-label="Back"
@@ -101,7 +101,7 @@ export function MobileScreenHeader({
         </button>
       ) : null}
       <div className="min-w-0 flex-1">
-        <p className="text-title truncate text-on-surface">{title}</p>
+        <p className="truncate text-2xl font-semibold tracking-tight text-on-surface">{title}</p>
         {subtitle ? (
           <p className="text-label-sm truncate text-on-surface-subtle">{subtitle}</p>
         ) : null}

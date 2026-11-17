@@ -73,7 +73,7 @@ function GuestRequestsScreen() {
             return (
               <div
                 key={g.id}
-                className="hk-card border border-outline-variant bg-surface-container-lowest p-3"
+                className="hk-card bg-surface-container-lowest shadow-soft p-3"
               >
                 <div className="flex items-start gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-container text-primary">

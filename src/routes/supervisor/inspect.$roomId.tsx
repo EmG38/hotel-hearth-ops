@@ -55,7 +55,7 @@ function Inspect() {
 
         <button
           onClick={() => setShowHkChecklist((v) => !v)}
-          className="flex w-full items-center justify-between hk-card border border-outline-variant bg-surface-container-lowest p-3 text-left"
+          className="flex w-full items-center justify-between hk-card bg-surface-container-lowest shadow-soft p-3 text-left"
         >
           <span>
             <span className="text-body block font-medium text-on-surface">
@@ -78,7 +78,7 @@ function Inspect() {
         </button>
 
         {showHkChecklist && (
-          <div className="mt-1.5 space-y-1 hk-card border border-outline-variant bg-surface-container-lowest p-3">
+          <div className="mt-1.5 space-y-1 hk-card bg-surface-container-lowest shadow-soft p-3">
             {room.anomalies.includes("too_fast") && (
               <p className="text-label-sm font-medium text-warning">⚠ Finished suspiciously fast</p>
             )}
@@ -211,7 +211,7 @@ function Inspect() {
             onChange={(e) => setNote(e.target.value)}
             rows={3}
             placeholder="What needs redoing? This note goes back to the housekeeper, who will see it as a re-clean."
-            className="mt-4 w-full hk-card border border-outline-variant bg-surface-container-lowest p-3 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:ring-2 focus:ring-primary/30"
+            className="mt-4 w-full hk-card bg-surface-container-lowest shadow-soft p-3 text-body text-on-surface outline-none placeholder:text-on-surface-subtle focus:ring-2 focus:ring-primary/30"
           />
         )}
       </div>

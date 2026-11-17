@@ -68,7 +68,7 @@ function IssueTriage() {
               return (
                 <div
                   key={issue.id}
-                  className="hk-card border border-outline-variant bg-surface-container-lowest p-3.5"
+                  className="hk-card bg-surface-container-lowest shadow-soft p-3.5"
                 >
                   <div className="flex flex-wrap items-center gap-1.5">
                     <p className="text-label text-on-surface">{issue.title}</p>

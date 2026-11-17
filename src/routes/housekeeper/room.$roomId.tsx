@@ -93,9 +93,9 @@ function RoomDetail() {
   }
 
   return (
-    <MobileFrame>
+    <MobileFrame dark>
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <div className="relative flex h-56 shrink-0 flex-col justify-between overflow-hidden p-4">
+        <div className="relative flex h-80 shrink-0 flex-col justify-between overflow-hidden p-5 pt-14">
           {room.photo ? (
             <>
               <img
@@ -137,11 +137,11 @@ function RoomDetail() {
           </div>
           <div className="relative">
             <p className="text-label-sm text-white/80">{room.type}</p>
-            <p className="text-2xl font-bold text-white">Room {room.number}</p>
+            <p className="text-4xl font-semibold tracking-tight text-white">Room {room.number}</p>
           </div>
         </div>
 
-        <div className="-mt-6 flex-1 rounded-t-3xl bg-surface p-4">
+        <div className="-mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
           {!online && (
             <div className="-mx-4 -mt-4 mb-4 flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
               <Icon name="cloud_off" size={18} filled />
@@ -300,7 +300,7 @@ function RoomDetail() {
                     : `${progress.missingCount} ${t.t("requiredLeft")}`}
                 </button>
               ) : (
-                <div className="mt-5 hk-card border border-outline-variant bg-surface-container-lowest p-3.5">
+                <div className="mt-5 hk-card bg-surface-container-lowest shadow-soft p-3.5">
                   <p className="text-body font-semibold text-on-surface">{t.t("confirmMarkClean")}</p>
                   <p className="text-label-sm mt-1 text-on-surface-subtle">
                     {progress.done} {t.t("itemsDone").toLowerCase()} · {progress.skipped}{" "}

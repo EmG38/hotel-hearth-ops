@@ -40,7 +40,7 @@ function Attention() {
             <p className="text-body text-on-surface-subtle">{t.t("allClear")}</p>
           </div>
         ) : (
-          <div className="overflow-hidden hk-card border border-outline-variant">
+          <div className="flex flex-col gap-2.5">
             {needsAttention.map((r, i) => (
               <RoomRow
                 key={r.id}

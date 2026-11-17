@@ -5,6 +5,7 @@ import type { Room } from "@/lib/hotel-types";
 import { Avatar } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
+import { FloatingNav } from "@/components/mobile/FloatingNav";
 import { RoomRow } from "@/components/housekeeper/RoomRow";
 import { LoginFlow } from "@/components/housekeeper/LoginFlow";
 import { sortByPriority } from "@/lib/housekeeper-room";
@@ -140,63 +141,85 @@ function HousekeeperHome() {
               <span>{t.t("offlineBanner")}</span>
             </div>
           )}
-          <div className="flex items-center justify-between px-4 pt-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-5 pt-3">
+            <button
+              onClick={() => setCurrentStaffId(null)}
+              title={t.t("switchUser")}
+              className="relative"
+            >
+              <Avatar staff={me} size={46} />
+              <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface bg-success" />
+            </button>
+            <div className="flex items-center gap-2">
+              <LangToggle />
               <button
-                onClick={() => setCurrentStaffId(null)}
-                title={t.t("switchUser")}
-                className="relative"
+                onClick={() => navigate({ to: "/housekeeper/attention" })}
+                className="grid size-11 place-items-center rounded-full bg-surface-container-lowest text-on-surface shadow-soft"
+                aria-label={t.t("needsAttention")}
               >
-                <Avatar staff={me} size={44} />
-                <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-2 border-surface bg-success" />
+                <Icon name="notifications" size={20} />
               </button>
-              <div>
-                <p className="text-label-sm text-on-surface-subtle">{t.t(greetingKey())}</p>
-                <p className="text-title text-on-surface">{me.name}</p>
+            </div>
+          </div>
+
+          <div className="px-5 pt-5">
+            <p className="text-label text-on-surface-subtle">{t.t(greetingKey())}</p>
+            <h1 className="text-[28px] font-semibold leading-[1.15] tracking-tight text-on-surface">
+              {me.name.split(" ")[0]},<br />
+              {total - doneCount} {t.t("roomsWord")} to go
+            </h1>
+          </div>
+
+          <button
+            onClick={() => navigate({ to: "/housekeeper/summary" })}
+            className="relative mx-5 mt-5 block h-52 w-[calc(100%-2.5rem)] overflow-hidden rounded-[28px] text-left shadow-soft active:scale-[0.99]"
+          >
+            {myRooms[0]?.photo ? (
+              <img src={myRooms[0].photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+            <span className="text-label-sm absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 font-semibold text-on-surface">
+              <Icon name="cleaning_services" size={14} filled className="text-primary" />
+              {t.t("todaysShift")}
+            </span>
+            <span className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white/25 text-white backdrop-blur">
+              <Icon name="arrow_outward" size={18} />
+            </span>
+            <div className="absolute inset-x-4 bottom-4 text-white">
+              <p className="text-4xl font-semibold tracking-tight">
+                {doneCount}
+                <span className="text-xl opacity-75">/{total}</span>
+              </p>
+              <p className="text-label opacity-90">{t.t("roomsCompleted")}</p>
+              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+              </div>
+              <div className="mt-2.5 flex gap-1.5">
+                <span className="text-label-sm rounded-full bg-white/20 px-2.5 py-1 backdrop-blur">
+                  {pct}% {t.t("complete")}
+                </span>
+                <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 backdrop-blur">
+                  <Icon name="schedule" size={12} />
+                  {me.avgMinutes} {t.t("minPerRoom")}
+                </span>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1.5">
-              <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-primary-container px-3 py-1.5 font-medium text-primary">
-                <Icon name="cleaning_services" size={14} filled />
-                {t.t("housekeeper")}
-              </span>
-              <LangToggle />
-            </div>
-          </div>
+          </button>
 
-          <div className="mx-4 mt-4 overflow-hidden hk-card bg-gradient-to-br from-primary to-secondary p-5 text-on-primary shadow-soft">
-            <div className="flex items-center justify-between">
-              <p className="text-label-sm font-semibold uppercase tracking-wide opacity-90">
-                {t.t("todaysShift")}
-              </p>
-              <button
-                onClick={() => navigate({ to: "/housekeeper/summary" })}
-                className="text-label-sm rounded-full bg-white/20 px-3 py-1 font-medium"
-              >
-                {t.t("summary")} →
-              </button>
-            </div>
-            <p className="mt-2 text-3xl font-bold">
-              {doneCount}
-              <span className="text-xl opacity-80">/{total}</span>
-            </p>
-            <p className="text-label opacity-90">{t.t("roomsCompleted")}</p>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
-              <div className="h-full rounded-full bg-white" style={{ width: `${pct}%` }} />
-            </div>
-            <p className="text-label-sm mt-2 opacity-90">
-              {pct}% {t.t("complete")} · {t.t("avgPerRoom")} {me.avgMinutes} {t.t("minPerRoom")}
-            </p>
-          </div>
-
-          <div className="px-4 pt-5">
-            <p className="text-title-sm text-on-surface">{t.t("statusOverview")}</p>
-            <div className="mt-2 grid grid-cols-4 gap-2">
+          <div className="pt-6">
+            <p className="px-5 text-lg font-semibold tracking-tight text-on-surface">{t.t("statusOverview")}</p>
+            <div className="mt-3 flex gap-2 overflow-x-auto px-5 pb-1">
               {STATUS_PILLS.map((p) => (
-                <div key={p.key} className={cn("hk-card border px-2 py-2.5 text-center", p.tone)}>
-                  <span className={cn("mx-auto mb-1 block size-1.5 rounded-full", p.dot)} />
-                  <p className={cn("text-title-lg font-bold", p.text)}>{byStatus[p.key].length}</p>
-                  <p className="text-label-sm text-on-surface-subtle">{t.t(p.label)}</p>
+                <div
+                  key={p.key}
+                  className="flex shrink-0 items-center gap-2 rounded-full bg-surface-container-lowest py-2 pl-2 pr-4 shadow-soft"
+                >
+                  <span className={cn("grid size-8 place-items-center rounded-full text-label font-bold text-on-primary", p.dot)}>
+                    {byStatus[p.key].length}
+                  </span>
+                  <span className="text-label text-on-surface">{t.t(p.label)}</span>
                 </div>
               ))}
             </div>
@@ -204,8 +227,8 @@ function HousekeeperHome() {
 
           {needsAttention.length > 0 && (
             <div className="pt-5">
-              <div className="flex items-center justify-between px-4">
-                <p className="text-title-sm text-on-surface">{t.t("needsAttention")}</p>
+              <div className="flex items-center justify-between px-5">
+                <p className="text-lg font-semibold tracking-tight text-on-surface">{t.t("needsAttention")}</p>
                 <button
                   onClick={() => navigate({ to: "/housekeeper/attention" })}
                   className="text-label-sm font-medium text-primary"
@@ -213,14 +236,14 @@ function HousekeeperHome() {
                   {t.t("seeAll")} →
                 </button>
               </div>
-              <div className="mt-2 flex gap-3 overflow-x-auto px-4 pb-1">
+              <div className="mt-3 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
                 {needsAttention.map((r) => (
                   <button
                     key={r.id}
                     onClick={() =>
                       navigate({ to: "/housekeeper/room/$roomId", params: { roomId: r.id } })
                     }
-                    className="relative h-28 w-36 shrink-0 overflow-hidden hk-card text-left transition-transform active:scale-[0.97]"
+                    className="relative h-56 w-60 shrink-0 snap-start overflow-hidden rounded-[26px] text-left shadow-soft transition-transform active:scale-[0.97]"
                   >
                     {r.photo ? (
                       <img
@@ -239,9 +262,24 @@ function HousekeeperHome() {
                         filled
                       />
                     )}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2.5">
-                      <p className="text-label font-semibold text-white">Rm {r.number}</p>
-                      <p className="text-label-sm text-white/80">{r.type}</p>
+                    <span className="text-label-sm absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-error px-2.5 py-1 font-semibold text-on-primary">
+                      <span className="size-1.5 rounded-full bg-white" />
+                      {t.t("dirty")}
+                    </span>
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
+                      <p className="text-2xl font-semibold tracking-tight text-white">{r.number}</p>
+                      <div className="mt-2 flex gap-1.5">
+                        <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-white backdrop-blur">
+                          <Icon name="bed" size={12} />
+                          {r.type}
+                        </span>
+                        {r.view === "gulf" && (
+                          <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-white backdrop-blur">
+                            <Icon name="waves" size={12} />
+                            {t.t("gulfView")}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -249,10 +287,10 @@ function HousekeeperHome() {
             </div>
           )}
 
-          <div className="px-4 pt-5 pb-4">
-            <p className="text-title-sm text-on-surface">{t.t("allRooms")}</p>
+          <div className="px-5 pt-6 pb-4">
+            <p className="text-lg font-semibold tracking-tight text-on-surface">{t.t("allRooms")}</p>
             {wingGroups.map(({ wing, total, ready, preview, hasMore }) => (
-              <div key={wing} className="mt-3">
+              <div key={wing} className="mt-4">
                 <button
                   onClick={() =>
                     navigate({ to: "/housekeeper/wing/$wing", params: { wing: String(wing) } })
@@ -267,7 +305,7 @@ function HousekeeperHome() {
                     <Icon name="chevron_right" size={14} />
                   </p>
                 </button>
-                <div className="mt-1.5 overflow-hidden hk-card border border-outline-variant">
+                <div className="mt-1.5 flex flex-col gap-2.5">
                   {preview.map((r, i) => (
                     <RoomRow
                       key={r.id}
@@ -286,7 +324,7 @@ function HousekeeperHome() {
                           params: { wing: String(wing) },
                         })
                       }
-                      className="flex w-full items-center justify-center gap-1 border-t border-outline-variant bg-surface-container-lowest py-2.5 text-label font-medium text-primary active:bg-surface-container"
+                      className="flex w-full items-center justify-center gap-1 rounded-full border border-outline-variant py-2.5 text-label font-medium text-on-surface active:bg-surface-container"
                     >
                       {t.t("viewAll")} {total} {t.t("roomsWord")}
                       <Icon name="chevron_right" size={16} />
@@ -305,25 +343,13 @@ function HousekeeperHome() {
       )}
 
       {me && (
-        <nav className="flex shrink-0 items-center justify-around border-t border-outline-variant bg-surface-container-lowest py-2">
-          <button className="flex flex-col items-center gap-0.5 px-4 py-1 text-primary">
-            <Icon name="home" size={22} filled />
-            <span className="text-label-sm font-medium">{t.t("home")}</span>
-          </button>
-          <button
-            onClick={() => navigate({ to: "/housekeeper/scan" })}
-            className="-mt-6 grid size-14 place-items-center rounded-full bg-primary text-on-primary shadow-soft active:scale-95"
-          >
-            <Icon name="qr_code_scanner" size={24} />
-          </button>
-          <button
-            onClick={() => navigate({ to: "/housekeeper/summary" })}
-            className="flex flex-col items-center gap-0.5 px-4 py-1 text-on-surface-variant"
-          >
-            <Icon name="assignment" size={22} />
-            <span className="text-label-sm">{t.t("summary")}</span>
-          </button>
-        </nav>
+        <FloatingNav
+          items={[
+            { key: "home", label: t.t("home"), icon: "home", active: true, onClick: () => {} },
+            { key: "scan", label: "Scan", icon: "qr_code_scanner", onClick: () => navigate({ to: "/housekeeper/scan" }) },
+            { key: "summary", label: t.t("summary"), icon: "assignment", onClick: () => navigate({ to: "/housekeeper/summary" }) },
+          ]}
+        />
       )}
     </MobileFrame>
   );

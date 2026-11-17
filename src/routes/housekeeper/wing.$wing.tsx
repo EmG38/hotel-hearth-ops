@@ -40,7 +40,7 @@ function WingView() {
             {t.t("noRoomsInWing")}
           </p>
         ) : (
-          <div className="overflow-hidden hk-card border border-outline-variant">
+          <div className="flex flex-col gap-2.5">
             {wingRooms.map((r, i) => (
               <RoomRow
                 key={r.id}

@@ -45,9 +45,9 @@ function SupervisorRoomDetail() {
   const attendant = staffById(room.attendantId);
 
   return (
-    <MobileFrame>
+    <MobileFrame dark>
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <div className="relative flex h-56 shrink-0 flex-col justify-between overflow-hidden p-4">
+        <div className="relative flex h-80 shrink-0 flex-col justify-between overflow-hidden p-5 pt-14">
           {room.photo ? (
             <>
               <img
@@ -91,11 +91,11 @@ function SupervisorRoomDetail() {
           </div>
           <div className="relative">
             <p className="text-label-sm text-white/80">{room.type}</p>
-            <p className="text-2xl font-bold text-white">Room {room.number}</p>
+            <p className="text-4xl font-semibold tracking-tight text-white">Room {room.number}</p>
           </div>
         </div>
 
-        <div className="-mt-6 flex-1 rounded-t-3xl bg-surface p-4">
+        <div className="-mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
           <div className="flex items-center justify-between">
             <span
               className={cn(
@@ -162,7 +162,7 @@ function SupervisorRoomDetail() {
           {!assigning ? (
             <button
               onClick={() => setAssigning(true)}
-              className="mt-1.5 flex w-full items-center gap-3 hk-card border border-outline-variant bg-surface-container-lowest p-3 text-left active:bg-surface-container"
+              className="mt-1.5 flex w-full items-center gap-3 hk-card bg-surface-container-lowest shadow-soft p-3 text-left active:bg-surface-container"
             >
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-label font-semibold text-on-primary">
                 {attendant?.initials ?? "?"}

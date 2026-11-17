@@ -118,11 +118,11 @@ function Performance() {
 
       <div className="flex-1 overflow-y-auto p-4">
         <div className="grid grid-cols-2 gap-2">
-          <div className="hk-card border border-outline-variant bg-surface-container-lowest p-3">
+          <div className="hk-card bg-surface-container-lowest shadow-soft p-3">
             <p className="text-label-sm text-on-surface-subtle">Rooms completed today</p>
             <p className="text-title-lg font-bold text-on-surface">{totals.completed}</p>
           </div>
-          <div className="hk-card border border-outline-variant bg-surface-container-lowest p-3">
+          <div className="hk-card bg-surface-container-lowest shadow-soft p-3">
             <p className="text-label-sm text-on-surface-subtle">Pass rate (live)</p>
             <p className="text-title-lg font-bold text-on-surface">{totals.passRate}%</p>
           </div>
@@ -139,7 +139,7 @@ function Performance() {
             return (
               <div
                 key={s.id}
-                className="hk-card border border-outline-variant bg-surface-container-lowest p-3.5"
+                className="hk-card bg-surface-container-lowest shadow-soft p-3.5"
               >
                 <div className="flex items-center gap-2.5">
                   <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-label font-semibold text-on-primary">

@@ -186,6 +186,10 @@
     user-select: none;
     -webkit-touch-callout: none;
   }
+  /* Leave room under the floating pill tab bar */
+  .hk-frame:has(.floating-nav) .overflow-y-auto:not(:has(.overflow-y-auto)) {
+    padding-bottom: 6.5rem;
+  }
   .hk-frame input,
   .hk-frame textarea {
     font-size: 16px; /* iOS Safari zooms the page on focus below this */
