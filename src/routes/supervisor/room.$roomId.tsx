@@ -122,6 +122,10 @@ function SupervisorRoomDetail() {
                   ? "Garden View"
                   : "Courtyard View"}
             </span>
+            <span className="text-label-sm inline-flex items-center gap-1 rounded-full bg-surface-container px-2 py-0.5 text-on-surface-variant">
+              <Icon name={room.occupancy === "occupied" ? "person" : "person_off"} size={12} />
+              {room.occupancy === "occupied" ? "Occupied" : "Vacant"}
+            </span>
             {room.taskType === "reclean" && (
               <span className="text-label-sm rounded-full bg-error/10 px-2 py-0.5 font-medium text-error">
                 Re-clean

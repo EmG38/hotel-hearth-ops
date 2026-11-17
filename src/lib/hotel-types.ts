@@ -21,13 +21,7 @@ export type RoomView = "gulf" | "garden" | "courtyard";
 
 /** Zones a housekeeper works through, in order, while cleaning a room. */
 export type CleaningZone =
-  | "entry_waste"
-  | "linen"
-  | "dusting"
-  | "bathroom"
-  | "restock"
-  | "floor"
-  | "final_check";
+  "entry_waste" | "linen" | "dusting" | "bathroom" | "restock" | "floor" | "final_check";
 
 export interface ChecklistItem {
   id: string;
@@ -83,6 +77,9 @@ export interface Room {
   view: RoomView;
   type: RoomType;
   status: RoomStatus;
+  /** Independent of cleaning status — a room can be "in_progress" (stayover, guest
+   * present) or "in_progress" (departure, guest gone) and these read very differently. */
+  occupancy: "occupied" | "vacant";
   taskType: TaskType;
   flags: RoomFlag[];
   attendantId: string | null;
@@ -156,12 +153,7 @@ export interface SupervisorProfile {
   shift: "Morning" | "Evening";
 }
 
-export type GuestRequestType =
-  | "towels"
-  | "amenities"
-  | "late_checkout"
-  | "housekeeping"
-  | "other";
+export type GuestRequestType = "towels" | "amenities" | "late_checkout" | "housekeeping" | "other";
 
 export type GuestRequestStatus = "pending" | "acknowledged" | "completed";
 

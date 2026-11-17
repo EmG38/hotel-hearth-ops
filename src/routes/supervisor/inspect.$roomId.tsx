@@ -124,58 +124,86 @@ function Inspect() {
           · pass ≥ {PASS_SCORE}%{criticalFail ? " · critical fail" : ""}
         </p>
 
-        {zones.map((zone) => (
-          <div key={zone} className="mt-3">
-            <p className="text-label-sm font-semibold uppercase text-on-surface-subtle">{zone}</p>
-            <div className="mt-1.5 space-y-1.5">
-              {inspectionPoints
-                .filter((p) => p.zone === zone)
-                .map((p) => (
-                  <div
-                    key={p.id}
-                    className={cn(
-                      "flex items-center gap-3 hk-card border p-2.5",
-                      results[p.id] === false
-                        ? "border-error/40 bg-error/5"
-                        : "border-outline-variant bg-surface-container-lowest",
-                    )}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="text-label block text-on-surface">{p.label}</span>
-                      <span className="text-label-sm block text-on-surface-subtle">
-                        {p.critical && <em className="not-italic text-error">Critical</em>}
-                        {p.critical && " · "}weight {p.weight}
+        {zones.map((zone) => {
+          const zonePoints = inspectionPoints.filter((p) => p.zone === zone);
+          const zonePassed = zonePoints.every((p) => results[p.id] === true);
+          return (
+            <div key={zone} className="mt-3">
+              <div className="flex items-center justify-between">
+                <p className="text-label-sm font-semibold uppercase text-on-surface-subtle">
+                  {zone}
+                </p>
+                <button
+                  onClick={() =>
+                    setResults((prev) => {
+                      const next = { ...prev };
+                      zonePoints.forEach((p) => {
+                        next[p.id] = true;
+                      });
+                      return next;
+                    })
+                  }
+                  className={cn(
+                    "text-label-sm inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-medium",
+                    zonePassed
+                      ? "border-success/40 bg-success/10 text-success"
+                      : "border-outline-variant text-on-surface-variant",
+                  )}
+                >
+                  <Icon name="done_all" size={13} />
+                  Pass zone
+                </button>
+              </div>
+              <div className="mt-1.5 space-y-1.5">
+                {inspectionPoints
+                  .filter((p) => p.zone === zone)
+                  .map((p) => (
+                    <div
+                      key={p.id}
+                      className={cn(
+                        "flex items-center gap-3 hk-card border p-2.5",
+                        results[p.id] === false
+                          ? "border-error/40 bg-error/5"
+                          : "border-outline-variant bg-surface-container-lowest",
+                      )}
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="text-label block text-on-surface">{p.label}</span>
+                        <span className="text-label-sm block text-on-surface-subtle">
+                          {p.critical && <em className="not-italic text-error">Critical</em>}
+                          {p.critical && " · "}weight {p.weight}
+                        </span>
                       </span>
-                    </span>
-                    <div className="flex shrink-0 gap-1.5">
-                      <button
-                        onClick={() => setResults({ ...results, [p.id]: true })}
-                        className={cn(
-                          "grid size-9 place-items-center rounded-full",
-                          results[p.id] === true
-                            ? "bg-success text-on-primary"
-                            : "bg-surface-container text-on-surface-subtle",
-                        )}
-                      >
-                        <Icon name="check" size={16} />
-                      </button>
-                      <button
-                        onClick={() => setResults({ ...results, [p.id]: false })}
-                        className={cn(
-                          "grid size-9 place-items-center rounded-full",
-                          results[p.id] === false
-                            ? "bg-error text-on-primary"
-                            : "bg-surface-container text-on-surface-subtle",
-                        )}
-                      >
-                        <Icon name="close" size={16} />
-                      </button>
+                      <div className="flex shrink-0 gap-1.5">
+                        <button
+                          onClick={() => setResults({ ...results, [p.id]: true })}
+                          className={cn(
+                            "grid size-9 place-items-center rounded-full",
+                            results[p.id] === true
+                              ? "bg-success text-on-primary"
+                              : "bg-surface-container text-on-surface-subtle",
+                          )}
+                        >
+                          <Icon name="check" size={16} />
+                        </button>
+                        <button
+                          onClick={() => setResults({ ...results, [p.id]: false })}
+                          className={cn(
+                            "grid size-9 place-items-center rounded-full",
+                            results[p.id] === false
+                              ? "bg-error text-on-primary"
+                              : "bg-surface-container text-on-surface-subtle",
+                          )}
+                        >
+                          <Icon name="close" size={16} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {rejecting && (
           <textarea

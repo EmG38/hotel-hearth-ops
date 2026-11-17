@@ -20,44 +20,13 @@ export const Route = createFileRoute("/supervisor/")({
 
 type Filter = "active" | "all" | RoomStatus;
 
-const FILTER_TABS: { key: Filter; label: string }[] = [
-  { key: "active", label: "Needs action" },
+const STATUS_TABS: { key: Filter; label: string }[] = [
+  { key: "active", label: "Needs Action" },
   { key: "dirty", label: "Dirty" },
   { key: "in_progress", label: "In Progress" },
   { key: "clean", label: "Awaiting Insp." },
   { key: "inspected", label: "Ready" },
   { key: "all", label: "All" },
-];
-
-const STATUS_PILLS = [
-  {
-    key: "dirty" as const,
-    label: "Dirty",
-    tone: "border-error/30 bg-error/5",
-    text: "text-error",
-    dot: "bg-error",
-  },
-  {
-    key: "in_progress" as const,
-    label: "In",
-    tone: "border-warning/30 bg-warning/5",
-    text: "text-warning",
-    dot: "bg-warning",
-  },
-  {
-    key: "clean" as const,
-    label: "Awaiting",
-    tone: "border-info/30 bg-info/5",
-    text: "text-info",
-    dot: "bg-info",
-  },
-  {
-    key: "inspected" as const,
-    label: "Inspected",
-    tone: "border-success/30 bg-success/5",
-    text: "text-success",
-    dot: "bg-success",
-  },
 ];
 
 function SupervisorBoard() {
@@ -73,7 +42,9 @@ function SupervisorBoard() {
   const online = useOnline();
   const me = supervisors.find((s) => s.id === currentSupervisorId);
   const [filter, setFilter] = useState<Filter>("active");
+  const [wing, setWing] = useState<string>("all");
   const [rushOnly, setRushOnly] = useState(false);
+  const [occupiedOnly, setOccupiedOnly] = useState(false);
 
   const byStatus = useMemo(() => {
     const g: Record<RoomStatus, Room[]> = { dirty: [], in_progress: [], clean: [], inspected: [] };
@@ -83,6 +54,12 @@ function SupervisorBoard() {
   const total = rooms.length;
   const readyPct = total ? Math.round((byStatus.inspected.length / total) * 100) : 0;
   const rushCount = rooms.filter((r) => r.rush).length;
+  const tabCount = (key: Filter) =>
+    key === "all"
+      ? total
+      : key === "active"
+        ? total - byStatus.inspected.length
+        : byStatus[key].length;
 
   const filtered = useMemo(() => {
     let list =
@@ -91,24 +68,14 @@ function SupervisorBoard() {
         : filter === "active"
           ? rooms.filter((r) => r.status !== "inspected")
           : rooms.filter((r) => r.status === filter);
+    if (wing !== "all") list = list.filter((r) => r.wing === Number(wing));
     if (rushOnly) list = list.filter((r) => r.rush);
-    return list;
-  }, [rooms, filter, rushOnly]);
-
-  const wingGroups = useMemo(() => {
-    const map = new Map<number, Room[]>();
-    filtered.forEach((r) => {
-      const list = map.get(r.wing) ?? [];
-      list.push(r);
-      map.set(r.wing, list);
-    });
-    return [...map.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([wing, list]) => ({
-        wing,
-        rooms: list.sort((a, b) => Number(a.number) - Number(b.number)),
-      }));
-  }, [filtered]);
+    if (occupiedOnly) list = list.filter((r) => r.occupancy === "occupied");
+    return [...list].sort(
+      (a, b) =>
+        Number(b.rush) - Number(a.rush) || a.wing - b.wing || Number(a.number) - Number(b.number),
+    );
+  }, [rooms, filter, wing, rushOnly, occupiedOnly]);
 
   const pendingRequests = guestRequests.filter((g) => g.status !== "completed").length;
 
@@ -183,25 +150,8 @@ function SupervisorBoard() {
             <p className="text-label-sm mt-2 opacity-90">{readyPct}% of property ready</p>
           </div>
 
-          <div className="px-4 pt-5">
-            <p className="text-title-sm text-on-surface">Status Overview</p>
-            <div className="mt-2 grid grid-cols-4 gap-2">
-              {STATUS_PILLS.map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => setFilter(p.key)}
-                  className={cn("hk-card border px-2 py-2.5 text-center", p.tone)}
-                >
-                  <span className={cn("mx-auto mb-1 block size-1.5 rounded-full", p.dot)} />
-                  <p className={cn("text-title-lg font-bold", p.text)}>{byStatus[p.key].length}</p>
-                  <p className="text-label-sm text-on-surface-subtle">{p.label}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
-            {FILTER_TABS.map((f) => (
+            {STATUS_TABS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
@@ -212,9 +162,24 @@ function SupervisorBoard() {
                     : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
                 )}
               >
-                {f.label}
+                {f.label} · {tabCount(f.key)}
               </button>
             ))}
+          </div>
+
+          <div className="mt-2 flex items-center gap-2 overflow-x-auto px-4 pb-1">
+            <select
+              value={wing}
+              onChange={(e) => setWing(e.target.value)}
+              className="text-label-sm shrink-0 rounded-full border border-outline-variant bg-surface-container-lowest px-3 py-1.5 font-medium text-on-surface-variant"
+            >
+              <option value="all">All wings</option>
+              {([1, 2, 3, 4, 5] as const).map((w) => (
+                <option key={w} value={w}>
+                  {wings[w].name}
+                </option>
+              ))}
+            </select>
             <button
               onClick={() => setRushOnly((r) => !r)}
               className={cn(
@@ -227,10 +192,22 @@ function SupervisorBoard() {
               <Icon name="star" size={13} filled={rushOnly} />
               Rush
             </button>
+            <button
+              onClick={() => setOccupiedOnly((o) => !o)}
+              className={cn(
+                "text-label-sm inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 font-medium transition-colors",
+                occupiedOnly
+                  ? "border-primary bg-primary text-on-primary"
+                  : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
+              )}
+            >
+              <Icon name="person" size={13} filled={occupiedOnly} />
+              Occupied
+            </button>
           </div>
 
-          <div className="px-4 pb-4 pt-4">
-            {wingGroups.length === 0 ? (
+          <div className="px-4 pb-4 pt-3">
+            {filtered.length === 0 ? (
               <div className="mt-10 flex flex-col items-center gap-2 text-center">
                 <span className="grid size-14 place-items-center rounded-full bg-success/10 text-success">
                   <Icon name="task_alt" size={28} filled />
@@ -238,26 +215,20 @@ function SupervisorBoard() {
                 <p className="text-body text-on-surface-subtle">Nothing matches this filter</p>
               </div>
             ) : (
-              wingGroups.map(({ wing, rooms: wingRooms }) => (
-                <div key={wing} className="mt-3">
-                  <p className="text-label-sm uppercase text-on-surface-subtle">
-                    {wings[wing as 1 | 2 | 3 | 4 | 5]?.name ?? `Wing ${wing}`}
-                  </p>
-                  <div className="mt-1.5 overflow-hidden hk-card border border-outline-variant">
-                    {wingRooms.map((r, i) => (
-                      <RoomRow
-                        key={r.id}
-                        room={r}
-                        attendant={staffById(r.attendantId)}
-                        divider={i > 0}
-                        onClick={() =>
-                          navigate({ to: "/supervisor/room/$roomId", params: { roomId: r.id } })
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))
+              <div className="overflow-hidden hk-card border border-outline-variant">
+                {filtered.map((r, i) => (
+                  <RoomRow
+                    key={r.id}
+                    room={r}
+                    attendant={staffById(r.attendantId)}
+                    divider={i > 0}
+                    showWing
+                    onClick={() =>
+                      navigate({ to: "/supervisor/room/$roomId", params: { roomId: r.id } })
+                    }
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>

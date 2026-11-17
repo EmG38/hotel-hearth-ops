@@ -276,7 +276,10 @@ function buildChecklistState(taskType: TaskType, fillRatio: number, seed: number
   const state: Room["checklist"] = {};
   list.forEach((it, i) => {
     if (seeded(seed + i) < fillRatio) {
-      state[it.id] = { status: "done", at: `${9 + ((seed + i) % 8)}:${String(((seed + i) * 7) % 60).padStart(2, "0")}` };
+      state[it.id] = {
+        status: "done",
+        at: `${9 + ((seed + i) % 8)}:${String(((seed + i) * 7) % 60).padStart(2, "0")}`,
+      };
     }
   });
   return state;
@@ -337,6 +340,15 @@ export function buildRooms(): Room[] {
         view: viewFor(wingMeta.proximity, i),
         type,
         status,
+        occupancy:
+          `r${wing}${String(i).padStart(2, "0")}` === "r215" ||
+          `r${wing}${String(i).padStart(2, "0")}` === "r419"
+            ? "occupied"
+            : taskType === "stayover"
+              ? "occupied"
+              : seeded(seq + 17) < 0.25
+                ? "occupied"
+                : "vacant",
         taskType,
         flags,
         photo: roomPhotoByType[type],
@@ -355,7 +367,10 @@ export function buildRooms(): Room[] {
         lastUpdated: `${9 + (seq % 8)}:${String((seq * 7) % 60).padStart(2, "0")}`,
         notes: [],
         checklist,
-        cleaningStartedAt: status === "in_progress" ? `${9 + (seq % 5)}:${String((seq * 3) % 60).padStart(2, "0")}` : undefined,
+        cleaningStartedAt:
+          status === "in_progress"
+            ? `${9 + (seq % 5)}:${String((seq * 3) % 60).padStart(2, "0")}`
+            : undefined,
         anomalies,
         inspections,
       });
