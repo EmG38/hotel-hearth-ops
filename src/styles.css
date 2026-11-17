@@ -294,3 +294,12 @@
     transform: scaleX(-1);
   }
 }
+
+/* Mobile app behaviour: scroll without visible scrollbars inside the phone frame */
+.mobile-frame * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-frame *::-webkit-scrollbar {
+  display: none;
+}
