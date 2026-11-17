@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -52,9 +53,19 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
   const time = useClock();
   const [overlay, setOverlay] = useState<ReactNode>(null);
   const overlayApi = useMemo(() => ({ open: setOverlay, close: () => setOverlay(null) }), []);
+  const frameRef = useRef<HTMLDivElement>(null);
+  // The console window is often shorter than the phone mockup, so a sheet
+  // anchored to the bottom of the screen can land below the fold. Pull the
+  // device up when a sheet opens so its actions are on screen, not off it.
+  useEffect(() => {
+    if (overlay) frameRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+  }, [overlay]);
   return (
     <div className="flex justify-center py-6">
-      <div className="mobile-frame relative w-[min(410px,100%)] rounded-[54px] bg-gradient-to-b from-[#2a2b2e] to-[#17181a] p-[10px] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_30px_60px_-12px_rgba(0,0,0,0.5),0_18px_36px_-18px_rgba(0,0,0,0.6)]">
+      <div
+        ref={frameRef}
+        className="mobile-frame relative w-[min(410px,100%)] rounded-[54px] bg-gradient-to-b from-[#2a2b2e] to-[#17181a] p-[10px] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_30px_60px_-12px_rgba(0,0,0,0.5),0_18px_36px_-18px_rgba(0,0,0,0.6)]"
+      >
         {/* Side button nubs */}
         <span className="absolute -left-[2px] top-28 h-14 w-[3px] rounded-l-sm bg-[#111214]" />
         <span className="absolute -left-[2px] top-44 h-9 w-[3px] rounded-l-sm bg-[#111214]" />
