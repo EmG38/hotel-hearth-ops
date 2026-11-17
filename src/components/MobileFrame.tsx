@@ -3,14 +3,20 @@ import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 
 function useClock() {
-  const [time, setTime] = useState(() => new Date());
+  // Starts empty and fills in after mount: a wall-clock value in the first
+  // render makes the server HTML and the client's first paint disagree, which
+  // React reports as a hydration mismatch and re-renders the whole tree.
+  const [time, setTime] = useState<Date | null>(null);
   useEffect(() => {
+    setTime(new Date());
     const id = setInterval(() => setTime(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
   return time
-    .toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
-    .replace(/\s?[AP]M/i, "");
+    ? time
+        .toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+        .replace(/\s?[AP]M/i, "")
+    : "";
 }
 
 /**
@@ -27,7 +33,7 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
   const time = useClock();
   return (
     <div className="flex justify-center py-6">
-      <div className="mobile-frame relative rounded-[54px] bg-gradient-to-b from-[#2a2b2e] to-[#17181a] p-[10px] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_30px_60px_-12px_rgba(0,0,0,0.5),0_18px_36px_-18px_rgba(0,0,0,0.6)]">
+      <div className="mobile-frame relative w-[min(410px,100%)] rounded-[54px] bg-gradient-to-b from-[#2a2b2e] to-[#17181a] p-[10px] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_30px_60px_-12px_rgba(0,0,0,0.5),0_18px_36px_-18px_rgba(0,0,0,0.6)]">
         {/* Side button nubs */}
         <span className="absolute -left-[2px] top-28 h-14 w-[3px] rounded-l-sm bg-[#111214]" />
         <span className="absolute -left-[2px] top-44 h-9 w-[3px] rounded-l-sm bg-[#111214]" />
@@ -35,8 +41,9 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
 
         <div
           className={cn(
-            "hk-frame relative flex aspect-[402/874] flex-col overflow-hidden rounded-[44px] bg-surface",
-            "w-[min(390px,calc(100vw-112px))]",
+            "hk-frame relative flex aspect-[402/874] w-full flex-col overflow-hidden rounded-[44px] bg-surface",
+            // The bezel above is capped by the space the console has left, so
+            // the phone never slides under the sidebar on narrow windows.
           )}
         >
           {/* Notch */}

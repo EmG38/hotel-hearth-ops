@@ -5,8 +5,9 @@ import { useHkT, timeAgo } from "@/lib/housekeeper-i18n";
 import { statusDot, statusLabelKey, statusTextTone } from "@/lib/housekeeper-room";
 
 /** One room card — shared by Home, the Wing view and the Needs Attention
- * screen. Photo-led like a booking app listing: thumbnail, big room number,
- * soft chips for type / view / flags, status pill on the right. */
+ * screen. Photo-led like a booking app listing: thumbnail, big room number
+ * with its type beside it, then a chip line carrying the status pill and any
+ * flags, so the wide status label never crowds the number. */
 export function RoomRow({
   room,
   onClick,
@@ -37,6 +38,15 @@ export function RoomRow({
           <p className="truncate text-label-sm text-on-surface-subtle">{room.type}</p>
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-1">
+          <span
+            className={cn(
+              "text-label-sm inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-semibold",
+              statusTextTone[room.status],
+            )}
+            style={{ backgroundColor: "color-mix(in oklab, currentColor 10%, transparent)" }}
+          >
+            {t.t(statusLabelKey[room.status])}
+          </span>
           {room.view === "gulf" && (
             <span className="text-label-sm inline-flex items-center gap-1 rounded-full border border-outline-variant px-2 py-0.5 text-on-surface-variant">
               <Icon name="waves" size={12} />
@@ -57,12 +67,7 @@ export function RoomRow({
           <span className="text-label-sm text-on-surface-subtle">{timeAgo(room.lastUpdated, t)}</span>
         </div>
       </div>
-      <div className="flex shrink-0 flex-col items-end gap-1">
-        <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", statusTextTone[room.status])} style={{ backgroundColor: "color-mix(in oklab, currentColor 10%, transparent)" }}>
-          {t.t(statusLabelKey[room.status])}
-        </span>
-        <Icon name="chevron_right" size={18} className="text-on-surface-subtle" />
-      </div>
+      <Icon name="chevron_right" size={18} className="shrink-0 text-on-surface-subtle" />
     </button>
   );
 }
