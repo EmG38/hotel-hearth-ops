@@ -160,7 +160,7 @@ function SupervisorBoard() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "text-label shrink-0 rounded-full border px-4 py-2 font-medium transition-colors",
+                  "text-label-sm shrink-0 rounded-full border px-3.5 py-1.5 font-medium transition-colors",
                   filter === f.key
                     ? "border-on-surface bg-on-surface text-surface"
                     : "border-transparent bg-surface-container-lowest text-on-surface-variant shadow-soft",

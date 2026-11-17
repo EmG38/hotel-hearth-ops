@@ -95,7 +95,7 @@ function SupervisorRoomDetail() {
           </div>
         </div>
 
-        <div className="-mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
+        <div className="relative z-10 -mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
           <div className="flex items-center justify-between">
             <span
               className={cn(

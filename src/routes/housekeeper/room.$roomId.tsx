@@ -141,7 +141,7 @@ function RoomDetail() {
           </div>
         </div>
 
-        <div className="-mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
+        <div className="relative z-10 -mt-8 flex-1 rounded-t-[32px] bg-surface p-5">
           {!online && (
             <div className="-mx-4 -mt-4 mb-4 flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
               <Icon name="cloud_off" size={18} filled />
