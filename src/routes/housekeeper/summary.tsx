@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import { Icon } from "@/components/Icon";
-import { MobileFrame } from "@/components/MobileFrame";
+import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { HousekeeperNav } from "@/components/housekeeper/HousekeeperNav";
 import { useHkT } from "@/lib/housekeeper-i18n";
 import { useOnline } from "@/lib/use-online";
@@ -16,11 +16,29 @@ const shiftTimes = {
   Evening: { start: "03:00 PM", end: "11:00 PM" },
 } as const;
 
-function Row({ label, value, tone }: { label: string; value: string | number; tone?: string }) {
+function StatCard({ icon, label, value, tone }: { icon: string; label: string; value: number; tone: string }) {
   return (
-    <div className="flex items-center justify-between py-3">
-      <span className="text-body text-on-surface">{label}</span>
-      <span className={`text-label font-semibold ${tone ?? "text-on-surface"}`}>{value}</span>
+    <div className="flex items-center gap-3 rounded-[22px] bg-surface-container-lowest p-3 shadow-soft">
+      <span
+        className={`grid size-10 shrink-0 place-items-center rounded-2xl ${tone}`}
+        style={{ backgroundColor: "color-mix(in oklab, currentColor 12%, transparent)" }}
+      >
+        <Icon name={icon} size={20} filled />
+      </span>
+      <div className="min-w-0">
+        <p className="text-xl font-semibold leading-none tracking-tight text-on-surface">{value}</p>
+        <p className="text-label-sm mt-1 truncate text-on-surface-subtle">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function TimeRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <Icon name={icon} size={18} className="text-on-surface-subtle" />
+      <span className="text-body flex-1 text-on-surface-variant">{label}</span>
+      <span className="text-label font-semibold text-on-surface">{value}</span>
     </div>
   );
 }
@@ -52,85 +70,89 @@ function ShiftSummary() {
   const fastest = Math.max(8, me.avgMinutes - 10);
   const longest = me.avgMinutes + 14;
 
+  const pct = total ? Math.round((completed / total) * 100) : 0;
+
   return (
     <MobileFrame>
-      <div className="flex flex-1 flex-col overflow-y-auto pb-28">
-        <div className="flex items-center gap-3 px-4 pt-4">
-          <button
-            onClick={() => navigate({ to: "/housekeeper" })}
-            className="grid size-10 place-items-center rounded-full bg-surface-container text-on-surface"
-          >
-            <Icon name="chevron_left" size={22} />
-          </button>
-          <div>
-            <p className="text-title text-on-surface">Shift Summary</p>
-            <p className="text-label-sm text-on-surface-subtle">Today · {me.shift} shift</p>
-          </div>
-        </div>
+      <div className="flex flex-1 flex-col pb-32">
+        <MobileScreenHeader
+          title="Shift Summary"
+          subtitle={`Today · ${me.shift} shift`}
+          onBack={() => navigate({ to: "/housekeeper" })}
+        />
 
         {!online && (
-          <div className="mt-3 flex items-center gap-2 bg-warning/15 px-4 py-2.5 text-label text-warning">
+          <div className="mx-4 mb-2 flex items-center gap-2 rounded-2xl bg-warning/15 px-4 py-2.5 text-label text-warning">
             <Icon name="cloud_off" size={18} filled />
             <span>{t.t("offlineBanner")}</span>
           </div>
         )}
 
-        <div className="mx-4 mt-4 shrink-0 hk-card bg-gradient-to-br from-primary to-secondary p-5 text-center text-on-primary shadow-soft">
-          <p className="text-label font-medium opacity-90">{t.t("yourPerformanceToday")}</p>
-          <p className="mt-2 text-4xl font-bold">
-            {completed}
-            <span className="text-2xl opacity-80">/{total}</span>
-          </p>
-          <p className="text-label opacity-90">{t.t("roomsCompleted")}</p>
-          <div className="mt-4 flex justify-center gap-3">
-            <div className="hk-card bg-white/20 px-5 py-2.5 text-center">
-              <p className="text-title-lg font-bold">{me.avgMinutes} min</p>
-              <p className="text-label-sm opacity-90">{t.t("avgPerRoomStat")}</p>
+        <div className="mx-4 mt-2 shrink-0 rounded-[28px] bg-secondary p-5 text-on-primary shadow-soft">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-label-sm uppercase tracking-wide opacity-75">{t.t("yourPerformanceToday")}</p>
+              <p className="mt-2 text-5xl font-semibold leading-none tracking-tight">
+                {completed}
+                <span className="text-2xl font-normal opacity-60"> / {total}</span>
+              </p>
+              <p className="text-label mt-1 opacity-80">{t.t("roomsCompleted")}</p>
             </div>
-            <div className="hk-card bg-white/20 px-5 py-2.5 text-center">
-              <p className="text-title-lg font-bold">{me.passRate}%</p>
-              <p className="text-label-sm opacity-90">{t.t("passRate")}</p>
+            <span className="rounded-full bg-primary px-3 py-1 text-label font-semibold">{pct}%</span>
+          </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/15">
+            <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-2xl bg-white/10 px-3 py-2.5">
+              <p className="text-lg font-semibold">{me.avgMinutes} min</p>
+              <p className="text-label-sm opacity-75">{t.t("avgPerRoomStat")}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 px-3 py-2.5">
+              <p className="text-lg font-semibold">{me.passRate}%</p>
+              <p className="text-label-sm opacity-75">{t.t("passRate")}</p>
             </div>
           </div>
         </div>
 
-        <div className="mx-4 mt-4 divide-y divide-outline-variant hk-card bg-surface-container-lowest px-4">
-          <Row label={t.t("roomsAssigned")} value={total} />
-          <Row label={t.t("completed")} value={completed} tone="text-success" />
-          <Row label={t.t("awaitingInspection")} value={awaiting} tone="text-info" />
-          <Row label={t.t("dndSkipped")} value={dndSkipped} tone="text-on-surface-subtle" />
-          <Row label={t.t("issuesReported")} value={myIssues} tone="text-error" />
-        </div>
-
-        <div className="mx-4 mt-4 hk-card bg-surface-container-lowest px-4">
-          <p className="text-label-sm pt-3 uppercase text-on-surface-subtle">{t.t("yourTimes")}</p>
-          <div className="divide-y divide-outline-variant">
-            <Row label={t.t("shiftStart")} value={times.start} />
-            <Row label={t.t("shiftEnd")} value={times.end} />
-            <Row label={t.t("fastestRoom")} value={`${fastest} min`} />
-            <Row label={t.t("longestRoom")} value={`${longest} min`} />
-            <Row label={t.t("averageTime")} value={`${me.avgMinutes} min`} />
+        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">{t.t("roomsAssigned")}</p>
+        <div className="mx-4 mt-3 grid grid-cols-2 gap-2.5">
+          <StatCard icon="bed" label={t.t("roomsAssigned")} value={total} tone="text-tertiary" />
+          <StatCard icon="verified" label={t.t("completed")} value={completed} tone="text-success" />
+          <StatCard icon="hourglass_top" label={t.t("awaitingInspection")} value={awaiting} tone="text-info" />
+          <StatCard icon="do_not_disturb_on" label={t.t("dndSkipped")} value={dndSkipped} tone="text-on-surface-variant" />
+          <div className="col-span-2">
+            <StatCard icon="report" label={t.t("issuesReported")} value={myIssues} tone="text-error" />
           </div>
         </div>
 
-        <p className="text-label-sm mx-4 mt-4 flex items-start gap-2 hk-card bg-surface-container px-3 py-2.5 text-on-surface-variant">
-          <Icon name="info" size={16} className="mt-0.5 shrink-0" />
+        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">{t.t("yourTimes")}</p>
+        <div className="mx-4 mt-3 divide-y divide-outline-variant/60 rounded-[22px] bg-surface-container-lowest px-4 shadow-soft">
+          <TimeRow icon="login" label={t.t("shiftStart")} value={times.start} />
+          <TimeRow icon="logout" label={t.t("shiftEnd")} value={times.end} />
+          <TimeRow icon="bolt" label={t.t("fastestRoom")} value={`${fastest} min`} />
+          <TimeRow icon="timer" label={t.t("longestRoom")} value={`${longest} min`} />
+          <TimeRow icon="avg_time" label={t.t("averageTime")} value={`${me.avgMinutes} min`} />
+        </div>
+
+        <p className="text-label-sm mx-4 mt-4 flex items-start gap-2 rounded-2xl bg-tertiary-container px-3 py-2.5 text-on-surface-variant">
+          <Icon name="lock" size={16} className="mt-0.5 shrink-0 text-tertiary" />
           {t.t("personalStatsNote")} {me.name.split(" ")[0]}.
         </p>
 
-        <div className="mt-auto p-4">
+        <div className="mx-4 mt-5">
           <button
             onClick={() => {
               setCurrentStaffId(null);
               navigate({ to: "/housekeeper" });
             }}
-            className="w-full hk-card bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
+            className="w-full rounded-full bg-primary py-3.5 text-label font-semibold text-on-primary shadow-soft active:scale-[0.98]"
           >
             {t.t("doneSignOff")}
           </button>
         </div>
       </div>
-    <HousekeeperNav active="summary" />
+      <HousekeeperNav active="summary" />
     </MobileFrame>
   );
 }
