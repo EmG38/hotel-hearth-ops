@@ -80,27 +80,28 @@ function Performance() {
       <MobileScreenHeader
         title="Performance"
         subtitle="No public ranking — supervisor-only"
-        actions={
-          <div className="flex gap-1.5">
-            {(["Morning", "Evening"] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setShift(s)}
-                title={`${s} shift`}
-                className={cn(
-                  "grid size-9 place-items-center rounded-full border",
-                  shift === s
-                    ? "border-primary bg-primary text-on-primary"
-                    : "border-outline-variant text-on-surface-variant",
-                )}
-              >
-                <Icon name={s === "Morning" ? "wb_sunny" : "nights_stay"} size={15} filled />
-                <span className="sr-only">{s}</span>
-              </button>
-            ))}
-          </div>
-        }
       />
+
+      <div className="px-4 pt-3">
+        <p className="text-label-sm mb-1.5 font-semibold uppercase tracking-wide text-on-surface-subtle">Shift</p>
+        <div className="flex rounded-full bg-surface-container p-1">
+          {(["Morning", "Evening"] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setShift(s)}
+              aria-pressed={shift === s}
+              className={cn(
+                "text-label flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 font-semibold transition-colors",
+                shift === s ? "bg-surface-container-lowest text-on-surface shadow-soft" : "text-on-surface-variant",
+              )}
+            >
+              <Icon name={s === "Morning" ? "wb_sunny" : "nights_stay"} size={16} filled className={s === "Morning" ? "text-primary" : "text-tertiary"} />
+              {s} shift
+              <span className="text-label-sm font-normal text-on-surface-subtle">{s === "Morning" ? "7–3" : "3–11"}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="px-4 pt-3">
         <select

@@ -154,60 +154,96 @@ function SupervisorBoard() {
             </div>
           </div>
 
-          <div className="mt-5 flex gap-2 overflow-x-auto px-5 pb-1">
-            {STATUS_TABS.map((f) => (
+          <div className="mx-5 mt-5 rounded-[20px] bg-surface-container-lowest p-4 shadow-soft">
+            <div className="flex items-center justify-between">
+              <p className="text-title flex items-center gap-1.5 font-semibold text-on-surface">
+                <Icon name="tune" size={18} className="text-primary" />
+                Filters
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-label-sm text-on-surface-variant">{filtered.length} rooms</span>
+                {(filter !== "active" || wing !== "all" || rushOnly || occupiedOnly) && (
+                  <button
+                    onClick={() => {
+                      setFilter("active");
+                      setWing("all");
+                      setRushOnly(false);
+                      setOccupiedOnly(false);
+                    }}
+                    className="text-label-sm font-semibold text-primary"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <p className="text-label-sm mt-3 mb-1.5 font-semibold uppercase tracking-wide text-on-surface-subtle">Status</p>
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5">
+              {STATUS_TABS.map((f) => {
+                const on = filter === f.key;
+                const dot = { dirty: "bg-error", in_progress: "bg-warning", clean: "bg-info", inspected: "bg-success" } as Record<string, string>;
+                return (
+                  <button
+                    key={f.key}
+                    onClick={() => setFilter(f.key)}
+                    className={cn(
+                      "text-label-sm inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold transition-colors",
+                      on ? "bg-secondary text-on-primary" : "bg-surface-container text-on-surface-variant",
+                    )}
+                  >
+                    {dot[f.key] && <span className={cn("size-2 rounded-full", dot[f.key])} />}
+                    {f.label}
+                    <span className={cn("rounded-full px-1.5 text-[10px]", on ? "bg-on-primary/20" : "bg-surface-container-lowest")}>
+                      {tabCount(f.key)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="text-label-sm mt-3 mb-1.5 font-semibold uppercase tracking-wide text-on-surface-subtle">Wing</p>
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5">
+              {(["all", "1", "2", "3", "4", "5"] as const).map((w) => (
+                <button
+                  key={w}
+                  onClick={() => setWing(w)}
+                  className={cn(
+                    "text-label-sm shrink-0 rounded-full border px-3 py-1.5 font-semibold transition-colors",
+                    wing === w
+                      ? "border-tertiary bg-tertiary-container text-tertiary"
+                      : "border-outline-variant text-on-surface-variant",
+                  )}
+                >
+                  {w === "all" ? "All wings" : wings[Number(w) as 1 | 2 | 3 | 4 | 5].name}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
               <button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
+                onClick={() => setRushOnly((r) => !r)}
+                aria-pressed={rushOnly}
                 className={cn(
-                  "text-label-sm shrink-0 rounded-full border px-3.5 py-1.5 font-medium transition-colors",
-                  filter === f.key
-                    ? "border-on-surface bg-on-surface text-surface"
-                    : "border-transparent bg-surface-container-lowest text-on-surface-variant shadow-soft",
+                  "text-label inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
+                  rushOnly ? "border-warning bg-warning/10 text-warning" : "border-outline-variant text-on-surface-variant",
                 )}
               >
-                {f.label} · {tabCount(f.key)}
+                <Icon name="star" size={16} filled={rushOnly} />
+                Rush only · {rushCount}
               </button>
-            ))}
-          </div>
-
-          <div className="mt-2 flex items-center gap-2 overflow-x-auto px-5 pb-1">
-            <select
-              value={wing}
-              onChange={(e) => setWing(e.target.value)}
-              className="text-label-sm shrink-0 rounded-full border border-outline-variant bg-surface-container-lowest px-3 py-1.5 font-medium text-on-surface-variant"
-            >
-              <option value="all">All wings</option>
-              {([1, 2, 3, 4, 5] as const).map((w) => (
-                <option key={w} value={w}>
-                  {wings[w].name}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => setRushOnly((r) => !r)}
-              className={cn(
-                "text-label-sm inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 font-medium transition-colors",
-                rushOnly
-                  ? "border-warning bg-warning text-on-primary"
-                  : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
-              )}
-            >
-              <Icon name="star" size={13} filled={rushOnly} />
-              Rush
-            </button>
-            <button
-              onClick={() => setOccupiedOnly((o) => !o)}
-              className={cn(
-                "text-label-sm inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 font-medium transition-colors",
-                occupiedOnly
-                  ? "border-primary bg-primary text-on-primary"
-                  : "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
-              )}
-            >
-              <Icon name="person" size={13} filled={occupiedOnly} />
-              Occupied
-            </button>
+              <button
+                onClick={() => setOccupiedOnly((o) => !o)}
+                aria-pressed={occupiedOnly}
+                className={cn(
+                  "text-label inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
+                  occupiedOnly ? "border-primary bg-primary-container text-primary" : "border-outline-variant text-on-surface-variant",
+                )}
+              >
+                <Icon name="person" size={16} filled={occupiedOnly} />
+                Occupied
+              </button>
+            </div>
           </div>
 
           <div className="px-5 pb-4 pt-4">
