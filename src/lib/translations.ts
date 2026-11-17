@@ -8,7 +8,7 @@ export type Lang = "en" | "ur";
 
 export const dict = {
   /* ── Brand & shell ── */
-  "app.name": { en: "Golden Sands", ur: "گولڈن سینڈز" },
+  "app.name": { en: "Marsa Dhahab", ur: "گولڈن سینڈز" },
   "app.tag": { en: "Hotel · Ops", ur: "ہوٹل · آپریشنز" },
   "role.supervisor": { en: "Supervisor", ur: "نگران" },
   "role.reception": { en: "Reception", ur: "استقبالیہ" },

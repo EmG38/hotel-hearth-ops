@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/")({
   head: () => ({
-    meta: [{ title: "Property Board — Golden Sands Hotel" }],
+    meta: [{ title: "Property Board — Marsa Dhahab Hotel" }],
   }),
   component: SupervisorBoard,
 });

@@ -9,7 +9,7 @@ import type { GuestRequest } from "@/lib/hotel-types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/requests")({
-  head: () => ({ meta: [{ title: "Guest Requests — Golden Sands Hotel" }] }),
+  head: () => ({ meta: [{ title: "Guest Requests — Marsa Dhahab Hotel" }] }),
   component: GuestRequestsScreen,
 });
 

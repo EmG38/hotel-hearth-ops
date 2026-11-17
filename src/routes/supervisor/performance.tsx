@@ -8,7 +8,7 @@ import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/performance")({
-  head: () => ({ meta: [{ title: "Performance — Golden Sands Hotel" }] }),
+  head: () => ({ meta: [{ title: "Performance — Marsa Dhahab Hotel" }] }),
   component: Performance,
 });
 

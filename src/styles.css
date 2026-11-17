@@ -5,24 +5,24 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Golden Sands Hotel design system.
+ * Marsa Dhahab Hotel design system.
  * All palette values are named theme tokens below — never hardcode hex in components.
  */
 
 @theme {
   /* Brand */
-  --color-primary: #e0610e;
+  --color-primary: #e99023;
   --color-on-primary: #ffffff;
-  --color-primary-container: #fdeadb;
-  --color-secondary: #1b2f55;
+  --color-primary-container: #fdf0dc;
+  --color-secondary: #012947;
   /* Tertiary = the Gulf livery's light sky blue (sampled from the reference
-     images: #2D93CE vivid / #83AEC8 powder). Used as the third identity accent
+     images: #1c82ab vivid / #83AEC8 powder). Used as the third identity accent
      alongside orange primary and navy secondary. */
-  --color-tertiary: #2d93ce;
-  --color-tertiary-container: #dceefb;
+  --color-tertiary: #1c82ab;
+  --color-tertiary-container: #d9eef6;
 
   /* Brand ink — deep espresso for dark hero panels */
-  --color-brand-ink: #14233f;
+  --color-brand-ink: #012947;
 
   /* Room status */
   --color-success: #0d9488; /* available / inspected-ready */
@@ -41,7 +41,7 @@
   --color-surface-container-high: #d6e6f1;
 
   /* Content */
-  --color-on-surface: #14233f;
+  --color-on-surface: #012947;
   --color-on-surface-variant: #45546b;
   --color-on-surface-subtle: #8f9bab;
 
@@ -91,24 +91,24 @@
 :root {
   --radius: 0.75rem;
   --background: #f7f9fb;
-  --foreground: #14233f;
+  --foreground: #012947;
   --card: #ffffff;
-  --card-foreground: #14233f;
+  --card-foreground: #012947;
   --popover: #ffffff;
-  --popover-foreground: #14233f;
+  --popover-foreground: #012947;
   --muted: #eaf3f9;
   --muted-foreground: #45546b;
-  --accent: #fdeadb;
-  --accent-foreground: #14233f;
+  --accent: #fdf0dc;
+  --accent-foreground: #012947;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #cfdbe6;
   --input: #cfdbe6;
-  --ring: #e0610e;
-  --primary: #e0610e;
+  --ring: #e99023;
+  --primary: #e99023;
   --primary-foreground: #ffffff;
-  --secondary: #fdeadb;
-  --secondary-foreground: #1b2f55;
+  --secondary: #fdf0dc;
+  --secondary-foreground: #012947;
 }
 
 /* Material 3-like type scale */
@@ -302,4 +302,34 @@
 }
 .mobile-frame *::-webkit-scrollbar {
   display: none;
+}
+
+/* ---- Splash + sign-in motion (sand & Gulf water) ---- */
+@keyframes md-rise { from { transform: translateY(40px) scale(.6); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes md-fade-up { from { transform: translateY(12px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes md-bob { 0%,100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-6px) rotate(-1.5deg) } }
+@keyframes md-wave { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes md-sun { from { transform: translateY(60px) scale(.7); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes md-shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
+@keyframes md-grain { 0%,100% { opacity: .35 } 50% { opacity: .6 } }
+@keyframes md-out { to { opacity: 0; transform: scale(1.04); visibility: hidden } }
+@utility animate-md-rise { animation: md-rise 1.1s cubic-bezier(.2,.8,.2,1) both; }
+@utility animate-md-fade-up { animation: md-fade-up .8s ease-out both; }
+@utility animate-md-bob { animation: md-bob 4s ease-in-out infinite; }
+@utility animate-md-wave { animation: md-wave 7s linear infinite; }
+@utility animate-md-wave-slow { animation: md-wave 12s linear infinite; }
+@utility animate-md-sun { animation: md-sun 1.4s ease-out both; }
+@utility animate-md-grain { animation: md-grain 3s ease-in-out infinite; }
+@utility animate-md-out { animation: md-out .6s ease-in forwards; }
+@utility text-md-shimmer {
+  background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
+  background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: md-shimmer 3.5s linear infinite;
+}
+@theme {
+  --color-sand: #f3dfb8;
+  --color-sand-deep: #e2c08a;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-md-bob, .animate-md-wave, .animate-md-wave-slow, .text-md-shimmer { animation: none; }
 }

@@ -100,6 +100,18 @@ export const staff: Staff[] = [
     onTimePct: 90,
     passRate: 93,
   },
+  {
+    id: "s7", name: "Maria Reyes", initials: "MR", shift: "Morning",
+    roomsCompleted: 14, avgMinutes: 26, onTimePct: 92, passRate: 95,
+  },
+  {
+    id: "s8", name: "Anjali Sharma", initials: "AS", shift: "Morning",
+    roomsCompleted: 12, avgMinutes: 28, onTimePct: 89, passRate: 90,
+  },
+  {
+    id: "s9", name: "Fatima Noor", initials: "FN", shift: "Evening",
+    roomsCompleted: 10, avgMinutes: 31, onTimePct: 85, passRate: 88,
+  },
 ];
 
 /** Supervisors for the mobile Supervisor app's login — local Gulf nationals,
@@ -107,6 +119,10 @@ export const staff: Staff[] = [
 export const supervisors: SupervisorProfile[] = [
   { id: "sup1", name: "Noura Al Qahtani", initials: "NQ", shift: "Morning" },
   { id: "sup2", name: "Khalid Al Otaibi", initials: "KO", shift: "Evening" },
+  { id: "sup3", name: "Mariam Al Mansouri", initials: "MM", shift: "Morning" },
+  { id: "sup4", name: "Ahmed Al Harbi", initials: "AH", shift: "Evening" },
+  { id: "sup5", name: "Layla Al Shamsi", initials: "LS", shift: "Morning" },
+  { id: "sup6", name: "Omar Al Dosari", initials: "OD", shift: "Evening" },
 ];
 
 /**

@@ -14,13 +14,13 @@ import { useI18n, useStatusText, useTypeText, useWingName } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Property Board — Golden Sands Hotel" },
+      { title: "Property Board — Marsa Dhahab Hotel" },
       {
         name: "description",
         content:
           "Live status of all 100 rooms by wing and room type, with rush flags and filters.",
       },
-      { property: "og:title", content: "Property Board — Golden Sands Hotel" },
+      { property: "og:title", content: "Property Board — Marsa Dhahab Hotel" },
       {
         property: "og:description",
         content:

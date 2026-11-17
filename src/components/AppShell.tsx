@@ -7,7 +7,7 @@ import { useHotel } from "@/lib/hotel-store";
 import { useI18n } from "@/lib/i18n";
 import type { DictKey } from "@/lib/translations";
 import type { Role } from "@/lib/hotel-types";
-import logoAsset from "@/assets/golden-sands-emblem.png.asset.json";
+import logoAsset from "@/assets/marsa-dhahab-emblem.png.asset.json";
 
 const navSections: {
   role: Role;
@@ -110,7 +110,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-container">
           <img
             src={logoAsset.url}
-            alt="Golden Sands Hotel logo"
+            alt="Marsa Dhahab Hotel logo"
             className="size-7 object-contain"
           />
         </span>

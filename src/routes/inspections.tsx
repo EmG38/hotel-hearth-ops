@@ -18,12 +18,12 @@ import { wings } from "@/lib/mock-data";
 export const Route = createFileRoute("/inspections")({
   head: () => ({
     meta: [
-      { title: "Inspection Queue — Golden Sands Hotel" },
+      { title: "Inspection Queue — Marsa Dhahab Hotel" },
       {
         name: "description",
         content: "Inspect cleaned rooms against a four-area checklist and pass or reject them.",
       },
-      { property: "og:title", content: "Inspection Queue — Golden Sands Hotel" },
+      { property: "og:title", content: "Inspection Queue — Marsa Dhahab Hotel" },
       {
         property: "og:description",
         content: "Inspect cleaned rooms against a four-area checklist and pass or reject them.",

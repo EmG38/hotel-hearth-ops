@@ -11,13 +11,13 @@ import { useI18n, useStatusText, useTypeText } from "@/lib/i18n";
 export const Route = createFileRoute("/reservations")({
   head: () => ({
     meta: [
-      { title: "Reservations — Golden Sands Hotel" },
+      { title: "Reservations — Marsa Dhahab Hotel" },
       {
         name: "description",
         content:
           "Adjust expected arrival and departure times; changes reprioritise housekeeping order.",
       },
-      { property: "og:title", content: "Reservations — Golden Sands Hotel" },
+      { property: "og:title", content: "Reservations — Marsa Dhahab Hotel" },
       {
         property: "og:description",
         content:

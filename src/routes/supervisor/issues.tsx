@@ -10,7 +10,7 @@ import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/issues")({
-  head: () => ({ meta: [{ title: "Issue Triage — Golden Sands Hotel" }] }),
+  head: () => ({ meta: [{ title: "Issue Triage — Marsa Dhahab Hotel" }] }),
   component: IssueTriage,
 });
 

@@ -13,12 +13,12 @@ import { useI18n, useStatusText, useTypeText, useViewText, useWingName } from "@
 export const Route = createFileRoute("/availability")({
   head: () => ({
     meta: [
-      { title: "Availability Board — Golden Sands Hotel" },
+      { title: "Availability Board — Marsa Dhahab Hotel" },
       {
         name: "description",
         content: "Sellable room count and live inventory by type and wing for the front desk.",
       },
-      { property: "og:title", content: "Availability Board — Golden Sands Hotel" },
+      { property: "og:title", content: "Availability Board — Marsa Dhahab Hotel" },
       {
         property: "og:description",
         content: "Sellable room count and live inventory by type and wing for the front desk.",

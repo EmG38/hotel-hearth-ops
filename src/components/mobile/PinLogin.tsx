@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
-import goldenSandsLogo from "@/assets/golden-sands-logo.png";
+import logo from "@/assets/marsa-dhahab-logo.png.asset.json";
+import { SplashScreen } from "./SplashScreen";
 
 export interface PinLoginProfile {
   id: string;
@@ -35,6 +36,7 @@ export function PinLogin({
   const [selected, setSelected] = useState<PinLoginProfile | null>(null);
   const [pin, setPin] = useState("");
   const [success, setSuccess] = useState(false);
+  const [splash, setSplash] = useState(true);
 
   function press(digit: string) {
     if (pin.length >= 4 || success) return;
@@ -46,14 +48,18 @@ export function PinLogin({
     }
   }
 
+  if (splash) return <SplashScreen onDone={() => setSplash(false)} />;
+
   return (
-    <div className="flex flex-1 flex-col bg-surface px-6 pb-8 pt-8">
+    <div className="flex flex-1 flex-col bg-gradient-to-b from-tertiary-container/60 via-surface to-surface px-6 pb-8 pt-8">
       <div className="flex flex-col items-center">
-        <img
-          src={goldenSandsLogo}
-          alt="Golden Sands Hotel"
-          className="h-16 w-auto object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]"
-        />
+        <div className="animate-md-rise">
+          <img
+            src={logo.url}
+            alt="Marsa Dhahab Hotel"
+            className={cn("animate-md-bob w-auto object-contain", selected ? "h-24" : "h-36")}
+          />
+        </div>
       </div>
 
       {!selected ? (
