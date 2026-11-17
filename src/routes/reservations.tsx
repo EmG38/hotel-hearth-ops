@@ -6,6 +6,7 @@ import { Button, Card, Field, PageHeader, StatTile, inputClass } from "@/compone
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
 import { statusMeta } from "@/lib/room-status";
+import { useI18n, useStatusText, useTypeText } from "@/lib/i18n";
 
 export const Route = createFileRoute("/reservations")({
   head: () => ({
@@ -29,6 +30,9 @@ export const Route = createFileRoute("/reservations")({
 
 function TimeEditor({ reservationId }: { reservationId: string }) {
   const { reservations, updateReservationTimes, roomById, toggleRush } = useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const typeText = useTypeText();
   const res = reservations.find((r) => r.id === reservationId)!;
   const [checkIn, setCheckInTime] = useState(res.expectedCheckIn);
   const [checkOut, setCheckOutTime] = useState(res.expectedCheckOut);
@@ -49,8 +53,8 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
             )}
           </p>
           <p className="text-label-sm text-on-surface-subtle">
-            {res.code} · {res.roomType} · {res.nights} nights ·{" "}
-            {res.status === "checked_in" ? "in house" : "expected"}
+            {res.code} · {typeText[res.roomType]} · {res.nights} {t("common.nights")} ·{" "}
+            {res.status === "checked_in" ? t("shell.inHouse") : t("res.expected")}
           </p>
         </div>
         {room && (
@@ -61,15 +65,15 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
             )}
           >
             <Icon name="meeting_room" size={14} filled />
-            Room {room.number} · {statusMeta[room.status].short}
+            {t("common.roomN", { n: room.number })} · {statusText[room.status].short}
           </span>
         )}
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <Field
-          label="Expected check-in"
-          hint={earlyCheckIn ? "Early arrival — room prioritised" : undefined}
+          label={t("res.expectedCheckIn")}
+          hint={earlyCheckIn ? t("res.earlyHint") : undefined}
         >
           <input
             type="time"
@@ -82,8 +86,8 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
           />
         </Field>
         <Field
-          label="Expected check-out"
-          hint={lateCheckout ? "Late checkout — clean scheduled later" : undefined}
+          label={t("res.expectedCheckOut")}
+          hint={lateCheckout ? t("res.lateHint") : undefined}
         >
           <input
             type="time"
@@ -101,7 +105,7 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
         {saved && (
           <span className="text-body-sm mr-auto flex items-center gap-1.5 text-success">
             <Icon name="check_circle" size={16} filled />
-            Times updated and sent to housekeeping
+            {t("res.timesUpdated")}
           </span>
         )}
         {room && earlyCheckIn && (
@@ -113,12 +117,12 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
               toggleRush(room.id);
               toast(
                 next
-                  ? `Room ${room.number} flagged Rush`
-                  : `Rush flag removed from Room ${room.number}`,
+                  ? t("ap.toastRush", { n: room.number })
+                  : t("ap.toastUnrush", { n: room.number }),
               );
             }}
           >
-            {room.rush ? "Remove rush flag" : "Flag room as Rush"}
+            {room.rush ? t("res.removeRush") : t("res.flagRush")}
           </Button>
         )}
         <Button
@@ -131,13 +135,13 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
               expectedCheckOut: checkOut,
             });
             setSaved(true);
-            toast.success(`${res.guestName}'s times updated`, {
-              description: "Housekeeping priority order refreshed",
+            toast.success(t("res.toastUpdated", { name: res.guestName }), {
+              description: t("res.toastDesc"),
               icon: <Icon name="save" size={18} filled />,
             });
           }}
         >
-          Update reservation
+          {t("res.update")}
         </Button>
       </div>
     </Card>
@@ -146,6 +150,7 @@ function TimeEditor({ reservationId }: { reservationId: string }) {
 
 function Reservations() {
   const { reservations } = useHotel();
+  const { t } = useI18n();
   const [tab, setTab] = useState<"arrivals" | "in_house">("arrivals");
 
   const arrivals = reservations.filter((r) => r.status === "expected");
@@ -154,21 +159,18 @@ function Reservations() {
 
   return (
     <>
-      <PageHeader
-        title="Reservations"
-        subtitle="Early check-in and late checkout changes reprioritise the housekeeping order for that room"
-      />
+      <PageHeader title={t("res.title")} subtitle={t("res.subtitle")} />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
         <StatTile
-          label="Arrivals today"
+          label={t("res.arrivalsToday")}
           value={arrivals.length}
           icon="flight_land"
           tone="tertiary"
         />
-        <StatTile label="In house" value={inHouse.length} icon="hotel" tone="info" />
+        <StatTile label={t("res.inHouse")} value={inHouse.length} icon="hotel" tone="info" />
         <StatTile
-          label="Late checkouts"
+          label={t("res.lateCheckouts")}
           value={inHouse.filter((r) => r.expectedCheckOut > "11:00").length}
           icon="more_time"
           tone="warning"
@@ -178,22 +180,22 @@ function Reservations() {
       <div className="mb-4 flex gap-1.5">
         {(
           [
-            { key: "arrivals", label: "Arrivals", icon: "flight_land" },
-            { key: "in_house", label: "In house", icon: "hotel" },
+            { key: "arrivals", labelKey: "res.arrivals", icon: "flight_land" },
+            { key: "in_house", labelKey: "res.inHouse", icon: "hotel" },
           ] as const
-        ).map((t) => (
+        ).map((tab_) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+            key={tab_.key}
+            onClick={() => setTab(tab_.key)}
             className={cn(
               "text-label inline-flex items-center gap-2 rounded-full border px-4 py-2 transition-colors",
-              tab === t.key
+              tab === tab_.key
                 ? "border-primary bg-primary text-on-primary"
                 : "border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container",
             )}
           >
-            <Icon name={t.icon} size={16} filled />
-            {t.label}
+            <Icon name={tab_.icon} size={16} filled />
+            {t(tab_.labelKey)}
           </button>
         ))}
       </div>

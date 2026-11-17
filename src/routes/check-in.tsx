@@ -15,6 +15,7 @@ import {
 } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
+import { useI18n, useStatusText, useTypeText } from "@/lib/i18n";
 
 export const Route = createFileRoute("/check-in")({
   head: () => ({
@@ -45,6 +46,8 @@ function ReservationRow({
   active: boolean;
   onClick: () => void;
 }) {
+  const { t } = useI18n();
+  const typeText = useTypeText();
   return (
     <button
       onClick={onClick}
@@ -66,13 +69,14 @@ function ReservationRow({
           )}
         </span>
         <span className="text-label-sm block text-on-surface-subtle">
-          {reservation.code} · {reservation.roomType} · {reservation.nights}n · {reservation.guests}{" "}
-          guests · ETA {reservation.expectedCheckIn}
+          {reservation.code} · {typeText[reservation.roomType]} ·{" "}
+          {t("common.nightsShort", { n: reservation.nights })} · {reservation.guests}{" "}
+          {t("common.guests")} · {t("common.eta", { t: reservation.expectedCheckIn })}
         </span>
       </span>
       {reservation.status === "checked_in" && (
         <span className="text-label-sm rounded-full border border-success/20 bg-success/10 px-2 py-0.5 uppercase text-success">
-          In
+          {t("ci.in")}
         </span>
       )}
     </button>
@@ -81,24 +85,25 @@ function ReservationRow({
 
 function NotReadyPanel({ room, onAlternate }: { room: Room; onAlternate: () => void }) {
   const { toggleRush, staffById } = useHotel();
+  const { t } = useI18n();
   const attendant = staffById(room.attendantId);
   return (
     <div className="mt-3 rounded-xl border border-warning/30 bg-warning/5 p-4">
       <div className="flex items-start gap-3">
         <Icon name="warning" size={20} filled className="mt-0.5 text-warning" />
         <div className="min-w-0 flex-1">
-          <p className="text-title text-on-surface">Room {room.number} is not ready</p>
+          <p className="text-title text-on-surface">{t("ci.notReady", { n: room.number })}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
             <StatusChip status={room.status} />
             {room.eta && (
               <span className="text-label-sm inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-container-lowest px-2 py-0.5 text-on-surface-variant">
                 <Icon name="schedule" size={13} />
-                ETA {room.eta}
+                {t("common.eta", { t: room.eta })}
               </span>
             )}
             {attendant && (
               <span className="text-label-sm text-on-surface-subtle">
-                Assigned to {attendant.name}
+                {t("ci.assignedTo", { name: attendant.name })}
               </span>
             )}
           </div>
@@ -111,21 +116,19 @@ function NotReadyPanel({ room, onAlternate }: { room: Room; onAlternate: () => v
                 toggleRush(room.id);
                 toast(
                   next
-                    ? `Room ${room.number} flagged Rush — supervisor notified`
-                    : `Rush flag removed from Room ${room.number}`,
+                    ? t("ci.toastRush", { n: room.number })
+                    : t("ap.toastUnrush", { n: room.number }),
                   { icon: <Icon name="star" size={18} filled /> },
                 );
               }}
             >
-              {room.rush ? "Rush flag active — remove" : "Flag as Rush"}
+              {room.rush ? t("ci.rushActive") : t("ci.flagRush")}
             </Button>
             <Button variant="outline" icon="swap_horiz" onClick={onAlternate}>
-              Offer alternate room
+              {t("ci.offerAlternate")}
             </Button>
           </div>
-          <p className="text-label-sm mt-2 text-on-surface-subtle">
-            Rush flags appear immediately on the supervisor Property Board and inspection queue.
-          </p>
+          <p className="text-label-sm mt-2 text-on-surface-subtle">{t("ci.rushNote")}</p>
         </div>
       </div>
     </div>
@@ -135,6 +138,9 @@ function NotReadyPanel({ room, onAlternate }: { room: Room; onAlternate: () => v
 function CheckIn() {
   const { rooms, reservations, checkIn, roomById, focusReservationId, setFocusReservationId } =
     useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const typeText = useTypeText();
   const [query, setQuery] = useState("");
   const [resId, setResId] = useState<string | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -175,14 +181,11 @@ function CheckIn() {
 
   return (
     <>
-      <PageHeader
-        title="Check-In"
-        subtitle="Only Inspected / Ready rooms can be assigned — everything else is shown with its real status"
-      />
+      <PageHeader title={t("ci.title")} subtitle={t("ci.subtitle")} />
 
       <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
         <Card className="p-4">
-          <p className="text-title mb-3 text-on-surface">Reservation lookup</p>
+          <p className="text-title mb-3 text-on-surface">{t("ci.lookup")}</p>
           <div className="relative">
             <Icon
               name="search"
@@ -192,13 +195,13 @@ function CheckIn() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Guest name or reservation code"
+              placeholder={t("ci.searchPh")}
               className={cn(inputClass, "pl-10")}
             />
           </div>
           <div className="mt-3 space-y-1.5">
             {results.length === 0 ? (
-              <EmptyState icon="person_search" title="No reservation found" />
+              <EmptyState icon="person_search" title={t("ci.noRes")} />
             ) : (
               results.map((r) => (
                 <ReservationRow
@@ -220,8 +223,8 @@ function CheckIn() {
           {!reservation ? (
             <EmptyState
               icon="how_to_reg"
-              title="Select a reservation"
-              body="Pick a guest on the left to choose a room and complete check-in."
+              title={t("ci.selectRes")}
+              body={t("ci.selectResBody")}
             />
           ) : (
             <>
@@ -232,27 +235,35 @@ function CheckIn() {
                     {reservation.vip && (
                       <span className="text-label-sm inline-flex items-center gap-1 rounded-full border border-secondary/30 bg-primary-container px-2 py-0.5 uppercase text-secondary">
                         <Icon name="workspace_premium" size={13} filled />
-                        VIP
+                        {t("common.vip")}
                       </span>
                     )}
                   </p>
                   <p className="text-body-sm mt-0.5 text-on-surface-variant">
-                    {reservation.code} · {reservation.roomType} · {reservation.nights} nights ·{" "}
-                    {reservation.guests} guests · arriving {reservation.arrival} at{" "}
-                    {reservation.expectedCheckIn}
+                    {t("ci.resLine", {
+                      code: reservation.code,
+                      type: typeText[reservation.roomType],
+                      nights: reservation.nights,
+                      guests: reservation.guests,
+                    })}{" "}
+                    ·{" "}
+                    {t("ci.arriving", {
+                      date: reservation.arrival,
+                      t: reservation.expectedCheckIn,
+                    })}
                   </p>
                 </div>
                 {reservation.status === "checked_in" && selectedRoom && (
                   <span className="text-label animate-in fade-in zoom-in-95 inline-flex items-center gap-1.5 rounded-full border border-success/20 bg-success/10 px-3 py-1.5 text-success duration-300">
                     <Icon name="check_circle" size={16} filled />
-                    Checked in to {selectedRoom.number}
+                    {t("ci.checkedInTo", { room: selectedRoom.number })}
                   </span>
                 )}
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 <Chip active={sameTypeOnly && !alternates} onClick={() => setSameTypeOnly(true)}>
-                  {reservation.roomType} only
+                  {t("ci.onlyType", { type: typeText[reservation.roomType] })}
                 </Chip>
                 <Chip
                   active={!sameTypeOnly || alternates}
@@ -262,10 +273,13 @@ function CheckIn() {
                   }}
                 >
                   <Icon name="swap_horiz" size={15} />
-                  All alternates
+                  {t("ci.allAlternates")}
                 </Chip>
                 <span className="text-label-sm ml-auto text-on-surface-subtle">
-                  {candidates.filter(isSellable).length} ready of {candidates.length} shown
+                  {t("ci.readyOf", {
+                    ready: candidates.filter(isSellable).length,
+                    total: candidates.length,
+                  })}
                 </span>
               </div>
 
@@ -290,14 +304,16 @@ function CheckIn() {
                         {r.number}
                         {r.rush && <Icon name="star" size={14} filled className="text-warning" />}
                       </span>
-                      <span className="text-label-sm block text-on-surface-subtle">{r.type}</span>
+                      <span className="text-label-sm block text-on-surface-subtle">
+                        {typeText[r.type]}
+                      </span>
                       <span className={cn("text-label-sm mt-1 flex items-center gap-1", meta.text)}>
                         <Icon name={meta.icon} size={13} filled />
-                        {meta.short}
+                        {statusText[r.status].short}
                       </span>
                       {r.eta && !ready && (
                         <span className="text-label-sm block text-on-surface-subtle">
-                          ETA {r.eta}
+                          {t("common.eta", { t: r.eta })}
                         </span>
                       )}
                     </button>
@@ -319,9 +335,9 @@ function CheckIn() {
                 <span className="text-body-sm mr-auto text-on-surface-variant">
                   {selectedRoom
                     ? isSellable(selectedRoom)
-                      ? `Room ${selectedRoom.number} is inspected and ready.`
-                      : `Room ${selectedRoom.number} cannot be assigned yet.`
-                    : "Choose a ready room to continue."}
+                      ? t("ci.readyMsg", { n: selectedRoom.number })
+                      : t("ci.cannotAssign", { n: selectedRoom.number })
+                    : t("ci.chooseReady")}
                 </span>
                 <Button
                   variant="primary"
@@ -335,15 +351,18 @@ function CheckIn() {
                     if (!selectedRoom) return;
                     checkIn(reservation.id, selectedRoom.id);
                     toast.success(
-                      `${reservation.guestName} checked in to Room ${selectedRoom.number}`,
+                      t("ci.toastCheckedIn", {
+                        name: reservation.guestName,
+                        n: selectedRoom.number,
+                      }),
                       {
-                        description: "Welcome them in — have a great stay!",
+                        description: t("ci.toastWelcome"),
                         icon: <Icon name="celebration" size={18} filled />,
                       },
                     );
                   }}
                 >
-                  Check Guest In
+                  {t("ci.checkGuestIn")}
                 </Button>
               </div>
             </>

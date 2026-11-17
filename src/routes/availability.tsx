@@ -8,7 +8,7 @@ import { PageHero } from "@/components/PageHero";
 import { StatusLegend } from "@/components/StatusLegend";
 import { Icon } from "@/components/Icon";
 import { cn } from "@/lib/utils";
-import { wings } from "@/lib/mock-data";
+import { useI18n, useStatusText, useTypeText, useViewText, useWingName } from "@/lib/i18n";
 
 export const Route = createFileRoute("/availability")({
   head: () => ({
@@ -28,17 +28,17 @@ export const Route = createFileRoute("/availability")({
   component: AvailabilityBoard,
 });
 
-const viewLabel: Record<Room["view"], string> = {
-  gulf: "Gulf View",
-  garden: "Garden View",
-  courtyard: "Courtyard View",
-};
 const viewIcon: Record<Room["view"], string> = { gulf: "waves", garden: "park", courtyard: "deck" };
 
 const ROOM_TYPES: RoomType[] = ["Standard", "Deluxe", "Suite"];
 
 function AvailabilityBoard() {
   const { rooms, staffById } = useHotel();
+  const { t } = useI18n();
+  const statusText = useStatusText();
+  const typeText = useTypeText();
+  const viewText = useViewText();
+  const wingName = useWingName();
   const [showAll, setShowAll] = useState(false);
   const [type, setType] = useState<string>("all");
   const [wing, setWing] = useState<string>("all");
@@ -62,13 +62,13 @@ function AvailabilityBoard() {
     <>
       <PageHero
         ghostIcon="vpn_key"
-        eyebrow="Reception"
-        title="Availability Board"
-        subtitle="Out of Order and Out of Service rooms are excluded from the sellable count"
+        eyebrow={t("role.reception")}
+        title={t("av.title")}
+        subtitle={t("av.subtitle")}
         actions={
           <Chip active={showAll} onClick={() => setShowAll((v) => !v)}>
             <Icon name={showAll ? "visibility" : "verified"} size={15} filled />
-            {showAll ? "Showing all statuses" : "Ready rooms only"}
+            {showAll ? t("av.showAll") : t("av.readyOnly")}
           </Chip>
         }
       >
@@ -76,22 +76,25 @@ function AvailabilityBoard() {
           <div>
             <p className="text-display text-primary">
               {sellable.length}
-              <span className="text-headline text-on-surface-subtle"> of {rooms.length}</span>
+              <span className="text-headline text-on-surface-subtle">
+                {" "}
+                {t("av.of")} {rooms.length}
+              </span>
             </p>
-            <p className="text-label uppercase text-on-surface-variant">Rooms sellable now</p>
+            <p className="text-label uppercase text-on-surface-variant">{t("av.sellableNow")}</p>
           </div>
           <div className="grid flex-1 gap-3 sm:grid-cols-3">
-            {ROOM_TYPES.map((t) => {
-              const all = rooms.filter((r) => r.type === t);
+            {ROOM_TYPES.map((ty) => {
+              const all = rooms.filter((r) => r.type === ty);
               return (
                 <StatTile
-                  key={t}
-                  label={t}
+                  key={ty}
+                  label={typeText[ty]}
                   value={all.filter(isSellable).length}
                   unit={`/ ${all.length}`}
-                  icon={t === "Suite" ? "king_bed" : t === "Deluxe" ? "bed" : "single_bed"}
+                  icon={ty === "Suite" ? "king_bed" : ty === "Deluxe" ? "bed" : "single_bed"}
                   tone="success"
-                  hint={`${all.filter(isBlocked).length} blocked`}
+                  hint={t("av.blocked", { n: all.filter(isBlocked).length })}
                 />
               );
             })}
@@ -102,29 +105,31 @@ function AvailabilityBoard() {
       <Card className="mb-5 p-4">
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-32">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Room type</span>
+            <span className="text-label-sm uppercase text-on-surface-subtle">
+              {t("av.roomType")}
+            </span>
             <Select value={type} onChange={(e) => setType(e.target.value)} className="mt-1.5">
-              <option value="all">All types</option>
-              {ROOM_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
+              <option value="all">{t("common.allTypes")}</option>
+              {ROOM_TYPES.map((ty) => (
+                <option key={ty} value={ty}>
+                  {typeText[ty]}
                 </option>
               ))}
             </Select>
           </label>
           <label className="min-w-28">
-            <span className="text-label-sm uppercase text-on-surface-subtle">Wing</span>
+            <span className="text-label-sm uppercase text-on-surface-subtle">{t("pb.wing")}</span>
             <Select value={wing} onChange={(e) => setWing(e.target.value)} className="mt-1.5">
-              <option value="all">All wings</option>
+              <option value="all">{t("common.allWings")}</option>
               {([1, 2, 3, 4, 5] as const).map((w) => (
                 <option key={w} value={w}>
-                  {wings[w].name}
+                  {wingName(w)}
                 </option>
               ))}
             </Select>
           </label>
           <span className="text-body-sm mb-2.5 ml-auto text-on-surface-subtle">
-            {rows.length} rooms listed
+            {t("av.listed", { n: rows.length })}
           </span>
         </div>
         <StatusLegend className="mt-4 border-t border-outline-variant pt-3" />
@@ -132,24 +137,20 @@ function AvailabilityBoard() {
 
       <Card className="overflow-hidden">
         {rows.length === 0 ? (
-          <EmptyState
-            icon="search_off"
-            title="No rooms match"
-            body="Widen the filters or switch to all statuses."
-          />
+          <EmptyState icon="search_off" title={t("av.noMatch")} body={t("av.noMatchBody")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-180 text-left">
               <thead>
                 <tr className="text-label-sm bg-surface-container uppercase text-on-surface-subtle">
-                  <th className="px-4 py-2.5 font-semibold">Room</th>
-                  <th className="px-4 py-2.5 font-semibold">Wing</th>
-                  <th className="px-4 py-2.5 font-semibold">Type</th>
-                  <th className="px-4 py-2.5 font-semibold">View</th>
-                  <th className="px-4 py-2.5 font-semibold">Status</th>
-                  <th className="px-4 py-2.5 font-semibold">Flags</th>
-                  <th className="px-4 py-2.5 font-semibold">ETA</th>
-                  <th className="px-4 py-2.5 font-semibold">Sellable</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.room")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.wing")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.type")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.view")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.status")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.flags")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.eta")}</th>
+                  <th className="px-4 py-2.5 font-semibold">{t("av.col.sellable")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -164,8 +165,12 @@ function AvailabilityBoard() {
                           {r.rush && <Icon name="star" size={14} filled className="text-warning" />}
                         </span>
                       </td>
-                      <td className="text-body px-4 py-2.5 text-on-surface-variant">{wings[r.wing].name}</td>
-                      <td className="text-body px-4 py-2.5 text-on-surface-variant">{r.type}</td>
+                      <td className="text-body px-4 py-2.5 text-on-surface-variant">
+                        {wingName(r.wing)}
+                      </td>
+                      <td className="text-body px-4 py-2.5 text-on-surface-variant">
+                        {typeText[r.type]}
+                      </td>
                       <td className="px-4 py-2.5">
                         <span className="text-body-sm inline-flex items-center gap-1 text-on-surface-variant">
                           <Icon
@@ -174,13 +179,13 @@ function AvailabilityBoard() {
                             filled={r.view === "gulf"}
                             className="text-tertiary"
                           />
-                          {viewLabel[r.view]}
+                          {viewText[r.view]}
                         </span>
                       </td>
                       <td className="px-4 py-2.5">
                         <span className={cn("text-body-sm flex items-center gap-1.5", meta.text)}>
                           <span className={cn("size-2 rounded-full", meta.dot)} />
-                          {meta.label}
+                          {statusText[r.status].label}
                         </span>
                         {attendant && r.status !== "inspected" && (
                           <span className="text-label-sm text-on-surface-subtle">
@@ -204,10 +209,10 @@ function AvailabilityBoard() {
                                 )}
                               >
                                 {f === "ooo"
-                                  ? "Out of Order"
+                                  ? t("flag.ooo")
                                   : f === "oos"
-                                    ? "Out of Service"
-                                    : "DND"}
+                                    ? t("flag.oos")
+                                    : t("flag.dnd.short")}
                               </span>
                             ))
                           )}
