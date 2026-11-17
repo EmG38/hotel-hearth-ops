@@ -156,7 +156,11 @@ function Performance() {
                   </span>
                 </div>
                 <div className="mt-2.5 space-y-1.5">
-                  <Bar value={passRate} tone="bg-secondary" />
+                  {st.inspected > 0 ? (
+                    <Bar value={passRate} tone="bg-secondary" />
+                  ) : (
+                    <p className="text-label-sm text-on-surface-subtle">No inspections yet</p>
+                  )}
                   <p className="text-label-sm -mt-0.5 text-on-surface-subtle">
                     Pass rate (live) · {st.inspected} inspected
                   </p>
