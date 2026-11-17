@@ -71,6 +71,15 @@ function LangToggle() {
           {l === "en" ? "EN" : "हि"}
         </button>
       ))}
+      {/* Placeholder only — Urdu translation isn't wired up yet. */}
+      <button
+        type="button"
+        disabled
+        title="Urdu — coming soon"
+        className="cursor-not-allowed rounded-full px-2 py-0.5 text-on-surface-subtle opacity-60"
+      >
+        اردو
+      </button>
     </div>
   );
 }
