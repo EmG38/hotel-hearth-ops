@@ -64,3 +64,13 @@ export interface Reservation {
 }
 
 export type Role = "supervisor" | "reception" | "housekeeper";
+
+/** Minimal identity for the Supervisor mobile app's job→face→PIN login —
+ * deliberately lighter than Staff, which carries housekeeper performance
+ * metrics that don't apply to a supervisor. */
+export interface SupervisorProfile {
+  id: string;
+  name: string;
+  initials: string;
+  shift: "Morning" | "Evening";
+}

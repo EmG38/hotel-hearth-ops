@@ -15,12 +15,7 @@ const navSections: {
   {
     role: "supervisor",
     label: "Supervisor",
-    items: [
-      { to: "/", label: "Property Board", icon: "grid_view" },
-      { to: "/inspections", label: "Inspections", icon: "fact_check" },
-      { to: "/issues", label: "Issues", icon: "report" },
-      { to: "/performance", label: "Performance", icon: "monitoring" },
-    ],
+    items: [{ to: "/supervisor", label: "Supervisor App", icon: "supervisor_account" }],
   },
   {
     role: "reception",
@@ -107,7 +102,11 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
     >
       <div className={cn("flex items-center gap-2 px-4", collapsed && "justify-center px-2")}>
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-container">
-          <img src={logoAsset.url} alt="Golden Sands Hotel logo" className="size-7 object-contain" />
+          <img
+            src={logoAsset.url}
+            alt="Golden Sands Hotel logo"
+            className="size-7 object-contain"
+          />
         </span>
         {!collapsed && (
           <div className="min-w-0">

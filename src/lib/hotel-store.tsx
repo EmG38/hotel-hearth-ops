@@ -8,12 +8,14 @@ import type {
   RoomFlag,
   RoomStatus,
   Staff,
+  SupervisorProfile,
 } from "./hotel-types";
 import {
   buildRooms,
   issues as seedIssues,
   reservations as seedReservations,
   staff as seedStaff,
+  supervisors as seedSupervisors,
 } from "./mock-data";
 
 interface HotelState {
@@ -32,6 +34,10 @@ interface HotelState {
   /** Which housekeeper is "signed in" on the mobile app preview (shared-device style, no password). */
   currentStaffId: string | null;
   setCurrentStaffId: (id: string | null) => void;
+  /** Which supervisor is "signed in" on the Supervisor mobile app — same shared-device pattern. */
+  currentSupervisorId: string | null;
+  setCurrentSupervisorId: (id: string | null) => void;
+  supervisors: SupervisorProfile[];
   roomById: (id: string | null) => Room | undefined;
   staffById: (id: string | null) => Staff | undefined;
   workload: (staffId: string) => number;
@@ -67,6 +73,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
   const [focusRoomId, setFocusRoomId] = useState<string | null>(null);
   const [focusReservationId, setFocusReservationId] = useState<string | null>(null);
   const [currentStaffId, setCurrentStaffId] = useState<string | null>(null);
+  const [currentSupervisorId, setCurrentSupervisorId] = useState<string | null>(null);
 
   const patchRoom = useCallback((roomId: string, patch: (r: Room) => Room) => {
     setRooms((prev) => prev.map((r) => (r.id === roomId ? patch(r) : r)));
@@ -86,6 +93,9 @@ export function HotelProvider({ children }: { children: ReactNode }) {
       setFocusReservationId,
       currentStaffId,
       setCurrentStaffId,
+      currentSupervisorId,
+      setCurrentSupervisorId,
+      supervisors: seedSupervisors,
       roomById: (id) => (id ? rooms.find((r) => r.id === id) : undefined),
       staffById: (id) => (id ? staff.find((s) => s.id === id) : undefined),
       workload: (staffId) =>
@@ -148,6 +158,7 @@ export function HotelProvider({ children }: { children: ReactNode }) {
     focusRoomId,
     focusReservationId,
     currentStaffId,
+    currentSupervisorId,
   ]);
 
   return <HotelContext.Provider value={value}>{children}</HotelContext.Provider>;

@@ -1,4 +1,12 @@
-import type { Issue, Reservation, Room, RoomStatus, RoomType, Staff } from "./hotel-types";
+import type {
+  Issue,
+  Reservation,
+  Room,
+  RoomStatus,
+  RoomType,
+  Staff,
+  SupervisorProfile,
+} from "./hotel-types";
 import roomStandardPhoto from "@/assets/photos/room-standard.jpg";
 import roomDeluxePhoto from "@/assets/photos/room-deluxe.jpg";
 import roomSuitePhoto from "@/assets/photos/room-suite.jpg";
@@ -82,6 +90,13 @@ export const staff: Staff[] = [
     onTimePct: 90,
     passRate: 93,
   },
+];
+
+/** Supervisors for the mobile Supervisor app's login — local Gulf nationals,
+ * matching the management-tier skew noted above. */
+export const supervisors: SupervisorProfile[] = [
+  { id: "sup1", name: "Noura Al Qahtani", initials: "NQ", shift: "Morning" },
+  { id: "sup2", name: "Khalid Al Otaibi", initials: "KO", shift: "Evening" },
 ];
 
 function roomType(index: number): RoomType {

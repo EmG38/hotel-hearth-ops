@@ -58,10 +58,7 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
           </div>
 
           <div
-            className={cn(
-              "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain pb-1",
-              dark && "-mt-11",
-            )}
+            className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto pb-1", dark && "-mt-11")}
           >
             {children}
           </div>
