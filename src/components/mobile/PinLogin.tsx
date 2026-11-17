@@ -52,19 +52,19 @@ export function PinLogin({
         <img
           src={goldenSandsLogo}
           alt="Golden Sands Hotel"
-          className="h-16 w-auto object-contain"
+          className="h-16 w-auto object-contain drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]"
         />
       </div>
 
       {!selected ? (
         <>
           <p className="mt-8 text-center text-title text-on-surface font-semibold">{signInLabel}</p>
-          <div className="mt-6 grid grid-cols-3 gap-x-3 gap-y-5 overflow-y-auto pb-2">
+          <div className="mt-6 flex flex-wrap justify-center gap-x-3 gap-y-5 overflow-y-auto pb-2">
             {roster.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setSelected(s)}
-                className="group flex flex-col items-center gap-1.5 transition-transform active:scale-95"
+                className="group flex w-[calc((100%-1.5rem)/3)] flex-col items-center gap-1.5 transition-transform active:scale-95"
               >
                 <Avatar p={s} className="size-[72px]" />
                 <span className="w-full truncate text-center text-label font-semibold text-on-surface">{s.name.split(" ")[0]}</span>
@@ -147,7 +147,7 @@ function Avatar({ p, className }: { p: PinLoginProfile; className?: string }) {
         p.initials
       ) : (
         <img
-          src={`https://i.pravatar.cc/200?u=golden-sands-${p.id}`}
+          src={photoFor(p)}
           alt={p.name}
           loading="lazy"
           onError={() => setFailed(true)}
@@ -156,4 +156,15 @@ function Avatar({ p, className }: { p: PinLoginProfile; className?: string }) {
       )}
     </span>
   );
+}
+
+/** Placeholder portrait matched to the person's gender by first name. Swap
+ * for real staff photos when wiring real data. */
+const MALE_FIRST_NAMES = new Set(["khalid", "ahmed", "omar", "ali", "raj", "jose", "mohammed"]);
+function photoFor(p: PinLoginProfile) {
+  const first = p.name.split(" ")[0].toLowerCase();
+  const set = MALE_FIRST_NAMES.has(first) ? "men" : "women";
+  let h = 0;
+  for (const c of p.id) h = (h * 31 + c.charCodeAt(0)) % 90;
+  return `https://randomuser.me/api/portraits/${set}/${h + 1}.jpg`;
 }

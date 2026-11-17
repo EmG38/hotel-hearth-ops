@@ -80,7 +80,7 @@ function SupervisorBoard() {
   const pendingRequests = guestRequests.filter((g) => g.status !== "completed").length;
 
   return (
-    <MobileFrame dark={!me}>
+    <MobileFrame>
       {!me ? (
         <MobileLoginFlow />
       ) : (

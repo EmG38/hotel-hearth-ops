@@ -129,7 +129,7 @@ function HousekeeperHome() {
   }, [myRooms]);
 
   return (
-    <MobileFrame dark={!me}>
+    <MobileFrame>
       {!me ? (
         <LoginFlow />
       ) : (
