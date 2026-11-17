@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 import { GlobalSearch } from "./GlobalSearch";
@@ -239,6 +239,14 @@ function TopBar() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
+  // Auto-collapse the sidebar on narrower screens so it doesn't cover the phone preview.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1180px)");
+    const apply = () => setCollapsed(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface">
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />

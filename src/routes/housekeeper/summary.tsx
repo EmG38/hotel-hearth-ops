@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { useHotel } from "@/lib/hotel-store";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
+import { HousekeeperNav } from "@/components/housekeeper/HousekeeperNav";
 import { useHkT } from "@/lib/housekeeper-i18n";
 import { useOnline } from "@/lib/use-online";
 
@@ -53,7 +54,7 @@ function ShiftSummary() {
 
   return (
     <MobileFrame>
-      <div className="flex flex-1 flex-col overflow-y-auto">
+      <div className="flex flex-1 flex-col overflow-y-auto pb-28">
         <div className="flex items-center gap-3 px-4 pt-4">
           <button
             onClick={() => navigate({ to: "/housekeeper" })}
@@ -129,6 +130,7 @@ function ShiftSummary() {
           </button>
         </div>
       </div>
+    <HousekeeperNav active="summary" />
     </MobileFrame>
   );
 }

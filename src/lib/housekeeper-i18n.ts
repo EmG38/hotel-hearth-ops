@@ -63,7 +63,7 @@ const dict = {
   summary: { en: "Summary", hi: "सारांश" },
   statusOverview: { en: "Status Overview", hi: "स्थिति अवलोकन" },
   dirty: { en: "Dirty", hi: "गंदा" },
-  inProgressShort: { en: "In", hi: "जारी" },
+  inProgressShort: { en: "In Progress", hi: "जारी" },
   awaitingShort: { en: "Awaiting", hi: "प्रतीक्षा" },
   inspectedShort: { en: "Inspected", hi: "निरीक्षित" },
   needsAttention: { en: "Needs Attention", hi: "ध्यान चाहिए" },

@@ -5,7 +5,7 @@ import type { Room } from "@/lib/hotel-types";
 import { Avatar } from "@/components/ui-kit";
 import { Icon } from "@/components/Icon";
 import { MobileFrame } from "@/components/MobileFrame";
-import { FloatingNav } from "@/components/mobile/FloatingNav";
+import { HousekeeperNav } from "@/components/housekeeper/HousekeeperNav";
 import { RoomRow } from "@/components/housekeeper/RoomRow";
 import { LoginFlow } from "@/components/housekeeper/LoginFlow";
 import { sortByPriority } from "@/lib/housekeeper-room";
@@ -287,7 +287,7 @@ function HousekeeperHome() {
             </div>
           )}
 
-          <div className="px-5 pt-6 pb-4">
+          <div className="px-5 pt-6 pb-32">
             <p className="text-lg font-semibold tracking-tight text-on-surface">{t.t("allRooms")}</p>
             {wingGroups.map(({ wing, total, ready, preview, hasMore }) => (
               <div key={wing} className="mt-4">
@@ -343,13 +343,7 @@ function HousekeeperHome() {
       )}
 
       {me && (
-        <FloatingNav
-          items={[
-            { key: "home", label: t.t("home"), icon: "home", active: true, onClick: () => {} },
-            { key: "scan", label: "Scan", icon: "qr_code_scanner", onClick: () => navigate({ to: "/housekeeper/scan" }) },
-            { key: "summary", label: t.t("summary"), icon: "assignment", onClick: () => navigate({ to: "/housekeeper/summary" }) },
-          ]}
-        />
+        <HousekeeperNav active="home" />
       )}
     </MobileFrame>
   );
