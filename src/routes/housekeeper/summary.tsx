@@ -27,7 +27,7 @@ function StatCard({ icon, label, value, tone }: { icon: string; label: string; v
       </span>
       <div className="min-w-0">
         <p className="text-xl font-semibold leading-none tracking-tight text-on-surface">{value}</p>
-        <p className="text-label-sm mt-1 truncate text-on-surface-subtle">{label}</p>
+        <p className="text-label-sm mt-1 leading-tight text-on-surface-subtle">{label}</p>
       </div>
     </div>
   );
@@ -115,7 +115,7 @@ function ShiftSummary() {
           </div>
         </div>
 
-        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">{t.t("roomsAssigned")}</p>
+        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">Today's rooms</p>
         <div className="mx-4 mt-3 grid grid-cols-2 gap-2.5">
           <StatCard icon="bed" label={t.t("roomsAssigned")} value={total} tone="text-tertiary" />
           <StatCard icon="verified" label={t.t("completed")} value={completed} tone="text-success" />
@@ -126,7 +126,7 @@ function ShiftSummary() {
           </div>
         </div>
 
-        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">{t.t("yourTimes")}</p>
+        <p className="mx-5 mt-6 text-lg font-semibold tracking-tight text-on-surface">Your times</p>
         <div className="mx-4 mt-3 divide-y divide-outline-variant/60 rounded-[22px] bg-surface-container-lowest px-4 shadow-soft">
           <TimeRow icon="login" label={t.t("shiftStart")} value={times.start} />
           <TimeRow icon="logout" label={t.t("shiftEnd")} value={times.end} />
