@@ -1,4 +1,11 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 
@@ -29,8 +36,22 @@ function useClock() {
  * the bezel gets its depth from layered shadows, not a border — the two
  * details that separate a convincing phone mockup from an obvious fake.
  */
+/** Lets any screen inside the frame open a full-phone sheet (account menu,
+ * confirmations) that sits above the scrolling content and stays inside the
+ * bezel, instead of a browser-wide modal that swallows the phone mockup. */
+type PhoneOverlayApi = { open: (node: ReactNode) => void; close: () => void };
+const PhoneOverlayContext = createContext<PhoneOverlayApi | null>(null);
+
+export function usePhoneOverlay() {
+  const ctx = useContext(PhoneOverlayContext);
+  if (!ctx) throw new Error("usePhoneOverlay must be used inside <MobileFrame>");
+  return ctx;
+}
+
 export function MobileFrame({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
   const time = useClock();
+  const [overlay, setOverlay] = useState<ReactNode>(null);
+  const overlayApi = useMemo(() => ({ open: setOverlay, close: () => setOverlay(null) }), []);
   return (
     <div className="flex justify-center py-6">
       <div className="mobile-frame relative w-[min(410px,100%)] rounded-[54px] bg-gradient-to-b from-[#2a2b2e] to-[#17181a] p-[10px] shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_30px_60px_-12px_rgba(0,0,0,0.5),0_18px_36px_-18px_rgba(0,0,0,0.6)]">
@@ -64,11 +85,18 @@ export function MobileFrame({ children, dark = false }: { children: ReactNode; d
             </div>
           </div>
 
-          <div
-            className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto", dark && "-mt-11")}
-          >
-            {children}
-          </div>
+          <PhoneOverlayContext.Provider value={overlayApi}>
+            <div
+              className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto", dark && "-mt-11")}
+            >
+              {children}
+            </div>
+            {overlay ? (
+              <div className="absolute inset-0 z-40" role="dialog" aria-modal="true">
+                {overlay}
+              </div>
+            ) : null}
+          </PhoneOverlayContext.Provider>
 
           {/* Home indicator */}
           <div className="pointer-events-none absolute inset-x-0 bottom-1.5 z-30 flex justify-center">

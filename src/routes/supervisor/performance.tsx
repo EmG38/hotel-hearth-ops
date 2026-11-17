@@ -5,6 +5,7 @@ import { wings } from "@/lib/mock-data";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { SupervisorAccountButton } from "@/components/supervisor/SupervisorAccountSheet";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/supervisor/performance")({
@@ -80,6 +81,7 @@ function Performance() {
       <MobileScreenHeader
         title="Performance"
         subtitle="No public ranking — supervisor-only"
+        actions={<SupervisorAccountButton />}
       />
 
       <div className="px-4 pt-3">

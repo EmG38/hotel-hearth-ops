@@ -7,6 +7,7 @@ import { MobileFrame } from "@/components/MobileFrame";
 import { MobileLoginFlow } from "@/components/supervisor/MobileLoginFlow";
 import { RoomRow } from "@/components/supervisor/RoomRow";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { SupervisorAccountButton } from "@/components/supervisor/SupervisorAccountSheet";
 import { useOnline } from "@/lib/use-online";
 import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
@@ -34,7 +35,6 @@ function SupervisorBoard() {
     rooms,
     staffById,
     currentSupervisorId,
-    setCurrentSupervisorId,
     supervisors,
     guestRequests,
   } = useHotel();
@@ -92,16 +92,7 @@ function SupervisorBoard() {
             </div>
           )}
           <div className="flex items-center justify-between px-5 pt-3">
-            <button
-              onClick={() => setCurrentSupervisorId(null)}
-              title="Switch user"
-              className="relative"
-            >
-              <span className="grid size-[46px] place-items-center rounded-full bg-secondary text-title font-semibold text-on-primary">
-                {me.initials}
-              </span>
-              <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface bg-success" />
-            </button>
+            <SupervisorAccountButton />
             <button
               onClick={() => navigate({ to: "/supervisor/requests" })}
               className="relative grid size-11 place-items-center rounded-full bg-surface-container-lowest text-on-surface shadow-soft"

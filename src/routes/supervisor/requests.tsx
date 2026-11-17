@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useHotel } from "@/lib/hotel-store";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
+import { SupervisorAccountButton } from "@/components/supervisor/SupervisorAccountSheet";
 import { guestRequestLabel } from "@/lib/mock-data";
 import type { GuestRequest } from "@/lib/hotel-types";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ function GuestRequestsScreen() {
         title="Guest Requests"
         subtitle={`${list.length} shown`}
         onBack={() => navigate({ to: "/supervisor" })}
+        actions={<SupervisorAccountButton />}
       />
       <div className="flex gap-2 px-4 pt-3">
         {FILTERS.map((f) => (

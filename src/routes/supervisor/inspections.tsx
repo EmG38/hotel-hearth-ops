@@ -4,6 +4,7 @@ import { useHotel } from "@/lib/hotel-store";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { SupervisorAccountButton } from "@/components/supervisor/SupervisorAccountSheet";
 import { wings } from "@/lib/mock-data";
 import type { RoomType } from "@/lib/hotel-types";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,11 @@ function InspectionQueue() {
 
   return (
     <MobileFrame>
-      <MobileScreenHeader title="Inspection Queue" subtitle={`${queue.length} awaiting sign-off`} />
+      <MobileScreenHeader
+        title="Inspection Queue"
+        subtitle={`${queue.length} awaiting sign-off`}
+        actions={<SupervisorAccountButton />}
+      />
       <div className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
         <select
           value={wing}

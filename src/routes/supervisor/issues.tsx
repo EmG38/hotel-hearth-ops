@@ -6,6 +6,7 @@ import type { IssueStatus } from "@/lib/hotel-types";
 import { MobileFrame, MobileScreenHeader } from "@/components/MobileFrame";
 import { Icon } from "@/components/Icon";
 import { SupervisorNav } from "@/components/supervisor/SupervisorNav";
+import { SupervisorAccountButton } from "@/components/supervisor/SupervisorAccountSheet";
 import { wings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +35,11 @@ function IssueTriage() {
 
   return (
     <MobileFrame>
-      <MobileScreenHeader title="Issue Triage" subtitle="Reported by housekeeping" />
+      <MobileScreenHeader
+        title="Issue Triage"
+        subtitle="Reported by housekeeping"
+        actions={<SupervisorAccountButton />}
+      />
       <div className="flex gap-2 overflow-x-auto px-4 pb-1 pt-3">
         {FILTERS.map((f) => (
           <button
