@@ -47,7 +47,7 @@ export function PinLogin({
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-brand-ink px-6 pb-8 pt-8">
+    <div className="flex flex-1 flex-col bg-surface px-6 pb-8 pt-8">
       <div className="flex flex-col items-center">
         <img
           src={goldenSandsLogo}
@@ -58,19 +58,17 @@ export function PinLogin({
 
       {!selected ? (
         <>
-          <p className="mt-8 text-center text-title text-white/90">{signInLabel}</p>
-          <div className="mt-5 grid grid-cols-2 gap-3 overflow-y-auto">
+          <p className="mt-8 text-center text-title text-on-surface font-semibold">{signInLabel}</p>
+          <div className="mt-6 grid grid-cols-3 gap-x-3 gap-y-5 overflow-y-auto pb-2">
             {roster.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setSelected(s)}
-                className="flex flex-col items-center gap-2 hk-card border border-white/10 bg-white/5 p-4 transition-all active:scale-[0.97] active:bg-white/10"
+                className="group flex flex-col items-center gap-1.5 transition-transform active:scale-95"
               >
-                <span className="grid size-14 place-items-center rounded-full border-2 border-primary/70 bg-primary/20 text-title font-semibold text-primary">
-                  {s.initials}
-                </span>
-                <span className="text-label text-white">{s.name}</span>
-                <span className="text-label-sm text-white/50">{s.shift} shift</span>
+                <Avatar p={s} className="size-[72px]" />
+                <span className="w-full truncate text-center text-label font-semibold text-on-surface">{s.name.split(" ")[0]}</span>
+                <span className="-mt-1 text-label-sm text-on-surface-variant">{s.shift} shift</span>
               </button>
             ))}
           </div>
@@ -83,17 +81,15 @@ export function PinLogin({
               setPin("");
               setSuccess(false);
             }}
-            className="self-start -mt-1 mb-4 flex items-center gap-1 text-label text-white/60"
+            className="self-start -mt-1 mb-4 flex items-center gap-1 text-label text-on-surface-variant"
           >
             <Icon name="chevron_left" size={18} />
             {switchUserLabel}
           </button>
 
-          <span className="grid size-16 place-items-center rounded-full border-2 border-primary/70 bg-primary/20 text-title-lg font-semibold text-primary">
-            {selected.initials}
-          </span>
-          <p className="mt-3 text-title text-white">{selected.name}</p>
-          <p className="mt-1 text-label-sm text-white/50">{pinPrompt}</p>
+          <Avatar p={selected} className="size-20" />
+          <p className="mt-3 text-title font-semibold text-on-surface">{selected.name}</p>
+          <p className="mt-1 text-label-sm text-on-surface-variant">{pinPrompt}</p>
 
           <div className="mt-6 flex gap-4">
             {[0, 1, 2, 3].map((i) => (
@@ -105,7 +101,7 @@ export function PinLogin({
                     ? "border-success bg-success"
                     : i < pin.length
                       ? "border-primary bg-primary"
-                      : "border-white/25 bg-transparent",
+                      : "border-outline-variant bg-transparent",
                 )}
               />
             ))}
@@ -124,7 +120,7 @@ export function PinLogin({
                   <button
                     key={i}
                     onClick={() => (k === "back" ? setPin((p) => p.slice(0, -1)) : press(k))}
-                    className="grid size-16 place-items-center rounded-full bg-white/8 text-title-lg font-semibold text-white active:bg-white/15"
+                    className="grid size-16 place-items-center rounded-full bg-surface-container-lowest text-title-lg font-semibold text-on-surface shadow-sm active:bg-surface-container"
                   >
                     {k === "back" ? <Icon name="backspace" size={22} /> : k}
                   </button>
@@ -135,5 +131,29 @@ export function PinLogin({
         </div>
       )}
     </div>
+  );
+}
+
+function Avatar({ p, className }: { p: PinLoginProfile; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <span
+      className={cn(
+        "grid shrink-0 place-items-center overflow-hidden rounded-full bg-tertiary-container text-title font-semibold text-tertiary ring-2 ring-surface-container-lowest shadow-md",
+        className,
+      )}
+    >
+      {failed ? (
+        p.initials
+      ) : (
+        <img
+          src={`https://i.pravatar.cc/200?u=golden-sands-${p.id}`}
+          alt={p.name}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="size-full object-cover"
+        />
+      )}
+    </span>
   );
 }
