@@ -125,7 +125,6 @@ function HousekeeperHome() {
         total: list.length,
         ready: list.filter((r) => r.status === "inspected").length,
         preview: sortByPriority(list).slice(0, WING_PREVIEW_MAX),
-        hasMore: list.length > WING_PREVIEW_MAX,
       }));
   }, [myRooms]);
 
@@ -289,7 +288,7 @@ function HousekeeperHome() {
 
           <div className="px-5 pt-6 pb-32">
             <p className="text-lg font-semibold tracking-tight text-on-surface">{t.t("allRooms")}</p>
-            {wingGroups.map(({ wing, total, ready, preview, hasMore }) => (
+            {wingGroups.map(({ wing, total, ready, preview }) => (
               <div key={wing} className="mt-4">
                 <button
                   onClick={() =>
@@ -316,20 +315,6 @@ function HousekeeperHome() {
                       }
                     />
                   ))}
-                  {hasMore && (
-                    <button
-                      onClick={() =>
-                        navigate({
-                          to: "/housekeeper/wing/$wing",
-                          params: { wing: String(wing) },
-                        })
-                      }
-                      className="flex w-full items-center justify-center gap-1 rounded-full border border-outline-variant py-2.5 text-label font-medium text-on-surface active:bg-surface-container"
-                    >
-                      {t.t("viewAll")} {total} {t.t("roomsWord")}
-                      <Icon name="chevron_right" size={16} />
-                    </button>
-                  )}
                 </div>
               </div>
             ))}
