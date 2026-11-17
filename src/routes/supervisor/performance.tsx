@@ -91,13 +91,12 @@ function Performance() {
               onClick={() => setShift(s)}
               aria-pressed={shift === s}
               className={cn(
-                "text-label flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 font-semibold transition-colors",
+                "text-xs flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 font-semibold transition-colors",
                 shift === s ? "bg-surface-container-lowest text-on-surface shadow-soft" : "text-on-surface-variant",
               )}
             >
-              <Icon name={s === "Morning" ? "wb_sunny" : "nights_stay"} size={16} filled className={s === "Morning" ? "text-primary" : "text-tertiary"} />
-              {s} shift
-              <span className="text-label-sm font-normal text-on-surface-subtle">{s === "Morning" ? "7–3" : "3–11"}</span>
+              <Icon name={s === "Morning" ? "wb_sunny" : "bedtime"} size={16} filled className={s === "Morning" ? "text-primary" : "text-tertiary"} />
+              <span className="whitespace-nowrap">{s} shift</span>
             </button>
           ))}
         </div>

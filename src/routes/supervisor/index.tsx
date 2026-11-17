@@ -188,7 +188,7 @@ function SupervisorBoard() {
                     key={f.key}
                     onClick={() => setFilter(f.key)}
                     className={cn(
-                      "text-label-sm inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold transition-colors",
+                      "text-[11px] leading-4 inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold transition-colors",
                       on ? "bg-secondary text-on-primary" : "bg-surface-container text-on-surface-variant",
                     )}
                   >
@@ -209,7 +209,7 @@ function SupervisorBoard() {
                   key={w}
                   onClick={() => setWing(w)}
                   className={cn(
-                    "text-label-sm shrink-0 rounded-full border px-3 py-1.5 font-semibold transition-colors",
+                    "text-[11px] leading-4 shrink-0 rounded-full border px-3 py-1.5 font-semibold transition-colors",
                     wing === w
                       ? "border-tertiary bg-tertiary-container text-tertiary"
                       : "border-outline-variant text-on-surface-variant",
@@ -225,7 +225,7 @@ function SupervisorBoard() {
                 onClick={() => setRushOnly((r) => !r)}
                 aria-pressed={rushOnly}
                 className={cn(
-                  "text-label inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
+                  "text-xs inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
                   rushOnly ? "border-warning bg-warning/10 text-warning" : "border-outline-variant text-on-surface-variant",
                 )}
               >
@@ -236,7 +236,7 @@ function SupervisorBoard() {
                 onClick={() => setOccupiedOnly((o) => !o)}
                 aria-pressed={occupiedOnly}
                 className={cn(
-                  "text-label inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
+                  "text-xs inline-flex items-center justify-center gap-1.5 rounded-xl border py-2 font-semibold transition-colors",
                   occupiedOnly ? "border-primary bg-primary-container text-primary" : "border-outline-variant text-on-surface-variant",
                 )}
               >
